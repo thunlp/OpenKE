@@ -1,7 +1,7 @@
 # OpenKE
 An Open-source Framework for Knowledge Embedding.
 
-##Overview
+## Overview
 
 This is an Efficient implementation based on TensorFlow for knowledge representation learning (KRL). We use C++ to implement some underlying operations such as data preprocessing and negative sampling. For each specific model, it is implemented by TensorFlow with Python interfaces so that there is a convenient platform to run models on GPUs. OpenKE composes 3 repositories:
 
@@ -11,7 +11,7 @@ TensorFlow-TransX: light and simple version of OpenKE based on TensorFlow, inclu
 
 Fast-TransX: efficient lightweight C++ inferences for TransE and its extended models utilizing the framework of OpenKE, including TransH, TransR, TransD, TranSparse and PTransE. 
 
-##Installation
+## Installation
 
 1. Install TensorFlow
 
@@ -25,7 +25,7 @@ Fast-TransX: efficient lightweight C++ inferences for TransE and its extended mo
 	
 	$ bash make.sh
 
-##Data
+## Data
 
 Datasets are required in the following format, containing at least three files for training:
 
@@ -36,7 +36,7 @@ entity2id.txt: all entities and corresponding ids, one per line. The first line 
 relation2id.txt: all relations and corresponding ids, one per line. The first line is the number of relations.
 
 
-##Quickstart
+## Quickstart
 
 To compute a knowledge graph embedding, first import datasets and set configure parameters for training, then train models and export results. For instance, we write a example.py to train TransE:
 
@@ -69,7 +69,7 @@ To compute a knowledge graph embedding, first import datasets and set configure 
 	con.run()
 	
 
-###Step 1: Import datasets
+### Step 1: Import datasets
 
 	con.set_in_path("benchmarks/FB15K/")
 	con.set_out_path("benchmarks/FB15K/")
@@ -87,7 +87,7 @@ Validation and test files are required and used to evaluate the training results
 We can allocate several threads to sample positive and negative cases.
 
 
-###Step 2: Set configure parameters for training.
+### Step 2: Set configure parameters for training.
 
 	con.set_train_times(500)
 	con.set_nbatches(100)
@@ -107,7 +107,7 @@ For negative sampling, we can corrupt entities and relations to construct negati
 	
 We can select a proper gradient descent optimization algorithm to train models.
 
-###Step 3: Train models
+### Step 3: Train models
 
 	con.init()
 	con.set_model(models.TransE)
@@ -115,7 +115,7 @@ We can select a proper gradient descent optimization algorithm to train models.
 positive
 We set the knowledge graph embedding model and start the training process.
 	
-###Step 4: Export results
+### Step 4: Export results
 
 	con.set_export_files("res/model.vec")
 
@@ -123,9 +123,9 @@ We set the knowledge graph embedding model and start the training process.
 
 The results will be automatically exported to the given files every few rounds.
 
-##Interfaces
+## Interfaces
 
-###Config
+### Config
 	
 	class Config(object):
 			
@@ -198,7 +198,7 @@ The results will be automatically exported to the given files every few rounds.
 	
 
 
-###Model
+### Model
 
 	class Model(object)
 	
