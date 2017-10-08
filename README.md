@@ -7,9 +7,9 @@ This is an Efficient implementation based on TensorFlow for knowledge representa
 
 OpenKE: the main project based on TensorFlow, which provides the optimized and stable framework for knowledge graph embedding models.
 
-TensorFlow-TransX: light and simple version of OpenKE based on TensorFlow, including TransE, TransH, TransR and TransD. 
+<a href="https://github.com/thunlp/TensorFlow-TransX"> TensorFlow-TransX</a>: light and simple version of OpenKE based on TensorFlow, including TransE, TransH, TransR and TransD. 
 
-Fast-TransX: efficient lightweight C++ inferences for TransE and its extended models utilizing the framework of OpenKE, including TransH, TransR, TransD, TranSparse and PTransE. 
+<a href="https://github.com/thunlp/Fast-TransX"> Fast-TransX</a>: efficient lightweight C++ inferences for TransE and its extended models utilizing the framework of OpenKE, including TransH, TransR, TransD, TranSparse and PTransE. 
 
 ## Installation
 
