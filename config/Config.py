@@ -5,19 +5,25 @@ import os
 import time
 import datetime
 import ctypes
+import json
 
 class Config(object):
 
 	def __init__(self):
 		self.lib = ctypes.cdll.LoadLibrary("./release/Base.so")
 		self.lib.sampling.argtypes = [ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_int64, ctypes.c_int64, ctypes.c_int64]
-		self.in_path = "./"
-		self.out_path = "./"
-		self.bern = 1
+		self.lib.getHeadBatch.argtypes = [ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p]
+		self.lib.getTailBatch.argtypes = [ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p]
+		self.lib.testHead.argtypes = [ctypes.c_void_p]
+		self.lib.testTail.argtypes = [ctypes.c_void_p]
+		self.test_flag = False
+		self.in_path = None
+		self.out_path = None
+		self.bern = 0
 		self.hidden_size = 100
 		self.ent_size = self.hidden_size
 		self.rel_size = self.hidden_size
-		self.train_times = 1000
+		self.train_times = 0
 		self.margin = 1.0
 		self.nbatches = 100
 		self.negative_ent = 1
@@ -28,35 +34,57 @@ class Config(object):
 		self.log_on = 1
 		self.exportName = None
 		self.importName = None
-		self.export_steps = 1
-		self.optimizer = "SGD"
+		self.export_steps = 0
+		self.opt_method = "SGD"
+		self.optimizer = None
 
 	def init(self):
-		self.lib.setInPath(ctypes.create_string_buffer(self.in_path, len(self.in_path) * 2))
-		self.lib.setOutPath(ctypes.create_string_buffer(self.out_path, len(self.out_path) * 2))
-		self.lib.setBern(self.bern)
-		self.lib.setWorkThreads(self.workThreads)
-		self.lib.randReset()
-		self.lib.importTrainFiles()
-		self.relTotal = self.lib.getRelationTotal()
-		self.entTotal = self.lib.getEntityTotal()
-		self.tripleTotal = self.lib.getTripleTotal()
-		self.batch_size = self.lib.getTripleTotal() / self.nbatches
-		self.batch_seq_size = self.batch_size * (1 + self.negative_ent + self.negative_rel)
-		self.batch_h = np.zeros(self.batch_size * (1 + self.negative_ent + self.negative_rel), dtype = np.int64)
-		self.batch_t = np.zeros(self.batch_size * (1 + self.negative_ent + self.negative_rel), dtype = np.int64)
-		self.batch_r = np.zeros(self.batch_size * (1 + self.negative_ent + self.negative_rel), dtype = np.int64)
-		self.batch_y = np.zeros(self.batch_size * (1 + self.negative_ent + self.negative_rel), dtype = np.float32)
-		self.batch_h_addr = self.batch_h.__array_interface__['data'][0]
-		self.batch_t_addr = self.batch_t.__array_interface__['data'][0]
-		self.batch_r_addr = self.batch_r.__array_interface__['data'][0]
-		self.batch_y_addr = self.batch_y.__array_interface__['data'][0]
+		self.trainModel = None
+		if self.in_path != None:
+			self.lib.setInPath(ctypes.create_string_buffer(self.in_path, len(self.in_path) * 2))
+			self.lib.setBern(self.bern)
+			self.lib.setWorkThreads(self.workThreads)
+			self.lib.randReset()
+			self.lib.importTrainFiles()
+			self.relTotal = self.lib.getRelationTotal()
+			self.entTotal = self.lib.getEntityTotal()
+			self.trainTotal = self.lib.getTrainTotal()
+			self.batch_size = self.lib.getTrainTotal() / self.nbatches
+			self.batch_seq_size = self.batch_size * (1 + self.negative_ent + self.negative_rel)
+			self.batch_h = np.zeros(self.batch_size * (1 + self.negative_ent + self.negative_rel), dtype = np.int64)
+			self.batch_t = np.zeros(self.batch_size * (1 + self.negative_ent + self.negative_rel), dtype = np.int64)
+			self.batch_r = np.zeros(self.batch_size * (1 + self.negative_ent + self.negative_rel), dtype = np.int64)
+			self.batch_y = np.zeros(self.batch_size * (1 + self.negative_ent + self.negative_rel), dtype = np.float32)
+			self.batch_h_addr = self.batch_h.__array_interface__['data'][0]
+			self.batch_t_addr = self.batch_t.__array_interface__['data'][0]
+			self.batch_r_addr = self.batch_r.__array_interface__['data'][0]
+			self.batch_y_addr = self.batch_y.__array_interface__['data'][0]
+		if self.test_flag:
+			self.lib.importTestFiles()
+			self.test_h = np.zeros(self.lib.getEntityTotal(), dtype = np.int64)
+			self.test_t = np.zeros(self.lib.getEntityTotal(), dtype = np.int64)
+			self.test_r = np.zeros(self.lib.getEntityTotal(), dtype = np.int64)
+			self.test_h_addr = self.test_h.__array_interface__['data'][0]
+			self.test_t_addr = self.test_t.__array_interface__['data'][0]
+			self.test_r_addr = self.test_r.__array_interface__['data'][0]
+
+	def get_ent_total(self):
+		return self.entTotal
+
+	def get_rel_total(self):
+		return self.relTotal
 
 	def set_lmbda(self, lmbda):
 		self.lmbda = lmbda
 
 	def set_optimizer(self, optimizer):
 		self.optimizer = optimizer
+
+	def set_opt_method(self, method):
+		self.opt_method = method
+
+	def set_test_flag(self, flag):
+		self.test_flag = flag
 
 	def set_log_on(self, flag):
 		self.log_on = flag
@@ -67,7 +95,7 @@ class Config(object):
 	def set_in_path(self, path):
 		self.in_path = path
 
-	def set_out_path(self, path):
+	def set_out_files(self, path):
 		self.out_path = path
 
 	def set_bern(self, bern):
@@ -105,8 +133,9 @@ class Config(object):
 	def set_import_files(self, path):
 		self.importName = path
 
-	def set_export_files(self, path):
+	def set_export_files(self, path, steps = 0):
 		self.exportName = path
+		self.export_steps = steps
 
 	def set_export_steps(self, steps):
 		self.export_steps = steps
@@ -125,15 +154,59 @@ class Config(object):
 				self.saver.restore(self.sess, self.importName)
 
 
-	def export_variables(self, path):
+	def export_variables(self, path = None):
 		with self.graph.as_default():
 			with self.sess.as_default():
-				self.saver.save(self.sess, path)
+				if path == None:
+					self.saver.save(self.sess, self.exportName)
+				else:
+					self.saver.save(self.sess, path)
 
-	def import_variables(self, path):
+	def import_variables(self, path = None):
 		with self.graph.as_default():
 			with self.sess.as_default():
-				self.saver.restore(self.sess, path)
+				if path == None:
+					self.saver.restore(self.sess, self.importName)
+				else:
+					self.saver.restore(self.sess, path)
+
+	def get_parameter_lists(self):
+		return self.trainModel.parameter_lists
+
+	def get_parameters_by_name(self, var_name):
+		with self.graph.as_default():
+			with self.sess.as_default():
+				if var_name in self.trainModel.parameter_lists:
+					return self.sess.run(self.trainModel.parameter_lists[var_name])
+				else:
+					return None
+
+	def get_parameters(self, mode = "numpy"):
+		res = {}
+		lists = self.get_parameter_lists()
+		for var_name in lists:
+			if mode == "numpy":
+				res[var_name] = self.get_parameters_by_name(var_name)
+			else:
+				res[var_name] = self.get_parameters_by_name(var_name).tolist()
+		return res
+
+	def save_parameters(self, path = None):
+		if path == None:
+			path = self.out_path
+		f = open(path, "w")
+		f.write(json.dumps(self.get_parameters("list")))
+		f.close()
+
+	def set_parameters_by_name(self, var_name, tensor):
+		with self.graph.as_default():
+			with self.sess.as_default():
+				if var_name in self.trainModel.parameter_lists:
+					self.trainModel.parameter_lists[var_name].assign(tensor).eval()
+
+	def set_parameters(self, lists):
+		for i in lists:
+			self.set_parameters_by_name(i, lists[i])
 
 	def set_model(self, model):
 		self.model = model
@@ -144,19 +217,20 @@ class Config(object):
 				initializer = tf.contrib.layers.xavier_initializer(uniform = True)
 				with tf.variable_scope("model", reuse=None, initializer = initializer):
 					self.trainModel = self.model(config = self)
-					if self.optimizer == "Adagrad" or self.optimizer == "adagrad":
-						optimizer = tf.train.AdagradOptimizer(learning_rate = self.alpha, initial_accumulator_value=1e-8)
-					elif self.optimizer == "Adadelta" or self.optimizer == "adadelta":
-						optimizer = tf.train.AdadeltaOptimizer(self.alpha)
-					elif self.optimizer == "Adam" or self.optimizer == "adam":
-						optimizer = tf.train.AdamOptimizer(self.alpha)
+					if self.optimizer != None:
+						pass
+					elif self.opt_method == "Adagrad" or self.opt_method == "adagrad":
+						self.optimizer = tf.train.AdagradOptimizer(learning_rate = self.alpha, initial_accumulator_value=1e-20)
+					elif self.opt_method == "Adadelta" or self.opt_method == "adadelta":
+						self.optimizer = tf.train.AdadeltaOptimizer(self.alpha)
+					elif self.opt_method == "Adam" or self.opt_method == "adam":
+						self.optimizer = tf.train.AdamOptimizer(self.alpha)
 					else:
-						optimizer = tf.train.GradientDescentOptimizer(self.alpha)
-					grads_and_vars = optimizer.compute_gradients(self.trainModel.loss)
-					self.train_op = optimizer.apply_gradients(grads_and_vars)
+						self.optimizer = tf.train.GradientDescentOptimizer(self.alpha)
+					grads_and_vars = self.optimizer.compute_gradients(self.trainModel.loss)
+					self.train_op = self.optimizer.apply_gradients(grads_and_vars)
 				self.saver = tf.train.Saver()
-
-
+				self.sess.run(tf.initialize_all_variables())
 
 	def train_step(self, batch_h, batch_t, batch_r, batch_y):
 		feed_dict = {
@@ -168,10 +242,18 @@ class Config(object):
 		_, loss = self.sess.run([self.train_op, self.trainModel.loss], feed_dict)
 	 	return loss
 
+	def test_step(self, test_h, test_t, test_r):
+		feed_dict = {
+			self.trainModel.predict_h: test_h,
+			self.trainModel.predict_t: test_t,
+			self.trainModel.predict_r: test_r,
+		}
+		predict = self.sess.run(self.trainModel.predict, feed_dict)
+		return predict
+
 	def run(self):
 		with self.graph.as_default():
 			with self.sess.as_default():
-				self.sess.run(tf.initialize_all_variables())
 				if self.importName != None:
 					self.restore_tensorflow()
 				for times in range(self.train_times):
@@ -182,6 +264,27 @@ class Config(object):
 					if self.log_on:
 						print times
 						print res
-					if self.exportName != None and times % self.export_steps == 0:
+					if self.exportName != None and (self.export_steps!=0 and times % self.export_steps == 0):
 						self.save_tensorflow()
+				if self.exportName != None:
+					self.save_tensorflow()
+				if self.out_path != None:
+					self.save_parameters(self.out_path)
 
+	def test(self):
+		with self.graph.as_default():
+			with self.sess.as_default():
+				if self.importName != None:
+					self.restore_tensorflow()
+				total = self.lib.getTestTotal()
+				for times in range(total):
+					self.lib.getHeadBatch(self.test_h_addr, self.test_t_addr, self.test_r_addr)
+					res = self.test_step(self.test_h, self.test_t, self.test_r)
+					self.lib.testHead(res.__array_interface__['data'][0])
+
+					self.lib.getTailBatch(self.test_h_addr, self.test_t_addr, self.test_r_addr)
+					res = self.test_step(self.test_h, self.test_t, self.test_r)
+					self.lib.testTail(res.__array_interface__['data'][0])
+					if self.log_on:
+						print times
+				self.lib.test()
