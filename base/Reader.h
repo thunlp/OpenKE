@@ -9,7 +9,7 @@ INT *freqRel, *freqEnt;
 INT *lefHead, *rigHead;
 INT *lefTail, *rigTail;
 INT *lefRel, *rigRel;
-float *left_mean, *right_mean;
+REAL *left_mean, *right_mean;
 
 Triple *trainList;
 Triple *trainHead;
@@ -33,38 +33,39 @@ void importTrainFiles() {
 	printf("The total of entities is %ld.\n", entityTotal);
 	fclose(fin);
 
-	fin = fopen((inPath + "triple2id.txt").c_str(), "r");
-	tmp = fscanf(fin, "%ld", &tripleTotal);
-	trainList = (Triple *)calloc(tripleTotal, sizeof(Triple));
-	trainHead = (Triple *)calloc(tripleTotal, sizeof(Triple));
-	trainTail = (Triple *)calloc(tripleTotal, sizeof(Triple));
-	trainRel = (Triple *)calloc(tripleTotal, sizeof(Triple));
+	fin = fopen((inPath + "train2id.txt").c_str(), "r");
+	tmp = fscanf(fin, "%ld", &trainTotal);
+	trainList = (Triple *)calloc(trainTotal, sizeof(Triple));
+	trainHead = (Triple *)calloc(trainTotal, sizeof(Triple));
+	trainTail = (Triple *)calloc(trainTotal, sizeof(Triple));
+	trainRel = (Triple *)calloc(trainTotal, sizeof(Triple));
 	freqRel = (INT *)calloc(relationTotal, sizeof(INT));
 	freqEnt = (INT *)calloc(entityTotal, sizeof(INT));
-	for (INT i = 0; i < tripleTotal; i++) {
+	for (INT i = 0; i < trainTotal; i++) {
 		tmp = fscanf(fin, "%ld", &trainList[i].h);
 		tmp = fscanf(fin, "%ld", &trainList[i].t);
 		tmp = fscanf(fin, "%ld", &trainList[i].r);
 	}
 	fclose(fin);
-	std::sort(trainList, trainList + tripleTotal, Triple::cmp_head);
-	tmp = tripleTotal; tripleTotal = 1;
+	std::sort(trainList, trainList + trainTotal, Triple::cmp_head);
+	tmp = trainTotal; trainTotal = 1;
 	trainHead[0] = trainTail[0] = trainRel[0] = trainList[0];
 	freqEnt[trainList[0].t] += 1;
 	freqEnt[trainList[0].h] += 1;
 	freqRel[trainList[0].r] += 1;
 	for (INT i = 1; i < tmp; i++)
 		if (trainList[i].h != trainList[i - 1].h || trainList[i].r != trainList[i - 1].r || trainList[i].t != trainList[i - 1].t) {
-			trainHead[tripleTotal] = trainTail[tripleTotal] = trainRel[tripleTotal] = trainList[tripleTotal] = trainList[i];
-			tripleTotal++;
+			trainHead[trainTotal] = trainTail[trainTotal] = trainRel[trainTotal] = trainList[trainTotal] = trainList[i];
+			trainTotal++;
 			freqEnt[trainList[i].t]++;
 			freqEnt[trainList[i].h]++;
 			freqRel[trainList[i].r]++;
 		}
-	std::sort(trainHead, trainHead + tripleTotal, Triple::cmp_head);
-	std::sort(trainTail, trainTail + tripleTotal, Triple::cmp_tail);
-	std::sort(trainRel, trainRel + tripleTotal, Triple::cmp_rel);
-	printf("The total of tripleTotal is %ld.\n", tripleTotal);
+
+	std::sort(trainHead, trainHead + trainTotal, Triple::cmp_head);
+	std::sort(trainTail, trainTail + trainTotal, Triple::cmp_tail);
+	std::sort(trainRel, trainRel + trainTotal, Triple::cmp_rel);
+	printf("The total of train triples is %ld.\n", trainTotal);
 
 	lefHead = (INT *)calloc(entityTotal, sizeof(INT));
 	rigHead = (INT *)calloc(entityTotal, sizeof(INT));
@@ -75,7 +76,7 @@ void importTrainFiles() {
 	memset(rigHead, -1, sizeof(INT)*entityTotal);
 	memset(rigTail, -1, sizeof(INT)*entityTotal);
 	memset(rigRel, -1, sizeof(INT)*entityTotal);
-	for (INT i = 1; i < tripleTotal; i++) {
+	for (INT i = 1; i < trainTotal; i++) {
 		if (trainTail[i].t != trainTail[i - 1].t) {
 			rigTail[trainTail[i - 1].t] = i - 1;
 			lefTail[trainTail[i].t] = i;
@@ -90,14 +91,14 @@ void importTrainFiles() {
 		}
 	}
 	lefHead[trainHead[0].h] = 0;
-	rigHead[trainHead[tripleTotal - 1].h] = tripleTotal - 1;
+	rigHead[trainHead[trainTotal - 1].h] = trainTotal - 1;
 	lefTail[trainTail[0].t] = 0;
-	rigTail[trainTail[tripleTotal - 1].t] = tripleTotal - 1;
+	rigTail[trainTail[trainTotal - 1].t] = trainTotal - 1;
 	lefRel[trainRel[0].h] = 0;
-	rigRel[trainRel[tripleTotal - 1].h] = tripleTotal - 1;
+	rigRel[trainRel[trainTotal - 1].h] = trainTotal - 1;
 
-	left_mean = (float *)calloc(relationTotal,sizeof(float));
-	right_mean = (float *)calloc(relationTotal,sizeof(float));
+	left_mean = (REAL *)calloc(relationTotal,sizeof(REAL));
+	right_mean = (REAL *)calloc(relationTotal,sizeof(REAL));
 	for (INT i = 0; i < entityTotal; i++) {
 		for (INT j = lefHead[i] + 1; j < rigHead[i]; j++)
 			if (trainHead[j].r != trainHead[j - 1].r)
@@ -114,6 +115,55 @@ void importTrainFiles() {
 		left_mean[i] = freqRel[i] / left_mean[i];
 		right_mean[i] = freqRel[i] / right_mean[i];
 	}
+}
+
+Triple *testList;
+Triple *tripleList;
+
+extern "C"
+void importTestFiles() {
+    FILE *fin;
+    INT tmp;
+    
+	fin = fopen((inPath + "relation2id.txt").c_str(), "r");
+    tmp = fscanf(fin, "%ld", &relationTotal);
+    fclose(fin);
+
+	fin = fopen((inPath + "entity2id.txt").c_str(), "r");
+    tmp = fscanf(fin, "%ld", &entityTotal);
+    fclose(fin);
+
+    FILE* f_kb1 = fopen((inPath + "test2id.txt").c_str(), "r");
+    FILE* f_kb2 = fopen((inPath + "train2id.txt").c_str(), "r");
+    FILE* f_kb3 = fopen((inPath + "valid2id.txt").c_str(), "r");
+    tmp = fscanf(f_kb1, "%ld", &testTotal);
+    tmp = fscanf(f_kb2, "%ld", &trainTotal);
+    tmp = fscanf(f_kb3, "%ld", &validTotal);
+    tripleTotal = testTotal + trainTotal + validTotal;
+    testList = (Triple *)calloc(testTotal, sizeof(Triple));
+    tripleList = (Triple *)calloc(tripleTotal, sizeof(Triple));
+    for (INT i = 0; i < testTotal; i++) {
+        tmp = fscanf(f_kb1, "%ld", &testList[i].h);
+        tmp = fscanf(f_kb1, "%ld", &testList[i].t);
+        tmp = fscanf(f_kb1, "%ld", &testList[i].r);
+        tripleList[i] = testList[i];
+    }
+    for (INT i = 0; i < trainTotal; i++) {
+        tmp = fscanf(f_kb2, "%ld", &tripleList[i + testTotal].h);
+        tmp = fscanf(f_kb2, "%ld", &tripleList[i + testTotal].t);
+        tmp = fscanf(f_kb2, "%ld", &tripleList[i + testTotal].r);
+    }
+    for (INT i = 0; i < validTotal; i++) {
+        tmp = fscanf(f_kb3, "%ld", &tripleList[i + testTotal + trainTotal].h);
+        tmp = fscanf(f_kb3, "%ld", &tripleList[i + testTotal + trainTotal].t);
+        tmp = fscanf(f_kb3, "%ld", &tripleList[i + testTotal + trainTotal].r);
+    }
+    fclose(f_kb1);
+    fclose(f_kb2);
+    fclose(f_kb3);
+
+    std::sort(tripleList, tripleList + tripleTotal, Triple::cmp_head);
+    printf("The total of test triples is %ld.\n", testTotal);
 }
 
 #endif

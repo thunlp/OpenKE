@@ -4,7 +4,7 @@
 #include "Triple.h"
 #include "Reader.h"
 
-INT corrupt_head(int id, INT h, INT r) {
+INT corrupt_head(INT id, INT h, INT r) {
 	INT lef, rig, mid, ll, rr;
 	lef = lefHead[h] - 1;
 	rig = rigHead[h];
@@ -36,7 +36,7 @@ INT corrupt_head(int id, INT h, INT r) {
 	return tmp + lef - ll + 1;
 }
 
-INT corrupt_tail(int id, INT t, INT r) {
+INT corrupt_tail(INT id, INT t, INT r) {
 	INT lef, rig, mid, ll, rr;
 	lef = lefTail[t] - 1;
 	rig = rigTail[t];
@@ -69,7 +69,7 @@ INT corrupt_tail(int id, INT t, INT r) {
 }
 
 
-INT corrupt_rel(int id, INT h, INT t) {
+INT corrupt_rel(INT id, INT h, INT t) {
 	INT lef, rig, mid, ll, rr;
 	lef = lefRel[h] - 1;
 	rig = rigRel[h];

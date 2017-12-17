@@ -2,6 +2,7 @@
 #include "Random.h"
 #include "Reader.h"
 #include "Corrupt.h"
+#include "Test.h"
 #include <cstdlib>
 #include <pthread.h>
 
@@ -28,6 +29,12 @@ INT getRelationTotal();
 
 extern "C"
 INT getTripleTotal();
+
+extern "C"
+INT getTrainTotal();
+
+extern "C"
+INT getTestTotal();
 
 extern "C"
 void randReset();
@@ -65,9 +72,9 @@ void* getBatch(void* con) {
 		rig = (id + 1) * (batchSize / workThreads + 1);
 		if (rig > batchSize) rig = batchSize;
 	}
-	float prob = 500;
+	REAL prob = 500;
 	for (INT batch = lef; batch < rig; batch++) {
-		INT i = rand_max(id, tripleTotal);
+		INT i = rand_max(id, trainTotal);
 		batch_h[batch] = trainList[i].h;
 		batch_t[batch] = trainList[i].t;
 		batch_r[batch] = trainList[i].r;

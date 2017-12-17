@@ -50,6 +50,9 @@ INT getWorkThreads() {
 INT relationTotal = 0;
 INT entityTotal = 0;
 INT tripleTotal = 0;
+INT testTotal = 0;
+INT trainTotal = 0;
+INT validTotal = 0;
 
 extern "C"
 INT getEntityTotal() {
@@ -66,6 +69,20 @@ INT getTripleTotal() {
 	return tripleTotal;
 }
 
+extern "C"
+INT getTrainTotal() {
+	return trainTotal;
+}
+
+extern "C"
+INT getTestTotal() {
+	return testTotal;
+}
+
+extern "C"
+INT getValidTotal() {
+	return validTotal;
+}
 /*
 ============================================================
 */
