@@ -14,7 +14,6 @@ class HolE(Model):
 		return tf.real(tf.ifft(tf.conj(tf.fft(a)) * tf.fft(b)))
 
 	def _calc(self, head, tail, rel):
-		# relation_mention = rel
 		relation_mention = tf.nn.l2_normalize(rel, 1)
 		entity_mention = self._ccorr(head, tail)
 		return -tf.sigmoid(tf.reduce_sum(relation_mention * entity_mention, 1, keep_dims = True))
@@ -25,6 +24,8 @@ class HolE(Model):
 		#Defining required parameters of the model, including embeddings of entities and relations
 		self.ent_embeddings = tf.get_variable(name = "ent_embeddings", shape = [config.entTotal, config.hidden_size], initializer = tf.contrib.layers.xavier_initializer(uniform = False))
 		self.rel_embeddings = tf.get_variable(name = "rel_embeddings", shape = [config.relTotal, config.hidden_size], initializer = tf.contrib.layers.xavier_initializer(uniform = False))
+		self.parameter_lists = {"ent_embeddings":self.ent_embeddings, \
+								"rel_embeddings":self.rel_embeddings, }
 
 	def loss_def(self):
 		#Obtaining the initial configuration of the model
@@ -52,3 +53,11 @@ class HolE(Model):
 		n_score =  tf.reduce_mean(_n_score, 1, keep_dims = True)
 		#Calculating loss to get what the framework will optimize
 		self.loss = tf.reduce_sum(tf.maximum(p_score - n_score + config.margin, 0))
+
+	def predict_def(self):
+		config = self.get_config()
+		predict_h, predict_t, predict_r = self.get_predict_instance()
+		predict_h_e = tf.nn.embedding_lookup(self.ent_embeddings, predict_h)
+		predict_t_e = tf.nn.embedding_lookup(self.ent_embeddings, predict_t)
+		predict_r_e = tf.nn.embedding_lookup(self.rel_embeddings, predict_r)
+		self.predict = tf.reduce_sum(self._calc(predict_h_e, predict_t_e, predict_r_e), 1, keep_dims = True)

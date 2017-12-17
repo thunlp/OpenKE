@@ -6,7 +6,6 @@ from Model import *
 class TransH(Model):
 
 	def _transfer(self, e, n):
-		# norm = tf.nn.l2_normalize(n, 1)
 		norm = n
 		return e - tf.reduce_sum(e * norm, 1, keep_dims = True) * norm
 
@@ -19,7 +18,10 @@ class TransH(Model):
 		#Defining required parameters of the model, including embeddings of entities and relations, and normal vectors of planes
 		self.ent_embeddings = tf.get_variable(name = "ent_embeddings", shape = [config.entTotal, config.hidden_size], initializer = tf.contrib.layers.xavier_initializer(uniform = False))
 		self.rel_embeddings = tf.get_variable(name = "rel_embeddings", shape = [config.relTotal, config.hidden_size], initializer = tf.contrib.layers.xavier_initializer(uniform = False))
-		self.normal_vector = tf.get_variable(name = "normal_vector", shape = [config.relTotal, config.hidden_size], initializer = tf.contrib.layers.xavier_initializer(uniform = False))
+		self.normal_vectors = tf.get_variable(name = "normal_vectors", shape = [config.relTotal, config.hidden_size], initializer = tf.contrib.layers.xavier_initializer(uniform = False))
+		self.parameter_lists = {"ent_embeddings":self.ent_embeddings, \
+								"rel_embeddings":self.rel_embeddings, \
+								"normal_vectors":self.normal_vectors}
 
 	def loss_def(self):
 		#Obtaining the initial configuration of the model
@@ -37,8 +39,8 @@ class TransH(Model):
 		neg_t_e = tf.nn.embedding_lookup(self.ent_embeddings, neg_t)
 		neg_r_e = tf.nn.embedding_lookup(self.rel_embeddings, neg_r)
 		#Getting the required normal vectors of planes to transfer entity embeddings
-		pos_norm = tf.nn.embedding_lookup(self.normal_vector, pos_r)
-		neg_norm = tf.nn.embedding_lookup(self.normal_vector, neg_r)
+		pos_norm = tf.nn.embedding_lookup(self.normal_vectors, pos_r)
+		neg_norm = tf.nn.embedding_lookup(self.normal_vectors, neg_r)
 		#Calculating score functions for all positive triples and negative triples
 		p_h = self._transfer(pos_h_e, pos_norm)
 		p_t = self._transfer(pos_t_e, pos_norm)
@@ -59,3 +61,19 @@ class TransH(Model):
 		n_score =  tf.reduce_sum(tf.reduce_mean(_n_score, 0, keep_dims = False), 1, keep_dims = True)
 		#Calculating loss to get what the framework will optimize
 		self.loss = tf.reduce_sum(tf.maximum(p_score - n_score + config.margin, 0))
+
+	def predict_def(self):
+		config = self.get_config()
+		predict_h, predict_t, predict_r = self.get_predict_instance()
+		predict_h_e = tf.nn.embedding_lookup(self.ent_embeddings, predict_h)
+		predict_t_e = tf.nn.embedding_lookup(self.ent_embeddings, predict_t)
+		predict_r_e = tf.nn.embedding_lookup(self.rel_embeddings, predict_r)
+		predict_norm = tf.nn.embedding_lookup(self.normal_vectors, predict_r)
+		h_e = self._transfer(predict_h_e, predict_norm)
+		t_e = self._transfer(predict_t_e, predict_norm)
+		r_e = predict_r_e
+		self.predict = tf.reduce_sum(self._calc(h_e, t_e, r_e), 1, keep_dims = True)
+
+
+
+		

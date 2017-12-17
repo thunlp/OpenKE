@@ -37,6 +37,9 @@ class Model(object):
 		else:
 			return self.batch_y
 
+	def get_predict_instance(self):
+		return [self.predict_h, self.predict_t, self.predict_r]
+
 	def input_def(self):
 		config = self.config
 		self.batch_h = tf.placeholder(tf.int64, [config.batch_seq_size])
@@ -49,11 +52,18 @@ class Model(object):
 		self.negative_h = tf.transpose(tf.reshape(self.batch_h[config.batch_size:config.batch_seq_size], [config.negative_ent + config.negative_rel, -1]), perm=[1, 0])
 		self.negative_t = tf.transpose(tf.reshape(self.batch_t[config.batch_size:config.batch_seq_size], [config.negative_ent + config.negative_rel, -1]), perm=[1, 0])
 		self.negative_r = tf.transpose(tf.reshape(self.batch_r[config.batch_size:config.batch_seq_size], [config.negative_ent + config.negative_rel, -1]), perm=[1, 0])
+		self.predict_h = tf.placeholder(tf.int64, [None])
+		self.predict_t = tf.placeholder(tf.int64, [None])
+		self.predict_r = tf.placeholder(tf.int64, [None])
+		self.parameter_lists = []
 
 	def embedding_def(self):
 		pass
 
 	def loss_def(self):
+		pass
+
+	def predict_def(self):
 		pass
 
 	def __init__(self, config):
@@ -67,3 +77,7 @@ class Model(object):
 
 		with tf.name_scope("loss"):
 			self.loss_def()
+
+		with tf.name_scope("predict"):
+			self.predict_def()
+

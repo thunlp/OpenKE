@@ -17,7 +17,10 @@ class TransR(Model):
 		#Defining required parameters of the model, including embeddings of entities and relations, and mapping matrices
 		self.ent_embeddings = tf.get_variable(name = "ent_embeddings", shape = [config.entTotal, config.ent_size], initializer = tf.contrib.layers.xavier_initializer(uniform = False))
 		self.rel_embeddings = tf.get_variable(name = "rel_embeddings", shape = [config.relTotal, config.rel_size], initializer = tf.contrib.layers.xavier_initializer(uniform = False))
-		self.transfer_matrix = tf.get_variable(name = "rel_matrix", shape = [config.relTotal, config.ent_size * config.rel_size], initializer = tf.contrib.layers.xavier_initializer(uniform = False))
+		self.transfer_matrix = tf.get_variable(name = "transfer_matrix", shape = [config.relTotal, config.ent_size * config.rel_size], initializer = tf.contrib.layers.xavier_initializer(uniform = False))
+		self.parameter_lists = {"ent_embeddings":self.ent_embeddings, \
+								"rel_embeddings":self.rel_embeddings, \
+								"transfer_matrix":self.transfer_matrix}
 
 	def loss_def(self):
 		#Obtaining the initial configuration of the model
@@ -56,3 +59,15 @@ class TransR(Model):
 		n_score =  tf.reduce_sum(tf.reduce_mean(_n_score, 1, keep_dims = False), 1, keep_dims = True)
 		#Calculating loss to get what the framework will optimize
 		self.loss = tf.reduce_sum(tf.maximum(p_score - n_score + config.margin, 0))
+
+	def predict_def(self):
+		config = self.get_config()
+		predict_h, predict_t, predict_r = self.get_predict_instance()
+		predict_h_e = tf.reshape(tf.nn.embedding_lookup(self.ent_embeddings, predict_h), [-1, config.ent_size, 1])
+		predict_t_e = tf.reshape(tf.nn.embedding_lookup(self.ent_embeddings, predict_t), [-1, config.ent_size, 1])
+		predict_r_e = tf.reshape(tf.nn.embedding_lookup(self.rel_embeddings, predict_r), [-1, config.rel_size])
+		predict_matrix = tf.reshape(tf.nn.embedding_lookup(self.transfer_matrix, predict_r), [-1, config.rel_size, config.ent_size])
+		h_e = tf.reshape(self._transfer(predict_matrix, predict_h_e), [-1, config.rel_size])
+		t_e = tf.reshape(self._transfer(predict_matrix, predict_t_e), [-1, config.rel_size])
+		r_e = predict_r_e
+		self.predict = tf.reduce_sum(self._calc(h_e, t_e, r_e), 1, keep_dims = True)

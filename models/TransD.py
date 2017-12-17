@@ -19,6 +19,10 @@ class TransD(Model):
 		self.rel_embeddings = tf.get_variable(name = "rel_embeddings", shape = [config.relTotal, config.hidden_size], initializer = tf.contrib.layers.xavier_initializer(uniform = False))
 		self.ent_transfer = tf.get_variable(name = "ent_transfer", shape = [config.entTotal, config.hidden_size], initializer = tf.contrib.layers.xavier_initializer(uniform = False))
 		self.rel_transfer = tf.get_variable(name = "rel_transfer", shape = [config.relTotal, config.hidden_size], initializer = tf.contrib.layers.xavier_initializer(uniform = False))
+		self.parameter_lists = {"ent_embeddings":self.ent_embeddings, \
+								"rel_embeddings":self.rel_embeddings, \
+								"ent_transfer":self.ent_transfer, \
+								"rel_transfer":self.rel_transfer}
 
 	def loss_def(self):
 		#Obtaining the initial configuration of the model
@@ -59,3 +63,17 @@ class TransD(Model):
 		n_score =  tf.reduce_sum(tf.reduce_mean(_n_score, 1, keep_dims = False), 1, keep_dims = True)
 		#Calculating loss to get what the framework will optimize
 		self.loss = tf.reduce_sum(tf.maximum(p_score - n_score + config.margin, 0))
+
+	def predict_def(self):
+		config = self.get_config()
+		predict_h, predict_t, predict_r = self.get_predict_instance()
+		predict_h_e = tf.nn.embedding_lookup(self.ent_embeddings, predict_h)
+		predict_t_e = tf.nn.embedding_lookup(self.ent_embeddings, predict_t)
+		predict_r_e = tf.nn.embedding_lookup(self.rel_embeddings, predict_r)
+		predict_h_t = tf.nn.embedding_lookup(self.ent_transfer, predict_h)
+		predict_t_t = tf.nn.embedding_lookup(self.ent_transfer, predict_t)
+		predict_r_t = tf.nn.embedding_lookup(self.rel_transfer, predict_r)
+		h_e = self._transfer(predict_h_e, predict_h_t, predict_r_t)
+		t_e = self._transfer(predict_t_e, predict_t_t, predict_r_t)
+		r_e = predict_r_e
+		self.predict = tf.reduce_sum(self._calc(h_e, t_e, r_e), 1, keep_dims = True)
