@@ -1,54 +1,58 @@
-#coding:utf-8
+import torch
+import torch.autograd as autograd
+import torch.nn as nn
+import torch.nn.functional as F
+import torch.optim as optim
 import numpy as np
-import tensorflow as tf
 from Model import *
-
 class ComplEx(Model):
-
-	def embedding_def(self):
-		config = self.get_config()
-		self.ent1_embeddings = tf.get_variable(name = "ent1_embeddings", shape = [config.entTotal, config.hidden_size], initializer = tf.contrib.layers.xavier_initializer(uniform = True))
-		self.rel1_embeddings = tf.get_variable(name = "rel1_embeddings", shape = [config.relTotal, config.hidden_size], initializer = tf.contrib.layers.xavier_initializer(uniform = True))
-		self.ent2_embeddings = tf.get_variable(name = "ent2_embeddings", shape = [config.entTotal, config.hidden_size], initializer = tf.contrib.layers.xavier_initializer(uniform = True))
-		self.rel2_embeddings = tf.get_variable(name = "rel2_embeddings", shape = [config.relTotal, config.hidden_size], initializer = tf.contrib.layers.xavier_initializer(uniform = True))
-		self.parameter_lists = {"ent_re_embeddings":self.ent1_embeddings, \
-								"ent_im_embeddings":self.ent2_embeddings, \
-								"rel_re_embeddings":self.rel1_embeddings, \
-								"rel_im_embeddings":self.rel2_embeddings}
-
-	def _calc(self, e1_h, e2_h, e1_t, e2_t, r1, r2):
-		return e1_h * e1_t * r1 + e2_h * e2_t * r1 + e1_h * e2_t * r2 - e2_h * e1_t * r2
-
-	def loss_def(self):
-		#Obtaining the initial configuration of the model
-		config = self.get_config()
-		#To get positive triples and negative triples for training
-		#To get labels for the triples, positive triples as 1 and negative triples as -1
-		#The shapes of h, t, r, y are (batch_size, 1 + negative_ent + negative_rel)
-		h, t, r = self.get_all_instance()
-		y = self.get_all_labels()
-		#Embedding entities and relations of triples
-		e1_h = tf.nn.embedding_lookup(self.ent1_embeddings, h)
-		e2_h = tf.nn.embedding_lookup(self.ent2_embeddings, h)
-		e1_t = tf.nn.embedding_lookup(self.ent1_embeddings, t)
-		e2_t = tf.nn.embedding_lookup(self.ent2_embeddings, t)
-		r1 = tf.nn.embedding_lookup(self.rel1_embeddings, r)
-		r2 = tf.nn.embedding_lookup(self.rel2_embeddings, r)
-		#Calculating score functions for all positive triples and negative triples
-		res = tf.reduce_sum(self._calc(e1_h, e2_h, e1_t, e2_t, r1, r2), 1, keep_dims = False)
-		loss_func = tf.reduce_mean(tf.nn.softplus(- y * res), 0, keep_dims = False)
-		regul_func = tf.reduce_mean(e1_h ** 2) + tf.reduce_mean(e1_t ** 2) + tf.reduce_mean(e2_h ** 2) + tf.reduce_mean(e2_t ** 2) + tf.reduce_mean(r1 ** 2) + tf.reduce_mean(r2 ** 2)
+	def __init__(self,config):
+		super(ComplEx,self).__init__(config)
+		self.ent_re_embeddings=nn.Embedding(self.config.entTotal,self.config.hidden_size)
+		self.ent_im_embeddings=nn.Embedding(self.config.entTotal,self.config.hidden_size)
+		self.rel_re_embeddings=nn.Embedding(self.config.relTotal,self.config.hidden_size)
+		self.rel_im_embeddings=nn.Embedding(self.config.relTotal,self.config.hidden_size)
+		self.softplus=nn.Softplus().cuda()
+		self.init_weights()
+	def init_weights(self):
+		nn.init.xavier_uniform(self.ent_re_embeddings.weight.data)
+		nn.init.xavier_uniform(self.ent_im_embeddings.weight.data)
+		nn.init.xavier_uniform(self.rel_re_embeddings.weight.data)
+		nn.init.xavier_uniform(self.rel_im_embeddings.weight.data)
+	def _calc(self,e_re_h,e_im_h,e_re_t,e_im_t,r_re,r_im):
+		return torch.sum(r_re * e_re_h * e_re_t + r_re * e_im_h * e_im_t + r_im * e_re_h * e_im_t - r_im * e_im_h * e_re_t,1,False)
+	def loss_func(self,loss,regul):
+		return loss+self.config.lmbda*regul
+	def forward(self):
+		batch_h,batch_t,batch_r=self.get_all_instance()
+		batch_y=self.get_all_labels()
+		e_re_h=self.ent_re_embeddings(batch_h)
+		e_im_h=self.ent_im_embeddings(batch_h)
+		e_re_t=self.ent_re_embeddings(batch_t)
+		e_im_t=self.ent_im_embeddings(batch_t)
+		r_re=self.rel_re_embeddings(batch_r)
+		r_im=self.rel_im_embeddings(batch_r)
+		y=batch_y
+		res=self._calc(e_re_h,e_im_h,e_re_t,e_im_t,r_re,r_im)
+		tmp=self.softplus(- y * res)
+		loss = torch.mean(tmp)
+		regul= torch.mean(e_re_h**2)+torch.mean(e_im_h**2)+torch.mean(e_re_t**2)+torch.mean(e_im_t**2)+torch.mean(r_re**2)+torch.mean(r_im**2)
 		#Calculating loss to get what the framework will optimize
-		self.loss =  loss_func + config.lmbda * regul_func
+		loss =  self.loss_func(loss,regul)
+		return loss
+	def predict(self, predict_h, predict_t, predict_r):
+		p_re_h=self.ent_re_embeddings(Variable(torch.from_numpy(predict_h)))
+		p_re_t=self.ent_re_embeddings(Variable(torch.from_numpy(predict_t)))
+		p_re_r=self.rel_re_embeddings(Variable(torch.from_numpy(predict_r)))
+		p_im_h=self.ent_im_embeddings(Variable(torch.from_numpy(predict_h)))
+		p_im_t=self.ent_im_embeddings(Variable(torch.from_numpy(predict_t)))
+		p_im_r=self.rel_im_embeddings(Variable(torch.from_numpy(predict_r)))
+		p_score = -self._calc(p_re_h, p_im_h, p_re_t, p_im_t, p_re_r, p_im_r)
+		return p_score.cpu()
 
-	def predict_def(self):
-		config = self.get_config()
-		predict_h, predict_t, predict_r = self.get_predict_instance()
-		predict_h_e1 = tf.nn.embedding_lookup(self.ent1_embeddings, predict_h)
-		predict_t_e1 = tf.nn.embedding_lookup(self.ent1_embeddings, predict_t)
-		predict_r_e1 = tf.nn.embedding_lookup(self.rel1_embeddings, predict_r)
-		predict_h_e2 = tf.nn.embedding_lookup(self.ent2_embeddings, predict_h)
-		predict_t_e2 = tf.nn.embedding_lookup(self.ent2_embeddings, predict_t)
-		predict_r_e2 = tf.nn.embedding_lookup(self.rel2_embeddings, predict_r)
-		self.predict = -tf.reduce_sum(self._calc(predict_h_e1, predict_h_e2, predict_t_e1, predict_t_e2, predict_r_e1, predict_r_e2), 1, keep_dims = True)
 
+
+	
+	
+	
+		

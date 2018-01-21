@@ -1,79 +1,66 @@
-#coding:utf-8
+import torch
+import torch.autograd as autograd
+import torch.nn as nn
+import torch.nn.functional as F
+import torch.optim as optim
 import numpy as np
-import tensorflow as tf
 from Model import *
-
 class TransH(Model):
+	def __init__(self,config):
+		super(TransH,self).__init__(config)
+		self.ent_embeddings=nn.Embedding(config.entTotal,config.hidden_size)
+		self.rel_embeddings=nn.Embedding(config.relTotal,config.hidden_size)
+		self.norm_vector=nn.Embedding(config.relTotal,config.hidden_size)
+		self.init_weights()
+	def init_weights(self):
+		nn.init.xavier_uniform(self.ent_embeddings.weight.data)
+		nn.init.xavier_uniform(self.rel_embeddings.weight.data)
+		nn.init.xavier_uniform(self.norm_vector.weight.data)
+	def _transfer(self,e,norm):
+		return e - torch.sum(e * norm, 1, True) * norm
+	def _calc(self,h,t,r):
+		return torch.abs(h+r-t)
+	def loss_func(self,p_score,n_score):
+		criterion= nn.MarginRankingLoss(self.config.margin,False).cuda()
+		y=Variable(torch.Tensor([-1])).cuda()
+		loss=criterion(p_score,n_score,y)
+		return loss
+	def forward(self):
+		pos_h,pos_t,pos_r=self.get_postive_instance()
+		neg_h,neg_t,neg_r=self.get_negtive_instance()
+		p_h_e=self.ent_embeddings(pos_h)
+		p_t_e=self.ent_embeddings(pos_t)
+		p_r_e=self.rel_embeddings(pos_r)
+		n_h_e=self.ent_embeddings(neg_h)
+		n_t_e=self.ent_embeddings(neg_t)
+		n_r_e=self.rel_embeddings(neg_r)
+		p_norm=self.norm_vector(pos_r)
+		n_norm=self.norm_vector(neg_r)
 
-	def _transfer(self, e, n):
-		norm = n
-		return e - tf.reduce_sum(e * norm, 1, keep_dims = True) * norm
+		p_h=self._transfer(p_h_e,p_norm)
+		p_t=self._transfer(p_t_e,p_norm)
+		p_r=p_r_e
+		n_h=self._transfer(n_h_e,n_norm)
+		n_t=self._transfer(n_t_e,n_norm)
+		n_r=n_r_e
 
-	def _calc(self, h, t, r):
-		return abs(h + r - t)
-
-	def embedding_def(self):
-		#Obtaining the initial configuration of the model
-		config = self.get_config()
-		#Defining required parameters of the model, including embeddings of entities and relations, and normal vectors of planes
-		self.ent_embeddings = tf.get_variable(name = "ent_embeddings", shape = [config.entTotal, config.hidden_size], initializer = tf.contrib.layers.xavier_initializer(uniform = False))
-		self.rel_embeddings = tf.get_variable(name = "rel_embeddings", shape = [config.relTotal, config.hidden_size], initializer = tf.contrib.layers.xavier_initializer(uniform = False))
-		self.normal_vectors = tf.get_variable(name = "normal_vectors", shape = [config.relTotal, config.hidden_size], initializer = tf.contrib.layers.xavier_initializer(uniform = False))
-		self.parameter_lists = {"ent_embeddings":self.ent_embeddings, \
-								"rel_embeddings":self.rel_embeddings, \
-								"normal_vectors":self.normal_vectors}
-
-	def loss_def(self):
-		#Obtaining the initial configuration of the model
-		config = self.get_config()
-		#To get positive triples and negative triples for training
-		#The shapes of pos_h, pos_t, pos_r are (batch_size)
-		#The shapes of neg_h, neg_t, neg_r are ((negative_ent + negative_rel) × batch_size)
-		pos_h, pos_t, pos_r = self.get_positive_instance(in_batch = False)
-		neg_h, neg_t, neg_r = self.get_negative_instance(in_batch = False)
-		#Embedding entities and relations of triples, e.g. pos_h_e, pos_t_e and pos_r_e are embeddings for positive triples
-		pos_h_e = tf.nn.embedding_lookup(self.ent_embeddings, pos_h)
-		pos_t_e = tf.nn.embedding_lookup(self.ent_embeddings, pos_t)
-		pos_r_e = tf.nn.embedding_lookup(self.rel_embeddings, pos_r)
-		neg_h_e = tf.nn.embedding_lookup(self.ent_embeddings, neg_h)
-		neg_t_e = tf.nn.embedding_lookup(self.ent_embeddings, neg_t)
-		neg_r_e = tf.nn.embedding_lookup(self.rel_embeddings, neg_r)
-		#Getting the required normal vectors of planes to transfer entity embeddings
-		pos_norm = tf.nn.embedding_lookup(self.normal_vectors, pos_r)
-		neg_norm = tf.nn.embedding_lookup(self.normal_vectors, neg_r)
-		#Calculating score functions for all positive triples and negative triples
-		p_h = self._transfer(pos_h_e, pos_norm)
-		p_t = self._transfer(pos_t_e, pos_norm)
-		p_r = pos_r_e
-		n_h = self._transfer(neg_h_e, neg_norm)
-		n_t = self._transfer(neg_t_e, neg_norm)
-		n_r = neg_r_e
-		#Calculating score functions for all positive triples and negative triples
-		#The shape of _p_score is (1, batch_size, hidden_size)
-		#The shape of _n_score is (negative_ent + negative_rel, batch_size, hidden_size)
 		_p_score = self._calc(p_h, p_t, p_r)
-		_p_score = tf.reshape(_p_score, [1, -1, config.rel_size])
 		_n_score = self._calc(n_h, n_t, n_r)
-		_n_score = tf.reshape(_n_score, [config.negative_ent + config.negative_rel, -1, config.rel_size])
-		#The shape of p_score is (batch_size, 1)
-		#The shape of n_score is (batch_size, 1)
-		p_score =  tf.reduce_sum(tf.reduce_mean(_p_score, 0, keep_dims = False), 1, keep_dims = True)
-		n_score =  tf.reduce_sum(tf.reduce_mean(_n_score, 0, keep_dims = False), 1, keep_dims = True)
-		#Calculating loss to get what the framework will optimize
-		self.loss = tf.reduce_sum(tf.maximum(p_score - n_score + config.margin, 0))
+		p_score=torch.sum(_p_score,1)
+		n_score=torch.sum(_n_score,1)
+		loss=self.loss_func(p_score,n_score)
+		return loss
 
-	def predict_def(self):
-		config = self.get_config()
-		predict_h, predict_t, predict_r = self.get_predict_instance()
-		predict_h_e = tf.nn.embedding_lookup(self.ent_embeddings, predict_h)
-		predict_t_e = tf.nn.embedding_lookup(self.ent_embeddings, predict_t)
-		predict_r_e = tf.nn.embedding_lookup(self.rel_embeddings, predict_r)
-		predict_norm = tf.nn.embedding_lookup(self.normal_vectors, predict_r)
-		h_e = self._transfer(predict_h_e, predict_norm)
-		t_e = self._transfer(predict_t_e, predict_norm)
-		r_e = predict_r_e
-		self.predict = tf.reduce_sum(self._calc(h_e, t_e, r_e), 1, keep_dims = True)
-
-
+	def predict(self, predict_h, predict_t, predict_r):
+		p_h_e=self.ent_embeddings(Variable(torch.from_numpy(predict_h)))
+		p_t_e=self.ent_embeddings(Variable(torch.from_numpy(predict_t)))
+		p_r_e=self.rel_embeddings(Variable(torch.from_numpy(predict_r)))
+		p_norm=self.norm_vector(Variable(torch.from_numpy(predict_r)))
+		p_h=self._transfer(p_h_e,p_norm)
+		p_t=self._transfer(p_t_e,p_norm)
+		p_r=p_r_e
+		_p_score=self._calc(p_h, p_t, p_r)
+		p_score=torch.sum(_p_score,1)
+		return p_score.cpu()
 
 		

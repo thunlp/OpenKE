@@ -1,2 +1,0 @@
-model_checkpoint_path: "model.vec.tf"
-all_model_checkpoint_paths: "model.vec.tf"

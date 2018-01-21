@@ -1,42 +1,42 @@
-#coding:utf-8
+import torch
+import torch.autograd as autograd
+import torch.nn as nn
+import torch.nn.functional as F
+import torch.optim as optim
 import numpy as np
-import tensorflow as tf
 from Model import *
-
 class DistMult(Model):
-
-	def _calc(self, h, t, r):
-		return h * r * t
-
-	def embedding_def(self):
-		config = self.get_config()
-		self.ent_embeddings = tf.get_variable(name = "ent_embeddings", shape = [config.entTotal, config.hidden_size], initializer = tf.contrib.layers.xavier_initializer(uniform = True))
-		self.rel_embeddings = tf.get_variable(name = "rel_embeddings", shape = [config.relTotal, config.hidden_size], initializer = tf.contrib.layers.xavier_initializer(uniform = True))
-		self.parameter_lists = {"ent_embeddings":self.ent_embeddings, \
-								"rel_embeddings":self.rel_embeddings}
-	def loss_def(self):
-		#Obtaining the initial configuration of the model
-		config = self.get_config()
-		#To get positive triples and negative triples for training
-		#To get labels for the triples, positive triples as 1 and negative triples as -1
-		#The shapes of h, t, r, y are (batch_size, 1 + negative_ent + negative_rel)
-		h, t, r = self.get_all_instance()
-		y = self.get_all_labels()
-		#Embedding entities and relations of triples
-		e_h = tf.nn.embedding_lookup(self.ent_embeddings, h)
-		e_t = tf.nn.embedding_lookup(self.ent_embeddings, t)
-		e_r = tf.nn.embedding_lookup(self.rel_embeddings, r)
-		#Calculating score functions for all positive triples and negative triples
-		res = tf.reduce_sum(self._calc(e_h, e_t, e_r), 1, keep_dims = False)
-		loss_func = tf.reduce_mean(tf.nn.softplus(- y * res))
-		regul_func = tf.reduce_mean(e_h ** 2) + tf.reduce_mean(e_t ** 2) + tf.reduce_mean(e_r ** 2)
+	def __init__(self,config):
+		super(DistMult,self).__init__(config)
+		self.ent_embeddings=nn.Embedding(self.config.entTotal,self.config.hidden_size)
+		self.rel_embeddings=nn.Embedding(self.config.relTotal,self.config.hidden_size)
+		self.softplus=nn.Softplus().cuda()
+		self.init_weights()
+	def init_weights(self):
+		nn.init.xavier_uniform(self.ent_embeddings.weight.data)
+		nn.init.xavier_uniform(self.rel_embeddings.weight.data)
+	def _calc(self,h,t,r):
+		return torch.sum(h*t*r,1,False)
+	def loss_func(self,loss,regul):
+		return loss+self.config.lmbda*regul
+	def forward(self):
+		batch_h,batch_t,batch_r=self.get_all_instance()
+		batch_y=self.get_all_labels()
+		e_h=self.ent_embeddings(batch_h)
+		e_t=self.ent_embeddings(batch_t)
+		e_r=self.rel_embeddings(batch_r)
+		y=batch_y
+		res=self._calc(e_h,e_t,e_r)
+		tmp=self.softplus(- y * res)
+		loss = torch.mean(tmp)
+		regul = torch.mean(e_h ** 2) + torch.mean(e_t ** 2) + torch.mean(e_r ** 2)
 		#Calculating loss to get what the framework will optimize
-		self.loss =  loss_func + config.lmbda * regul_func
-
-	def predict_def(self):
-		config = self.get_config()
-		predict_h, predict_t, predict_r = self.get_predict_instance()
-		predict_h_e = tf.nn.embedding_lookup(self.ent_embeddings, predict_h)
-		predict_t_e = tf.nn.embedding_lookup(self.ent_embeddings, predict_t)
-		predict_r_e = tf.nn.embedding_lookup(self.rel_embeddings, predict_r)
-		self.predict = -tf.reduce_sum(self._calc(predict_h_e, predict_t_e, predict_r_e), 1, keep_dims = True)
+		loss =  self.loss_func(loss,regul)
+		return loss
+	def predict(self, predict_h, predict_t, predict_r):
+		p_e_h=self.ent_embeddings(Variable(torch.from_numpy(predict_h)))
+		p_e_t=self.ent_embeddings(Variable(torch.from_numpy(predict_t)))
+		p_e_r=self.rel_embeddings(Variable(torch.from_numpy(predict_r)))
+		p_score=-self._calc(p_e_h,p_e_t,p_e_r)
+		return p_score.cpu()
+		

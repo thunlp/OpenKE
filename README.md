@@ -1,47 +1,72 @@
-# OpenKE
-An Open-source Framework for Knowledge Embedding.
+# OpenKE：一个高效的知识表示学习工具包
+OpenKE ([http://openke.thunlp.org/](http://openke.thunlp.org/)) 是一个由清华大学自然语言处理与社会人文计算实验室研制推出的知识表示学习工具包，提供TransE、TransH、TransR、TransD、RESCAL、DistMult、HolE、ComplEx 等算法的统一接口的高效实现，同时为开发新的知识表示模型提供平台。
 
-More information is available on our website 
-[http://openke.thunlp.org/](http://openke.thunlp.org/)
+## 目录
+* [项目介绍](#项目介绍)
+* [编译安装](#编译安装)
+* [数据介绍](#数据介绍)
+* [评测结果](#评测结果)
+* [快速开始](#快速开始)
+* [接口介绍](#接口介绍)
+* [作者信息](#作者信息)
 
-## Overview
+## 项目介绍
 
-This is an Efficient implementation based on TensorFlow for knowledge representation learning (KRL). We use C++ to implement some underlying operations such as data preprocessing and negative sampling. For each specific model, it is implemented by TensorFlow with Python interfaces so that there is a convenient platform to run models on GPUs. OpenKE composes 3 repositories:
+OpenKE (An Open-source Framework for Knowledge Embedding) 有如下两个特点：
 
-OpenKE: the main project based on TensorFlow, which provides the optimized and stable framework for knowledge graph embedding models.
+1. 使用 C++ 实现数据预处理和负采样等底层操作，支持多线程并行训练，并采用高效的负采样算法 (offset-based negtive sampling) 。
 
-<a href="https://github.com/thunlp/TensorFlow-TransX"> TensorFlow-TransX</a>: light and simple version of OpenKE based on TensorFlow, including TransE, TransH, TransR and TransD. 
+2. 提供 TensorFlow 和 PyTorch 两种框架训练模型，为部署 GPU 提供方便的平台。
 
-<a href="https://github.com/thunlp/Fast-TransX"> Fast-TransX</a>: efficient lightweight C++ inferences for TransE and its extended models utilizing the framework of OpenKE, including TransH, TransR, TransD, TranSparse and PTransE. 
+OpenKE 包括以下三个库：
 
-## Installation
+OpenKE: 这是本项目主要的库，快速稳定地实现知识图谱嵌入的经典模型。
 
-1. Install TensorFlow
+<a href="https://github.com/thunlp/TensorFlow-TransX"> TensorFlow-TransX</a>: OpenKE 的轻量级简化版本，基于 Tensorflow 实现 TransE, TransH, TransR 和 TransD。
 
-2. Clone the OpenKE repository:
+<a href="https://github.com/thunlp/Fast-TransX"> Fast-TransX</a>: 使用 C++ 快速简便实现 TransE, TransH, TransR, TransD, TranSparse 和 Fast-PTransE, 采用多线程加速训练。
+
+## 编译安装
+
+1. 安装 TensorFlow 或 PyTorch
+
+2. 从 github 下载 OpenKE 项目
 
 	$ git clone https://github.com/thunlp/OpenKE
 	
 	$ cd OpenKE
 
-3. Compile C++ files
+3. 编译 C++ 文件
 	
 	$ bash make.sh
 
-## Data
+## 数据介绍
 
-Datasets are required in the following format, containing at least three files for training:
+数据集至少包含三个文件，格式如下：
 
-triple2id.txt: training file, the first line is the number of triples for training. Then the follow lines are all in the format (e1, e2, rel).
+triple2id.txt: 训练数据，第一行是三元组总数，接下来每行是描述 (e1, e2, rel) 的三元组。
 
-entity2id.txt: all entities and corresponding ids, one per line. The first line is the number of entities.
+entity2id.txt: 所有的实体和对应编号，第一行是实体总数，接下来每行是描述 (entity, id) 的二元组。
 
-relation2id.txt: all relations and corresponding ids, one per line. The first line is the number of relations.
+relation2id.txt: 所有的关系和对应编号，第一行是关系总数，接下来每行是描述 (relation, id) 的二元组。
 
+## 评测结果
 
-## Quickstart
+FB15K:
 
-To compute a knowledge graph embedding, first import datasets and set configure parameters for training, then train models and export results. For instance, we write a example.py to train TransE:
+| Model | MeanRank(Raw)	| MeanRank(Filter)	| Hit@10(Raw)	| Hit@10(Filter)|
+| ----- |:-------------:| :----------------:|:-----------:|:-------------:|
+|TransE (n = 100, rounds = 1000)|250.10|150.96|51.25|71.13|
+|TransH (n = 100, rounds = 1000)|243.23|144.15|51.28|71.20|
+|TransR (n = 50, rounds = 1000)|260.05|164.16|43.37|59.03|
+|TransD (n = 100, rounds = 1000)|245.79|146.12|51.30|71.32|
+|RESCAL (n = 100, rounds = 1000)|263.72|160.95|37.32|52.68|
+|DistMult (n = 100, rounds = 1000)|247.15|136.43|51.86|75.41|
+|ComplEx (n = 100, rounds = 1000)|283.51|161.36|51.24|80.51|
+
+## 快速开始
+
+实现知识图谱嵌入时，首先导入数据集并设置超参数，然后训练模型并导出训练结果。以下的 example.py 展示如何实现 TransE:
 
 
 	import config
@@ -72,25 +97,25 @@ To compute a knowledge graph embedding, first import datasets and set configure 
 	con.run()
 	
 
-### Step 1: Import datasets
+### 第一步：导入数据集 
 
 	con.set_in_path("benchmarks/FB15K/")
 	con.set_out_path("benchmarks/FB15K/")
 	
-We import knowledge graphs from benchmarks/FB15K/ folder. The data consists of three essential files mentioned before:
+我们从 benchmarks/FB15K/ 文件夹导入知识图谱，数据集由三个文件组成：
 
 *	triple2id.txt
 *	entity2id.txt
 *	relation2id.txt
 
-Validation and test files are required and used to evaluate the training results, However, they are not indispensable for training.
+验证集和测试集用来评估训练结果，训练模型时可以不用。
 
 	con.set_work_threads(1)
 
-We can allocate several threads to sample positive and negative cases.
+我们可以分配多线程来采集正负样本。
 
 
-### Step 2: Set configure parameters for training.
+### 第二步：设置模型的超参数
 
 	con.set_train_times(500)
 	con.set_nbatches(100)
@@ -98,101 +123,101 @@ We can allocate several threads to sample positive and negative cases.
 	con.set_dimension(200)
 	con.set_margin(1)
 
-We set essential parameters, including the data traversing rounds, learning rate, batch size, and dimensions of entity and relation embeddings.
+设置模型必要的超参数，包括数据训练回合 (train_times), 学习率 (learning rate), Batch 大小 (batch_size), 实体和关系嵌入的维度 (dimensions)。
 
 	con.set_bern(0)
 	con.set_ent_neg_rate(1)
 	con.set_rel_neg_rate(0)
 
-For negative sampling, we can corrupt entities and relations to construct negative triples. set\_bern(0) will use the traditional sampling method, and set\_bern(1) will use the method in (Wang et al. 2014) denoted as "bern".
+对于负采样，我们可以打破实体或关系构造负样本。 set\_bern(0) 将使用传统的负采样方法， set\_bern(1) 将使用 (Wang et al. 2014) 提出的方法 "bern"。
 	
 	con.set_optimizer("SGD")
 	
-We can select a proper gradient descent optimization algorithm to train models.
+我们可以选择合适的梯度下降优化算法来训练模型。
 
-### Step 3: Train models
+### 第三步：训练模型
 
 	con.init()
 	con.set_model(models.TransE)
 	con.run()
-positive
-We set the knowledge graph embedding model and start the training process.
+
+设置模型并开始训练。
 	
-### Step 4: Export results
+### 第四步：导出训练结果
 
 	con.set_export_files("res/model.vec")
 
 	con.set_export_steps(10)
 
-The results will be automatically exported to the given files every few rounds.
+每几个回合后，结果会被自动导出到指定的文件。
 
-## Interfaces
+## 接口介绍
 
 ### Config
 	
 	class Config(object):
 			
-		#To set the learning rate
+		#设置学习率
 		def set_alpha(alpha = 0.001)
 		
-		#To set the degree of the regularization on the parameters
+		#设置正则化参数
 		def set_lmbda(lmbda = 0.0)
 		
-		#To set the gradient descent optimization algorithm (SGD, Adagrad, Adadelta, Adam)
+		#设置梯度下降优化算法 (SGD, Adagrad, Adadelta, Adam)
 		def set_optimizer(optimizer = "SGD")
 		
-		#To set the data traversing rounds
+		#设置数据训练的次数
 		def set_train_times(self, times)
 		
-		#To split the training triples into several batches, nbatches is the number of batches
+		#把训练数据分为几批, nbatches 是批数
 		def set_nbatches(nbatches = 100)
 		
-		#To set the margin for the loss function
+		#设置损失函数的 margin
 		def set_margin(margin = 1.0)
 		
-		#To set the dimensions of the entities and relations at the same time
+		#同时设置实体和关系的维度
 		def set_dimension(dim)
 		
-		#To set the dimensions of the entities
+		#设置实体的维度
 		def set_ent_dimension(self, dim)
 		
-		#To set the dimensions of the relations
+		#设置关系的维度
 		def set_rel_dimension(self, dim)
 		
-		#To set the input folder		
+		#设置数据导入的文件路径		
 		def set_in_path(path = "./")
 		
-		#To set the output folder
+		#设置导出结果的文件路径
 		def set_out_path(path = "./")
 		
-		#To allocate threads for each batch sampling
+		#为批样本采集设置线程数目
 		def set_work_threads(threads = 1)
 		
-		#To set negative sampling algorithms, unif (bern = 0) or bern (bern = 1)
+		#设置负样本采集算法, unif (bern = 0) 或 bern (bern = 1)
 		def set_bern(bern = 1)
 		
-		#For each positive triple, we construct rate negative triples by corrupt the entity
+		#对于每个正样本，我们打破实体来构造负样本
 		def set_ent_neg_rate(rate = 1)
 		
-		#For each positive triple, we construct rate negative triples by corrupt the relation
+		#对于每个正样本，我们打破关系来构造负样本
 		def set_rel_neg_rate(rate = 0)
 		
-		#To sample a batch of training triples, including positive and negative ones.
+		#采集一批训练数据，包括正样本和负样本
 		def sampling()
 		
-		#To set the import files, all parameters can be restored from the import files
+		#设置导入文件路径，所有的参数可以从导入文件中恢复
 		def set_import_files(path = None)
 		
-		#To set the export files
+		#设置导出文件路径
 		def set_export_files(path = None)
 		
-		#To export results every several rounds
+		#设置每几个回合导出结果
 		def set_export_steps(steps = 1)
 		
-		#To set the knowledge embedding model
+		#设置待训练的知识图谱嵌入模型
 		set_model(model)
 		
-		#The framework will print loss values during training if flag = 1
+		#如果 flag = 1, 将会在训练过程中打印 loss 
 		def set_log_on(flag = 1)
 	
 	
@@ -203,68 +228,122 @@ The results will be automatically exported to the given files every few rounds.
 
 ### Model
 
+#### TensorFlow 版本
 	class Model(object)
 	
-		# return config which saves the training parameters.
+		# 得到保存训练参数的 config
 		get_config(self)
 		
-		# in_batch = True, return [positive_head, positive_tail, positive_relation]
-		# The shape of positive_head is [batch_size, 1]
-		# in_batch = False, return [positive_head, positive_tail, positive_relation]
-		# The shape of positive_head is [batch_size]
+		# in_batch = True, 得到 [positive_head, positive_tail, positive_relation]
+		# positive_head 的形状是 [batch_size, 1]
+		# in_batch = False, 得到 [positive_head, positive_tail, positive_relation]
+		# positive_head 的形状是 [batch_size]
 		get_positive_instance(in_batch = True)
 		
-		# in_batch = True, return [negative_head, negative_tail, negative_relation]
-		# The shape of positive_head is [batch_size, negative_ent_rate + negative_rel_rate]
-		# in_batch = False, return [negative_head, negative_tail, negative_relation]
-		# The shape of positive_head is [(negative_ent_rate + negative_rel_rate) * batch_size]		
+		# in_batch = True, 得到 [negative_head, negative_tail, negative_relation]
+		# negtive_head 的形状是 [batch_size, negative_ent_rate + negative_rel_rate]
+		# in_batch = False, 得到 [negative_head, negative_tail, negative_relation]
+		# negtive_head 的形状是 [(negative_ent_rate + negative_rel_rate) * batch_size]		
 		get_negative_instance(in_batch = True)
 
-		# in_batch = True, return all training instances with the shape [batch_size, (1 + negative_ent_rate + negative_rel_rate)]
-		# in_batch = False, return all training instances with the shape [(negative_ent_rate + negative_rel_rate + 1) * batch_size]
+		# in_batch = True, 得到所有的训练样例，形状是 [batch_size, (1 + negative_ent_rate + negative_rel_rate)]
+		# in_batch = False, 得到所有的训练样例，形状是 [(negative_ent_rate + negative_rel_rate + 1) * batch_size]
 		def get_all_instance(in_batch = False)
 
-		# in_batch = True, return all training labels with the shape [batch_size, (1 + negative_ent_rate + negative_rel_rate)]
-		# in_batch = False, return all training labels with the shape [(negative_ent_rate + negative_rel_rate + 1) * batch_size]
-		# The positive triples are labeled as 1, and the negative triples are labeled as -1
+		# in_batch = True, 得到所有的训练标签，形状是 [batch_size, (1 + negative_ent_rate + negative_rel_rate)]
+		# in_batch = False, 得到所有的训练标签，形状是 [(negative_ent_rate + negative_rel_rate + 1) * batch_size]
+		# 正样本的标签是1，负样本的标签是-1
 		def get_all_labels(in_batch = False)
 		
-		# To define containers for training triples
+		# 定义训练样本的容器
 		def input_def()
 		
-		# To define embedding parameters for knowledge embedding models
+		# 定义训练模型的参数
 		def embedding_def()
 
-		# To define loss functions for knowledge embedding models
+		# 定义模型的损失函数
 		def loss_def()
 		
 		def __init__(config)
 
-	#The implementation for TransE
+#### PyTorch 版本
+	class Model(nn.Module):
+		def __init__(self,config):
+			super(Model,self).__init__()
+			self.config=config
+			
+		# 得到 [positive_head, positive_tail, positive_relation]
+		# positive_head 的形状是 [batch_size]
+		def get_postive_instance(self):
+			self.postive_h=Variable(torch.from_numpy(self.config.batch_h[0:self.config.batch_size]))
+			self.postive_t=Variable(torch.from_numpy(self.config.batch_t[0:self.config.batch_size]))
+			self.postive_r=Variable(torch.from_numpy(self.config.batch_r[0:self.config.batch_size]))
+			return self.postive_h,self.postive_t,self.postive_r
+			
+		# 得到 [negative_head, negative_tail, negative_relation]
+		# negtive_head 的形状是 [(negative_ent_rate + negative_rel_rate) * batch_size]
+		def get_negtive_instance(self):
+			self.negtive_h=Variable(torch.from_numpy(self.config.batch_h[self.config.batch_size:self.config.batch_seq_size]))
+			self.negtive_t=Variable(torch.from_numpy(self.config.batch_t[self.config.batch_size:self.config.batch_seq_size]))
+			self.negtive_r=Variable(torch.from_numpy(self.config.batch_r[self.config.batch_size:self.config.batch_seq_size]))
+			return self.negtive_h,self.negtive_t,self.negtive_r
+			
+		# 得到所有的训练样例，形状是 [(negative_ent_rate + negative_rel_rate + 1) * batch_size]
+		def get_all_instance(self):
+			self.batch_h=Variable(torch.from_numpy(self.config.batch_h))
+			self.batch_t=Variable(torch.from_numpy(self.config.batch_t))
+			self.batch_r=Variable(torch.from_numpy(self.config.batch_r))
+			return self.batch_h,self.batch_t,self.batch_r
+			
+		# 得到所有的训练标签，形状是 [(negative_ent_rate + negative_rel_rate + 1) * batch_size]
+		# 正样本的标签是1，负样本的标签是-1
+		def get_all_labels(self):
+			self.batch_y=Variable(torch.from_numpy(self.config.batch_y))
+			return self.batch_y
+			
+		# 定义每次训练执行的计算，会被每个子类重写
+		def forward(self):
+			pass
+			
+		# 损失函数
+		def loss_func(self):
+			pass
+
+#### 模型实现
+
+	#实现 TransE
 	class TransE(Model)
 
-	#The implementation for TransH	
+	#实现 TransH	
 	class TransH(Model)
 
-	#The implementation for TransR
+	#实现 TransR
 	class TransR(Model)
 
-	#The implementation for TransD
+	#实现 TransD
 	class TransD(Model)
 	
-	#The implementation for RESCAL
+	#实现 RESCAL
 	class RESCAL(Model)
 	
-	#The implementation for DistMult
+	#实现 DistMult
 	class DistMult(Model)
 	
-	#The implementation for HolE
+	#实现 HolE
 	class HolE(Model)					
 	
-	#The implementation for ComplEx
+	#实现 ComplEx
 	class ComplEx(Model)
 	
 		
-	
+## 作者信息	
+
+
+*	 [韩 旭](https://github.com/THUCSTHanxu13) 博士生
+*	[林衍凯](http://thunlp.org/~lyk/) 博士生
+*	[谢若冰](http://thunlp.org/~xrb/) 博士生
+*	[曹书林](https://github.com/shelly-github) 访问学生
+*	[刘知远](http://thunlp.org/~lzy/) 导师
+*	孙茂松 导师
 	
 	

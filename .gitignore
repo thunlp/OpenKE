@@ -132,3 +132,6 @@ venv.bak/
 *.exe
 *.out
 *.app
+
+#Backup files
+*.py.bak

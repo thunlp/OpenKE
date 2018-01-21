@@ -1,83 +1,44 @@
-#coding:utf-8
-import numpy as np
-import tensorflow as tf
+import torch
+import torch.autograd as autograd
+import torch.nn as nn
+import torch.nn.functional as F
+import torch.optim as optim
+from torch.autograd import Variable
 
-class Model(object):
+class Model(nn.Module):
 
-	def get_config(self):
-		return self.config
-
-	def get_positive_instance(self, in_batch = True):
-		if in_batch:
-			return [self.postive_h, self.postive_t, self.postive_r]
-		else:
-			return [self.batch_h[0:self.config.batch_size], \
-			self.batch_t[0:self.config.batch_size], \
-			self.batch_r[0:self.config.batch_size]]
-
-	def get_negative_instance(self, in_batch = True):
-		if in_batch:
-			return [self.negative_h, self.negative_t, self.negative_r]
-		else:
-			return [self.batch_h[self.config.batch_size:self.config.batch_seq_size],\
-			self.batch_t[self.config.batch_size:self.config.batch_seq_size],\
-			self.batch_r[self.config.batch_size:self.config.batch_seq_size]]
-
-	def get_all_instance(self, in_batch = False):
-		if in_batch:
-			return [tf.transpose(tf.reshape(self.batch_h, [1 + self.config.negative_ent + self.config.negative_rel, -1]), [1, 0]),\
-			tf.transpose(tf.reshape(self.batch_t, [1 + self.config.negative_ent + self.config.negative_rel, -1]), [1, 0]),\
-			tf.transpose(tf.reshape(self.batch_r, [1 + self.config.negative_ent + self.config.negative_rel, -1]), [1, 0])]
-		else:
-			return [self.batch_h, self.batch_t, self.batch_r]
-
-	def get_all_labels(self, in_batch = False):
-		if in_batch:
-			return tf.transpose(tf.reshape(self.batch_y, [1 + self.config.negative_ent + self.config.negative_rel, -1]), [1, 0])
-		else:
-			return self.batch_y
-
-	def get_predict_instance(self):
-		return [self.predict_h, self.predict_t, self.predict_r]
-
-	def input_def(self):
-		config = self.config
-		self.batch_h = tf.placeholder(tf.int64, [config.batch_seq_size])
-		self.batch_t = tf.placeholder(tf.int64, [config.batch_seq_size])
-		self.batch_r = tf.placeholder(tf.int64, [config.batch_seq_size])
-		self.batch_y = tf.placeholder(tf.float32, [config.batch_seq_size])
-		self.postive_h = tf.transpose(tf.reshape(self.batch_h[0:config.batch_size], [1, -1]), [1, 0])
-		self.postive_t = tf.transpose(tf.reshape(self.batch_t[0:config.batch_size], [1, -1]), [1, 0])
-		self.postive_r = tf.transpose(tf.reshape(self.batch_r[0:config.batch_size], [1, -1]), [1, 0])
-		self.negative_h = tf.transpose(tf.reshape(self.batch_h[config.batch_size:config.batch_seq_size], [config.negative_ent + config.negative_rel, -1]), perm=[1, 0])
-		self.negative_t = tf.transpose(tf.reshape(self.batch_t[config.batch_size:config.batch_seq_size], [config.negative_ent + config.negative_rel, -1]), perm=[1, 0])
-		self.negative_r = tf.transpose(tf.reshape(self.batch_r[config.batch_size:config.batch_seq_size], [config.negative_ent + config.negative_rel, -1]), perm=[1, 0])
-		self.predict_h = tf.placeholder(tf.int64, [None])
-		self.predict_t = tf.placeholder(tf.int64, [None])
-		self.predict_r = tf.placeholder(tf.int64, [None])
-		self.parameter_lists = []
-
-	def embedding_def(self):
-		pass
-
-	def loss_def(self):
-		pass
-
-	def predict_def(self):
-		pass
-
-	def __init__(self, config):
+	def __init__(self,config):
+		super(Model,self).__init__()
 		self.config = config
 
-		with tf.name_scope("input"):
-			self.input_def()
+	def get_postive_instance(self):
+		self.postive_h = Variable(torch.from_numpy(self.config.batch_h[0:self.config.batch_size])).cuda()
+		self.postive_t = Variable(torch.from_numpy(self.config.batch_t[0:self.config.batch_size])).cuda()
+		self.postive_r = Variable(torch.from_numpy(self.config.batch_r[0:self.config.batch_size])).cuda()
+		return self.postive_h,self.postive_t,self.postive_r
 
-		with tf.name_scope("embedding"):
-			self.embedding_def()
+	def get_negtive_instance(self):
+		self.negtive_h = Variable(torch.from_numpy(self.config.batch_h[self.config.batch_size:self.config.batch_seq_size])).cuda()
+		self.negtive_t = Variable(torch.from_numpy(self.config.batch_t[self.config.batch_size:self.config.batch_seq_size])).cuda()
+		self.negtive_r = Variable(torch.from_numpy(self.config.batch_r[self.config.batch_size:self.config.batch_seq_size])).cuda()
+		return self.negtive_h,self.negtive_t,self.negtive_r
 
-		with tf.name_scope("loss"):
-			self.loss_def()
+	def get_all_instance(self):
+		self.batch_h = Variable(torch.from_numpy(self.config.batch_h)).cuda()
+		self.batch_t = Variable(torch.from_numpy(self.config.batch_t)).cuda()
+		self.batch_r = Variable(torch.from_numpy(self.config.batch_r)).cuda()
+		return self.batch_h, self.batch_t, self.batch_r
 
-		with tf.name_scope("predict"):
-			self.predict_def()
+	def get_all_labels(self):
+		self.batch_y=Variable(torch.from_numpy(self.config.batch_y)).cuda()
+		return self.batch_y
+
+	def predict(self):
+		pass
+
+	def forward(self):
+		pass
+
+	def loss_func(self):
+		pass
 
