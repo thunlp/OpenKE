@@ -6,7 +6,6 @@ con = config.Config()
 #Input training files from benchmarks/FB15K/ folder.
 con.set_in_path("./benchmarks/FB15K/")
 #True: Input test files from the same folder.
-con.set_test_flag(True)
 con.set_log_on(1)
 con.set_work_threads(8)
 con.set_train_times(10)
@@ -25,4 +24,3 @@ con.set_out_files("./res/embedding.vec.json")
 con.init()
 con.set_model(models.TransE)
 con.run()
-con.test()
