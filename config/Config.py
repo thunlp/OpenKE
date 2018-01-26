@@ -100,7 +100,7 @@ class Config(object):
 	def set_in_path(self, path):
 		self.in_path = path
 
-	def set_out_path(self, path):
+	def set_out_files(self, path):
 		self.out_path = path
 
 	def set_bern(self, bern):
