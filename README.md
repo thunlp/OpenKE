@@ -6,9 +6,11 @@ More information is available on our website
 
 ## Overview
 
-This is an Efficient implementation based on TensorFlow for knowledge representation learning (KRL). We use C++ to implement some underlying operations such as data preprocessing and negative sampling. For each specific model, it is implemented by TensorFlow with Python interfaces so that there is a convenient platform to run models on GPUs. OpenKE composes 3 repositories:
+This is an Efficient implementation based on TensorFlow for knowledge representation learning (KRL). We use C++ to implement some underlying operations such as data preprocessing and negative sampling. For each specific model, it is implemented by TensorFlow with Python interfaces so that there is a convenient platform to run models on GPUs. OpenKE composes 4 repositories:
 
 OpenKE: the main project based on TensorFlow, which provides the optimized and stable framework for knowledge graph embedding models.
+
+<a href="https://github.com/thunlp/OpenKE/tree/OpenKE-PyTorch"> OpenKE-PyTorch</a>: OpenKE implemented with PyTorch, also providing the optimized and stable framework for knowledge graph embedding models.
 
 <a href="https://github.com/thunlp/TensorFlow-TransX"> TensorFlow-TransX</a>: light and simple version of OpenKE based on TensorFlow, including TransE, TransH, TransR and TransD. 
 
