@@ -37,9 +37,9 @@ class RESCAL(Model):
 		loss=self.loss_func(p_score,n_score)
 		return loss
 	def predict(self, predict_h, predict_t, predict_r):
-		p_h_e=self.ent_embeddings(Variable(torch.from_numpy(predict_h))).view(-1,self.config.hidden_size,1)
-		p_t_e=self.ent_embeddings(Variable(torch.from_numpy(predict_t))).view(-1,self.config.hidden_size,1)
-		p_r_e=self.rel_matrices(Variable(torch.from_numpy(predict_r))).view(-1,self.config.hidden_size,self.config.hidden_size)
+		p_h_e=self.ent_embeddings(Variable(torch.from_numpy(predict_h)).cuda()).view(-1,self.config.hidden_size,1)
+		p_t_e=self.ent_embeddings(Variable(torch.from_numpy(predict_t)).cuda()).view(-1,self.config.hidden_size,1)
+		p_r_e=self.rel_matrices(Variable(torch.from_numpy(predict_r)).cuda()).view(-1,self.config.hidden_size,self.config.hidden_size)
 		p_score=-torch.sum(self._calc(p_h_e, p_t_e, p_r_e),1)
 		return p_score.cpu()
 		

@@ -52,10 +52,10 @@ class TransH(Model):
 		return loss
 
 	def predict(self, predict_h, predict_t, predict_r):
-		p_h_e=self.ent_embeddings(Variable(torch.from_numpy(predict_h)))
-		p_t_e=self.ent_embeddings(Variable(torch.from_numpy(predict_t)))
-		p_r_e=self.rel_embeddings(Variable(torch.from_numpy(predict_r)))
-		p_norm=self.norm_vector(Variable(torch.from_numpy(predict_r)))
+		p_h_e=self.ent_embeddings(Variable(torch.from_numpy(predict_h)).cuda())
+		p_t_e=self.ent_embeddings(Variable(torch.from_numpy(predict_t)).cuda())
+		p_r_e=self.rel_embeddings(Variable(torch.from_numpy(predict_r)).cuda())
+		p_norm=self.norm_vector(Variable(torch.from_numpy(predict_r)).cuda())
 		p_h=self._transfer(p_h_e,p_norm)
 		p_t=self._transfer(p_t_e,p_norm)
 		p_r=p_r_e

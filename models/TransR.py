@@ -49,10 +49,10 @@ class TransR(Model):
 		loss=self.loss_func(p_score,n_score)
 		return loss
 	def predict(self, predict_h, predict_t, predict_r):
-		p_h_e=self.ent_embeddings(Variable(torch.from_numpy(predict_h))).view(-1,self.config.ent_size,1)
-		p_t_e=self.ent_embeddings(Variable(torch.from_numpy(predict_t))).view(-1,self.config.ent_size,1)
-		p_r_e=self.rel_embeddings(Variable(torch.from_numpy(predict_r))).view(-1,self.config.rel_size)
-		p_matrix=self.transfer_matrix(Variable(torch.from_numpy(predict_r))).view(-1,self.config.rel_size,self.config.ent_size)
+		p_h_e=self.ent_embeddings(Variable(torch.from_numpy(predict_h)).cuda()).view(-1,self.config.ent_size,1)
+		p_t_e=self.ent_embeddings(Variable(torch.from_numpy(predict_t)).cuda()).view(-1,self.config.ent_size,1)
+		p_r_e=self.rel_embeddings(Variable(torch.from_numpy(predict_r)).cuda()).view(-1,self.config.rel_size)
+		p_matrix=self.transfer_matrix(Variable(torch.from_numpy(predict_r)).cuda()).view(-1,self.config.rel_size,self.config.ent_size)
 		p_h=self._transfer(p_matrix,p_h_e).view(-1,self.config.rel_size)
 		p_t=self._transfer(p_matrix,p_t_e).view(-1,self.config.rel_size)
 		p_r=p_r_e				

@@ -34,9 +34,9 @@ class DistMult(Model):
 		loss =  self.loss_func(loss,regul)
 		return loss
 	def predict(self, predict_h, predict_t, predict_r):
-		p_e_h=self.ent_embeddings(Variable(torch.from_numpy(predict_h)))
-		p_e_t=self.ent_embeddings(Variable(torch.from_numpy(predict_t)))
-		p_e_r=self.rel_embeddings(Variable(torch.from_numpy(predict_r)))
+		p_e_h=self.ent_embeddings(Variable(torch.from_numpy(predict_h)).cuda())
+		p_e_t=self.ent_embeddings(Variable(torch.from_numpy(predict_t)).cuda())
+		p_e_r=self.rel_embeddings(Variable(torch.from_numpy(predict_r)).cuda())
 		p_score=-self._calc(p_e_h,p_e_t,p_e_r)
 		return p_score.cpu()
 		

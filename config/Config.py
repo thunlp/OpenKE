@@ -158,6 +158,7 @@ class Config(object):
 
 	def restore_pytorch(self):
 		self.trainModel.load_state_dict(torch.load(self.importName))
+		#self.trainModel.cuda()
 
 	def export_variables(self, path = None):
 		if path == None:
@@ -243,6 +244,7 @@ class Config(object):
 	def test(self):
 		if self.importName != None:
 			self.restore_pytorch()
+		#self.trainModel.cuda()
 		total = self.lib.getTestTotal()
 		for epoch in range(total):
 			self.lib.getHeadBatch(self.test_h_addr, self.test_t_addr, self.test_r_addr)

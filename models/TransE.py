@@ -45,9 +45,9 @@ class TransE(Model):
 		return loss
 
 	def predict(self, predict_h, predict_t, predict_r):
-		p_h=self.ent_embeddings(Variable(torch.from_numpy(predict_h)))
-		p_t=self.ent_embeddings(Variable(torch.from_numpy(predict_t)))
-		p_r=self.rel_embeddings(Variable(torch.from_numpy(predict_r)))
+		p_h=self.ent_embeddings(Variable(torch.from_numpy(predict_h)).cuda())
+		p_t=self.ent_embeddings(Variable(torch.from_numpy(predict_t)).cuda())
+		p_r=self.rel_embeddings(Variable(torch.from_numpy(predict_r)).cuda())
 		_p_score = self._calc(p_h, p_t, p_r)
 		p_score=torch.sum(_p_score,1)
 		return p_score.cpu()

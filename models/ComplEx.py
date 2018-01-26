@@ -41,12 +41,12 @@ class ComplEx(Model):
 		loss =  self.loss_func(loss,regul)
 		return loss
 	def predict(self, predict_h, predict_t, predict_r):
-		p_re_h=self.ent_re_embeddings(Variable(torch.from_numpy(predict_h)))
-		p_re_t=self.ent_re_embeddings(Variable(torch.from_numpy(predict_t)))
-		p_re_r=self.rel_re_embeddings(Variable(torch.from_numpy(predict_r)))
-		p_im_h=self.ent_im_embeddings(Variable(torch.from_numpy(predict_h)))
-		p_im_t=self.ent_im_embeddings(Variable(torch.from_numpy(predict_t)))
-		p_im_r=self.rel_im_embeddings(Variable(torch.from_numpy(predict_r)))
+		p_re_h=self.ent_re_embeddings(Variable(torch.from_numpy(predict_h)).cuda())
+		p_re_t=self.ent_re_embeddings(Variable(torch.from_numpy(predict_t)).cuda())
+		p_re_r=self.rel_re_embeddings(Variable(torch.from_numpy(predict_r)).cuda())
+		p_im_h=self.ent_im_embeddings(Variable(torch.from_numpy(predict_h)).cuda())
+		p_im_t=self.ent_im_embeddings(Variable(torch.from_numpy(predict_t)).cuda())
+		p_im_r=self.rel_im_embeddings(Variable(torch.from_numpy(predict_r)).cuda())
 		p_score = -self._calc(p_re_h, p_im_h, p_re_t, p_im_t, p_re_r, p_im_r)
 		return p_score.cpu()
 
