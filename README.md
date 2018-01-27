@@ -139,7 +139,7 @@ We set the knowledge graph embedding model and start the training process.
 
 ### Testing
 
-To evaluate the model, first import datasets and set essential configure paramters, then set model parameters and test the model. For instance, we write an example_test_transe.py to train TransE.
+To evaluate the model, first import datasets and set essential configure paramters, then set model parameters and test the model. For instance, we write an example_test_transe.py to test TransE.
 
 There are four approaches to test models:
 
