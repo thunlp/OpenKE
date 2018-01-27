@@ -139,7 +139,7 @@ We set the knowledge graph embedding model and start the training process.
 
 ### Testing
 
-To evaluate the model, first import datasets and set essential configure paramters, then set model parameters and test the model. For instance, we write an example_test_transe.py to train TransE.
+To evaluate the model, first import datasets and set essential configure paramters, then set model parameters and test the model. For instance, we write an example_test_transe.py to test TransE.
 
 There are three approaches to test models:
 
@@ -180,7 +180,7 @@ There are three approaches to test models:
 	con.set_parameters(content)
 	con.test()
 
-(3) Manually load models via tf.Saver().
+(3) Manually load models via torch.load().
 
 	import config
 	import models
@@ -201,7 +201,7 @@ There are three approaches to test models:
 
 There are four approaches to get the embedding matrix.
 
-(1) Set import files and OpenKE will automatically load models via tf.Saver().
+(1) Set import files and OpenKE will automatically load models via torch.load().
 
 	import json
 	import numpy as py
