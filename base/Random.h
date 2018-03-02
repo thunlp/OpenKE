@@ -24,4 +24,8 @@ INT rand_max(INT id, INT x) {
 	return res;
 }
 
+//[a,b)
+INT rand(INT a, INT b){
+	return (rand() % (b-a))+ a;
+}
 #endif

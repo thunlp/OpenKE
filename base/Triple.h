@@ -27,6 +27,10 @@ struct Triple {
 		return (a.h < b.h)||(a.h == b.h && a.t < b.t)||(a.h == b.h && a.t == b.t && a.r < b.r);
 	}
 
+	static bool cmp_rel2(const Triple &a, const Triple &b) {
+		return (a.r < b.r)||(a.r == b.r && a.h < b.h)||(a.r == b.r && a.h == b.h && a.t < b.t);
+	}
+
 };
 
 #endif

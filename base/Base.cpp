@@ -37,6 +37,9 @@ extern "C"
 INT getTestTotal();
 
 extern "C"
+INT getValidTotal();
+
+extern "C"
 void randReset();
 
 extern "C"
