@@ -3,12 +3,9 @@ import models
 import json
 
 con = config.Config()
-con.set_test_flag(True)
+#Input training files from benchmarks/FB15K/ folder.
 con.set_in_path("./benchmarks/FB15K/")
-con.set_out_path("./benchmarks/FB15K/a.vec")
-# con.set_export_files("res.vec")
-#con.set_import_files("res.vec")
-# con.set_export_steps(10)
+#True: Input test files from the same folder.
 con.set_log_on(1)
 con.set_work_threads(8)
 con.set_train_times(1000)
@@ -20,11 +17,10 @@ con.set_margin(1.0)
 con.set_ent_neg_rate(1)
 con.set_rel_neg_rate(0)
 con.set_opt_method("SGD")
+#Model parameters will be exported via torch.save() automatically.
+con.set_export_files("./res/transd.pt")
+#Model parameters will be exported to json files automatically.
+con.set_out_files("./res/transd.vec.json")
 con.init()
 con.set_model(models.TransD)
-# f = open("a.vec", "r")
-# content = json.loads(f.read())
-# f.close()
-# con.set_parameters(content)
 con.run()
-con.test()

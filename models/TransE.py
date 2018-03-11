@@ -7,6 +7,7 @@ import numpy as np
 from Model import *
 from torch.autograd import Variable
 
+
 class TransE(Model):
 
 	def __init__(self, config):
