@@ -9,8 +9,8 @@ link prediction
 ======================================================================================*/
 INT lastHead = 0;
 INT lastTail = 0;
-REAL l1_filter_tot = 0, l1_tot = 0, r1_tot = 0, r1_filter_tot = 0, l_tot = 0, r_tot = 0, l_filter_rank = 0, l_rank = 0;
-REAL l3_filter_tot = 0, l3_tot = 0, r3_tot = 0, r3_filter_tot = 0, l_filter_tot = 0, r_filter_tot = 0, r_filter_rank = 0, r_rank = 0;
+REAL l1_filter_tot = 0, l1_tot = 0, r1_tot = 0, r1_filter_tot = 0, l_tot = 0, r_tot = 0, l_filter_rank = 0, l_rank = 0, l_filter_reci_rank = 0, l_reci_rank = 0;
+REAL l3_filter_tot = 0, l3_tot = 0, r3_tot = 0, r3_filter_tot = 0, l_filter_tot = 0, r_filter_tot = 0, r_filter_rank = 0, r_rank = 0, r_filter_reci_rank = 0, r_reci_rank = 0;
 
 extern "C"
 void getHeadBatch(INT *ph, INT *pt, INT *pr) {
@@ -58,9 +58,11 @@ void testHead(REAL *con) {
     if (l_s < 1) l1_tot += 1;
     l_filter_rank += (l_filter_s+1);
     l_rank += (1+l_s);
+    l_filter_reci_rank += 1.0/(l_filter_s+1);
+    l_reci_rank += 1.0/(l_s+1);
     lastHead++;
     printf("l_filter_s: %ld\n", l_filter_s);
-    printf("%f %f %f %f\n", l_tot / lastHead, l_filter_tot / lastHead, l_rank / lastHead, l_filter_rank / lastHead);
+    printf("%f %f %f %f \n", l_tot / lastHead, l_filter_tot / lastHead, l_rank / lastHead, l_filter_rank / lastHead);
 }
 
 extern "C"
@@ -91,6 +93,8 @@ void testTail(REAL *con) {
     if (r_s < 1) r1_tot += 1;
     r_filter_rank += (1+r_filter_s);
     r_rank += (1+r_s);
+    r_filter_reci_rank += 1.0/(1+r_filter_s);
+    r_reci_rank += 1.0/(1+r_s);
     lastTail++;
     printf("r_filter_s: %ld\n", r_filter_s);
     printf("%f %f %f %f\n", r_tot /lastTail, r_filter_tot /lastTail, r_rank /lastTail, r_filter_rank /lastTail);
@@ -99,10 +103,10 @@ void testTail(REAL *con) {
 extern "C"
 void test_link_prediction() {
     printf("overall results:\n");
-    printf("left %f %f %f %f \n", l_rank/ testTotal, l_tot / testTotal, l3_tot / testTotal, l1_tot / testTotal);
-    printf("left(filter) %f %f %f %f \n", l_filter_rank/ testTotal, l_filter_tot / testTotal,  l3_filter_tot / testTotal,  l1_filter_tot / testTotal);
-    printf("right %f %f %f %f \n", r_rank/ testTotal, r_tot / testTotal,r3_tot / testTotal,r1_tot / testTotal);
-    printf("right(filter) %f %f %f %f\n", r_filter_rank/ testTotal, r_filter_tot / testTotal,r3_filter_tot / testTotal,r1_filter_tot / testTotal);
+    printf("left %f %f %f %f %f \n", l_rank/ testTotal, l_reci_rank/ testTotal, l_tot / testTotal, l3_tot / testTotal, l1_tot / testTotal);
+    printf("left(filter) %f %f %f %f %f \n", l_filter_rank/ testTotal, l_filter_reci_rank/ testTotal, l_filter_tot / testTotal,  l3_filter_tot / testTotal,  l1_filter_tot / testTotal);
+    printf("right %f %f %f %f %f \n", r_rank/ testTotal, r_reci_rank/ testTotal, r_tot / testTotal,r3_tot / testTotal,r1_tot / testTotal);
+    printf("right(filter) %f %f %f %f %f\n", r_filter_rank/ testTotal, r_filter_reci_rank/ testTotal, r_filter_tot / testTotal,r3_filter_tot / testTotal,r1_filter_tot / testTotal);
 }
 
 /*=====================================================================================
