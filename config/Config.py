@@ -240,7 +240,7 @@ class Config(object):
 			self.trainModel.batch_y: batch_y
 		}
 		_, loss = self.sess.run([self.train_op, self.trainModel.loss], feed_dict)
-	 	return loss
+		return loss
 
 	def test_step(self, test_h, test_t, test_r):
 		feed_dict = {
