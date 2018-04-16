@@ -14,3 +14,5 @@ from . import DistMult
 from DistMult import *
 from . import ComplEx
 from ComplEx import *
+from . import Analogy
+from Analogy import *

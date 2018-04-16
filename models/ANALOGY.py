@@ -8,10 +8,10 @@ from Model import *
 class Analogy(Model):
 	def __init__(self,config):
 		super(Analogy,self).__init__(config)
-		self.ent_re_embeddings=nn.Embedding(self.config.entTotal,self.config.hidden_size)
-		self.ent_im_embeddings=nn.Embedding(self.config.entTotal,self.config.hidden_size)
-		self.rel_re_embeddings=nn.Embedding(self.config.relTotal,self.config.hidden_size)
-		self.rel_im_embeddings=nn.Embedding(self.config.relTotal,self.config.hidden_size)
+		self.ent_re_embeddings=nn.Embedding(self.config.entTotal,self.config.hidden_size/2)
+		self.ent_im_embeddings=nn.Embedding(self.config.entTotal,self.config.hidden_size/2)
+		self.rel_re_embeddings=nn.Embedding(self.config.relTotal,self.config.hidden_size/2)
+		self.rel_im_embeddings=nn.Embedding(self.config.relTotal,self.config.hidden_size/2)
 		self.ent_embeddings = nn.Embedding(self.config.entTotal, self.config.hidden_size)
 		self.rel_embeddings = nn.Embedding(self.config.relTotal, self.config.hidden_size)
 		self.softplus=nn.Softplus().cuda()
@@ -41,8 +41,7 @@ class Analogy(Model):
 		r = self.rel_embeddings(batch_r)
 		y=batch_y
 		res=self._calc(e_re_h,e_im_h,e_h,e_re_t,e_im_t,e_t,r_re,r_im,r)
-		tmp=self.softplus(- y * res)
-		loss = torch.mean(tmp)
+		loss = torch.mean(self.softplus(- y * res))
 		regul= torch.mean(e_re_h**2)+torch.mean(e_im_h**2)*torch.mean(e_h**2)+torch.mean(e_re_t**2)+torch.mean(e_im_t**2)+torch.mean(e_t**2)+torch.mean(r_re**2)+torch.mean(r_im**2)+torch.mean(r**2)
 		#Calculating loss to get what the framework will optimize
 		loss =  self.loss_func(loss,regul)
