@@ -41,7 +41,7 @@ void testHead(REAL *con) {
     INT l_filter_s = 0;
     INT l_s_constrain = 0;
 
-    for (INT j = 0; j <= entityTotal; j++) {
+    for (INT j = 0; j < entityTotal; j++) {
         REAL value = con[j];
         if (j != h && value < minimal) {
             l_s += 1;
@@ -76,7 +76,7 @@ void testTail(REAL *con) {
     INT r_filter_s = 0;
     INT r_s_constrain = 0;
 
-    for (INT j = 0; j <= entityTotal; j++) {
+    for (INT j = 0; j < entityTotal; j++) {
         REAL value = con[j];
         if (j != t && value < minimal) {
             r_s += 1;
