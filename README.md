@@ -34,7 +34,8 @@ OpenKE: the main project based on TensorFlow, which provides the optimized and s
 
 * For training, datasets contain three files:
 
-  train2id.txt: training file, the first line is the number of triples for training. Then the follow lines are all in the format ***(e1, e2, rel)*** which indicates there is a relation ***rel*** between ***e1*** and ***e2*** .
+  train2id.txt: training file, the first line is the number of triples for training. Then the following lines are all in the format ***(e1, e2, rel)*** which indicates there is a relation ***rel*** between ***e1*** and ***e2*** .
+  **Note that train2id.txt contains ids from entitiy2id.txt and relation2id.txt instead of the names of the entities and relations. If you use your own datasets, please check the format of your training file. Files in the wrong format may cause segmentation fault.**
 
   entity2id.txt: all entities and corresponding ids, one per line. The first line is the number of entities.
 
@@ -42,9 +43,11 @@ OpenKE: the main project based on TensorFlow, which provides the optimized and s
 
 * For testing, datasets contain additional two files (totally five files):
 
-  test2id.txt: testing file, the first line is the number of triples for testing. Then the follow lines are all in the format ***(e1, e2, rel)*** .
+  test2id.txt: testing file, the first line is the number of triples for testing. Then the following lines are all in the format ***(e1, e2, rel)*** .
 
-  valid2id.txt: validating file, the first line is the number of triples for validating. Then the follow lines are all in the format ***(e1, e2, rel)*** .
+  valid2id.txt: validating file, the first line is the number of triples for validating. Then the following lines are all in the format ***(e1, e2, rel)*** .
+
+  type_constrain.txt: type constraining file, the first line is the number of relations. Then the following lines are type constraints for each relation. For example, the relation with id 1200 has 4 types of head entities, which are 3123, 1034, 58 and 5733. The relation with id 1200 has 4 types of tail entities, which are 12123, 4388, 11087 and 11088.
 
 ## Quickstart
 
@@ -155,7 +158,8 @@ There are four approaches to test models:
     con.set_in_path("./benchmarks/FB15K/")
 
     #True: Input test files from the same folder.
-    con.set_test_flag(True)
+    con.set_test_triple_classfication(True)
+    con.set_test_link_prediction(True)
 
     con.set_work_threads(4)
     con.set_train_times(500)
@@ -173,7 +177,8 @@ There are four approaches to test models:
     con.set_model(models.TransE)
     con.run()
 
-    #To test models after training needs "set_test_flag(True)".
+    #To test link prediction after training needs "set_test_link_prediction True)".
+    #To test triple classfication after training needs "set_test_triple_classification(True)"
     con.test()
 
 (2) Set import files and OpenKE will automatically load models via tf.Saver().
@@ -186,7 +191,8 @@ There are four approaches to test models:
 
     con = config.Config()
     con.set_in_path("./benchmarks/FB15K/")
-    con.set_test_flag(True)
+    con.set_test_link_prediction(True)
+    con.set_test_triple_classification(True)
     con.set_work_threads(4)
     con.set_dimension(50)
     con.set_import_files("./res/model.vec.tf")
@@ -204,7 +210,8 @@ There are four approaches to test models:
 
 	con = config.Config()
 	con.set_in_path("./benchmarks/FB15K/")
-	con.set_test_flag(True)
+    con.set_test_link_prediction(True)
+    con.set_test_triple_classification(True)
 	con.set_work_threads(4)
 	con.set_dimension(50)
 	con.init()
@@ -225,7 +232,8 @@ There are four approaches to test models:
 
     con = config.Config()
     con.set_in_path("./benchmarks/FB15K/")
-    con.set_test_flag(True)
+    con.set_test_link_prediction(True)
+    con.set_test_triple_classification(True)
     con.set_work_threads(4)
     con.set_dimension(50)
     con.init()
@@ -243,7 +251,8 @@ There are four approaches to get the embedding matrix.
 
 	con = config.Config()
 	con.set_in_path("./benchmarks/FB15K/")
-	con.set_test_flag(True)
+    con.set_test_link_prediction(True)
+    con.set_test_triple_classification(True)
 	con.set_work_threads(4)
 	con.set_dimension(50)
 	con.set_import_files("./res/model.vec.tf")
@@ -258,7 +267,8 @@ There are four approaches to get the embedding matrix.
 
 	con = config.Config()
 	con.set_in_path("./benchmarks/FB15K/")
-	con.set_test_flag(True)
+    con.set_test_link_prediction(True)
+    con.set_test_triple_classification(True)
 	con.set_work_threads(4)
 	con.set_dimension(50)
 	con.init()
@@ -271,7 +281,8 @@ There are four approaches to get the embedding matrix.
 
 	con = config.Config()
 	con.set_in_path("./benchmarks/FB15K/")
-	con.set_test_flag(True)
+    con.set_test_link_prediction(True)
+    con.set_test_triple_classification(True)
 	con.set_work_threads(4)
 	con.set_dimension(50)
 	con.init()
@@ -387,13 +398,14 @@ There are four approaches to get the embedding matrix.
 		def get_parameters(self, mode = "numpy")
  
 		#To set the knowledge embedding model
-		set_model(model)
+		def set_model(model)
 		
 		#The framework will print loss values during training if flag = 1
 		def set_log_on(flag = 1)
 
 		#This is essential when testing
-		def set_test_flag(self, flag)
+		def set_test_link_prediction(True)
+    	def set_test_triple_classification(True)
 	
 
 
