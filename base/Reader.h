@@ -16,6 +16,9 @@ Triple *trainHead;
 Triple *trainTail;
 Triple *trainRel;
 
+INT *testLef, *testRig;
+INT *validLef, *validRig;
+
 extern "C"
 void importTrainFiles() {
 
@@ -118,6 +121,7 @@ void importTrainFiles() {
 }
 
 Triple *testList;
+Triple *validList;
 Triple *tripleList;
 
 extern "C"
@@ -141,6 +145,7 @@ void importTestFiles() {
     tmp = fscanf(f_kb3, "%ld", &validTotal);
     tripleTotal = testTotal + trainTotal + validTotal;
     testList = (Triple *)calloc(testTotal, sizeof(Triple));
+    validList = (Triple *)calloc(validTotal, sizeof(Triple));
     tripleList = (Triple *)calloc(tripleTotal, sizeof(Triple));
     for (INT i = 0; i < testTotal; i++) {
         tmp = fscanf(f_kb1, "%ld", &testList[i].h);
@@ -157,13 +162,82 @@ void importTestFiles() {
         tmp = fscanf(f_kb3, "%ld", &tripleList[i + testTotal + trainTotal].h);
         tmp = fscanf(f_kb3, "%ld", &tripleList[i + testTotal + trainTotal].t);
         tmp = fscanf(f_kb3, "%ld", &tripleList[i + testTotal + trainTotal].r);
+        validList[i] = tripleList[i + testTotal + trainTotal];
     }
     fclose(f_kb1);
     fclose(f_kb2);
     fclose(f_kb3);
 
     std::sort(tripleList, tripleList + tripleTotal, Triple::cmp_head);
+    std::sort(testList, testList + testTotal, Triple::cmp_rel2);
+    std::sort(validList, validList + validTotal, Triple::cmp_rel2);
     printf("The total of test triples is %ld.\n", testTotal);
+    printf("The total of valid triples is %ld.\n", validTotal);
+
+    testLef = (INT *)calloc(relationTotal, sizeof(INT));
+	testRig = (INT *)calloc(relationTotal, sizeof(INT));
+	memset(testLef, -1, sizeof(INT)*relationTotal);
+	memset(testRig, -1, sizeof(INT)*relationTotal);
+	for (INT i = 1; i < testTotal; i++) {
+		if (testList[i].r != testList[i-1].r) {
+			testRig[testList[i-1].r] = i - 1;
+			testLef[testList[i].r] = i;
+		}
+	}
+	testLef[testList[0].r] = 0;
+	testRig[testList[testTotal - 1].r] = testTotal - 1;
+
+
+	validLef = (INT *)calloc(relationTotal, sizeof(INT));
+	validRig = (INT *)calloc(relationTotal, sizeof(INT));
+	memset(validLef, -1, sizeof(INT)*relationTotal);
+	memset(validRig, -1, sizeof(INT)*relationTotal);
+	for (INT i = 1; i < validTotal; i++) {
+		if (validList[i].r != validList[i-1].r) {
+			validRig[validList[i-1].r] = i - 1;
+			validLef[validList[i].r] = i;
+		}
+	}
+	validLef[validList[0].r] = 0;
+	validRig[validList[validTotal - 1].r] = validTotal - 1;
 }
+
+
+INT head_lef[10000];
+INT head_rig[10000];
+INT tail_lef[10000];
+INT tail_rig[10000];
+INT head_type[1000000];
+INT tail_type[1000000];
+
+extern "C"
+void importTypeFiles() {
+	INT total_lef = 0;
+    INT total_rig = 0;
+    FILE* f_type = fopen((inPath + "type_constrain.txt").c_str(),"r");
+    INT tmp;
+    tmp = fscanf(f_type, "%ld", &tmp);
+    for (INT i = 0; i < relationTotal; i++) {
+        INT rel, tot;
+        tmp = fscanf(f_type, "%ld%ld", &rel, &tot);
+        head_lef[rel] = total_lef;
+        for (INT j = 0; j < tot; j++) {
+            tmp = fscanf(f_type, "%ld", &head_type[total_lef]);
+            total_lef++;
+        }
+        head_rig[rel] = total_lef;
+        std::sort(head_type + head_lef[rel], head_type + head_rig[rel]);
+        tmp = fscanf(f_type, "%ld%ld", &rel, &tot);
+        tail_lef[rel] = total_rig;
+        for (INT j = 0; j < tot; j++) {
+            tmp = fscanf(f_type, "%ld", &tail_type[total_rig]);
+            total_rig++;
+        }
+        tail_rig[rel] = total_rig;
+        std::sort(tail_type + tail_lef[rel], tail_type + tail_rig[rel]);
+    }
+    fclose(f_type);
+}
+
 
 #endif
