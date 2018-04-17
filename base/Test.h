@@ -102,11 +102,45 @@ void testTail(REAL *con) {
 
 extern "C"
 void test_link_prediction() {
-    printf("overall results:\n");
-    printf("left %f %f %f %f %f \n", l_rank/ testTotal, l_reci_rank/ testTotal, l_tot / testTotal, l3_tot / testTotal, l1_tot / testTotal);
-    printf("left(filter) %f %f %f %f %f \n", l_filter_rank/ testTotal, l_filter_reci_rank/ testTotal, l_filter_tot / testTotal,  l3_filter_tot / testTotal,  l1_filter_tot / testTotal);
-    printf("right %f %f %f %f %f \n", r_rank/ testTotal, r_reci_rank/ testTotal, r_tot / testTotal,r3_tot / testTotal,r1_tot / testTotal);
-    printf("right(filter) %f %f %f %f %f\n", r_filter_rank/ testTotal, r_filter_reci_rank/ testTotal, r_filter_tot / testTotal,r3_filter_tot / testTotal,r1_filter_tot / testTotal);
+    l_rank /= testTotal;
+    r_rank /= testTotal;
+    l_reci_rank /= testTotal;
+    r_reci_rank /= testTotal;
+ 
+    l_tot /= testTotal;
+    l3_tot /= testTotal;
+    l1_tot /= testTotal;
+ 
+    r_tot /= testTotal;
+    r3_tot /= testTotal;
+    r1_tot /= testTotal;
+
+    // with filter
+    l_filter_rank /= testTotal;
+    r_filter_rank /= testTotal;
+    l_filter_reci_rank /= testTotal;
+    r_filter_reci_rank /= testTotal;
+ 
+    l_filter_tot /= testTotal;
+    l3_filter_tot /= testTotal;
+    l1_filter_tot /= testTotal;
+ 
+    r_filter_tot /= testTotal;
+    r3_filter_tot /= testTotal;
+    r1_filter_tot /= testTotal;
+
+    printf("Overall results:\n");
+    
+    printf("metric:\t\t\t MRR \t\t MR \t\t hit@10 \t hit@3  \t hit@1 \n");
+    printf("l(raw):\t\t\t %f \t %f \t %f \t %f \t %f \n", l_reci_rank, l_rank, l_tot, l3_tot, l1_tot);
+    printf("r(raw):\t\t\t %f \t %f \t %f \t %f \t %f \n", r_reci_rank, r_rank, r_tot, r3_tot, r1_tot);
+    printf("averaged(raw):\t\t %f \t %f \t %f \t %f \t %f \n",
+            (l_reci_rank+r_reci_rank)/2, (l_rank+r_rank)/2, (l_tot+r_tot)/2, (l3_tot+r3_tot)/2, (l1_tot+r1_tot)/2);
+    printf("\n");
+    printf("l(filter):\t\t %f \t %f \t %f \t %f \t %f \n", l_filter_reci_rank, l_filter_rank, l_filter_tot, l3_filter_tot, l1_filter_tot);
+    printf("r(filter):\t\t %f \t %f \t %f \t %f \t %f \n", r_filter_reci_rank, r_filter_rank, r_filter_tot, r3_filter_tot, r1_filter_tot);
+    printf("averaged(filter):\t %f \t %f \t %f \t %f \t %f \n",
+            (l_filter_reci_rank+r_filter_reci_rank)/2, (l_filter_rank+r_filter_rank)/2, (l_filter_tot+r_filter_tot)/2, (l3_filter_tot+r3_filter_tot)/2, (l1_filter_tot+r1_filter_tot)/2);
 }
 
 /*=====================================================================================
