@@ -3,9 +3,6 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# Complied Base
-release/Base.so
-
 # Distribution / packaging
 .Python
 build/
