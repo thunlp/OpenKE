@@ -103,12 +103,12 @@ void importTrainFiles() {
 	left_mean = (REAL *)calloc(relationTotal,sizeof(REAL));
 	right_mean = (REAL *)calloc(relationTotal,sizeof(REAL));
 	for (INT i = 0; i < entityTotal; i++) {
-		for (INT j = lefHead[i] + 1; j < rigHead[i]; j++)
+		for (INT j = lefHead[i] + 1; j <= rigHead[i]; j++)
 			if (trainHead[j].r != trainHead[j - 1].r)
 				left_mean[trainHead[j].r] += 1.0;
 		if (lefHead[i] <= rigHead[i])
 			left_mean[trainHead[lefHead[i]].r] += 1.0;
-		for (INT j = lefTail[i] + 1; j < rigTail[i]; j++)
+		for (INT j = lefTail[i] + 1; j <= rigTail[i]; j++)
 			if (trainTail[j].r != trainTail[j - 1].r)
 				right_mean[trainTail[j].r] += 1.0;
 		if (lefTail[i] <= rigTail[i])
