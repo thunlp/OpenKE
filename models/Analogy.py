@@ -4,60 +4,64 @@ import tensorflow as tf
 from Model import *
 
 class Analogy(Model):
+	def embedding_def(self):
+		config = self.get_config()
+		self.ent1_embeddings = tf.get_variable(name = "ent1_embeddings", shape = [config.entTotal, config.hidden_size/2], initializer = tf.contrib.layers.xavier_initializer(uniform = True))
+		self.rel1_embeddings = tf.get_variable(name = "rel1_embeddings", shape = [config.relTotal, config.hidden_size/2], initializer = tf.contrib.layers.xavier_initializer(uniform = True))
+		self.ent2_embeddings = tf.get_variable(name = "ent2_embeddings", shape = [config.entTotal, config.hidden_size/2], initializer = tf.contrib.layers.xavier_initializer(uniform = True))
+		self.rel2_embeddings = tf.get_variable(name = "rel2_embeddings", shape = [config.relTotal, config.hidden_size/2], initializer = tf.contrib.layers.xavier_initializer(uniform = True))
+		self.ent_embeddings  = tf.get_variable(name = "ent_embeddings", shape = [config.entTotal, config.hidden_size], initializer = tf.contrib.layers.xavier_initializer(uniform = True))
+		self.rel_embeddings  = tf.get_variable(name = "rel_embeddings", shape = [config.relTotal, config.hidden_size], initializer = tf.contrib.layers.xavier_initializer(uniform = True))
+		self.parameter_lists = {"ent_re_embeddings":self.ent1_embeddings, \
+								"ent_im_embeddings":self.ent2_embeddings, \
+								"rel_re_embeddings":self.rel1_embeddings, \
+								"rel_im_embeddings":self.rel2_embeddings, \
+								"ent_embeddings":self.ent_embeddings,\
+								"rel_embeddings":self.rel_embeddings
+								}
 
-    def _calc(self, e_re_h, e_im_h, e_h, e_re_t, e_im_t, e_t, r_re, r_im, r):
-        return tf.reduce_sum(r_re * e_re_h * e_re_t + r_re * e_im_h * e_im_t + r_im * e_re_h * e_im_t - r_im * e_im_h * e_re_t, axis=1, keepdims=False) + tf.reduce_sum(e_h * e_t * r, axis=1, keepdims=False)
+	def _calc_comp(self, e1_h, e2_h, e1_t, e2_t, r1, r2):
+		return e1_h * e1_t * r1 + e2_h * e2_t * r1 + e1_h * e2_t * r2 - e2_h * e1_t * r2
+	def _calc_dist(self, e_h, e_t, rel):
+		return e_h * e_t * rel
+	def loss_def(self):
+		#Obtaining the initial configuration of the model
+		config = self.get_config()
+		#To get positive triples and negative triples for training
+		#To get labels for the triples, positive triples as 1 and negative triples as -1
+		#The shapes of h, t, r, y are (batch_size, 1 + negative_ent + negative_rel)
+		h, t, r = self.get_all_instance()
+		y = self.get_all_labels()
+		#Embedding entities and relations of triples
+		e1_h = tf.nn.embedding_lookup(self.ent1_embeddings, h)
+		e2_h = tf.nn.embedding_lookup(self.ent2_embeddings, h)
+		e_h  = tf.nn.embedding_lookup(self.ent_embeddings, h)
+		e1_t = tf.nn.embedding_lookup(self.ent1_embeddings, t)
+		e2_t = tf.nn.embedding_lookup(self.ent2_embeddings, t)
+		e_t  = tf.nn.embedding_lookup(self.ent_embeddings, t)
+		r1 = tf.nn.embedding_lookup(self.rel1_embeddings, r)
+		r2 = tf.nn.embedding_lookup(self.rel2_embeddings, r)
+		rel = tf.nn.embedding_lookup(self.rel_embeddings, r)
+		#Calculating score functions for all positive triples and negative triples
+		res_comp = tf.reduce_sum(self._calc_comp(e1_h, e2_h, e1_t, e2_t, r1, r2), 1, keep_dims = False)
+		res_dist = tf.reduce_sum(self._calc_dist(e_h, e_t, rel), 1, keep_dims = False)
+		res = res_comp + res_dist
+		loss_func = tf.reduce_mean(tf.nn.softplus(- y * res), 0, keep_dims = False)
+		regul_func = tf.reduce_mean(e1_h ** 2) + tf.reduce_mean(e1_t ** 2) + tf.reduce_mean(e2_h ** 2) + tf.reduce_mean(e2_t ** 2) + tf.reduce_mean(r1 ** 2) + tf.reduce_mean(r2 ** 2) + tf.reduce_mean(e_h ** 2) + tf.reduce_mean(e_t ** 2) + tf.reduce_mean(rel ** 2)
+		#Calculating loss to get what the framework will optimize
+		self.loss =  loss_func + config.lmbda * regul_func
 
-    def embedding_def(self):
-        #Obtaining the initial configuration of the model
-        config = self.get_config()
-        #Defining required parameters of the model, including embeddings of entities and relations, entity transfer vectors, and relation transfer vectors
-        self.ent_embeddings = tf.get_variable(name = "ent_embeddings", shape = [config.entTotal, config.hidden_size], initializer = tf.contrib.layers.xavier_initializer(uniform=True))
-        self.rel_embeddings = tf.get_variable(name = "rel_embeddings", shape = [config.relTotal, config.hidden_size], initializer = tf.contrib.layers.xavier_initializer(uniform=True))
-        self.ent_re = tf.get_variable(name = "ent_re", shape = [config.entTotal, config.hidden_size], initializer = tf.contrib.layers.xavier_initializer(uniform=True))
-        self.rel_re = tf.get_variable(name = "rel_re", shape = [config.relTotal, config.hidden_size], initializer = tf.contrib.layers.xavier_initializer(uniform=True))
-        self.ent_im = tf.get_variable(name = "ent_im", shape = [config.entTotal, config.hidden_size], initializer = tf.contrib.layers.xavier_initializer(uniform=True))
-        self.rel_im = tf.get_variable(name = "rel_im", shape = [config.relTotal, config.hidden_size], initializer = tf.contrib.layers.xavier_initializer(uniform=True))
-        self.parameter_lists = {"ent_embeddings":self.ent_embeddings, \
-                                "rel_embeddings":self.rel_embeddings, \
-                                "ent_re":self.ent_re, \
-                                "rel_re":self.rel_re, \
-                                "ent_im":self.ent_im, \
-                                "rel_im":self.rel_im}
-
-    def loss_def(self):
-        #Obtaining the initial configuration of the model
-        config = self.get_config()
-        # get triples and labels
-        id_h, id_t, id_r = self.get_all_instance()
-        y = self.get_all_labels()
-        # get the embeddings
-        e_re_h = tf.nn.embedding_lookup(self.ent_re, id_h)
-        e_im_h = tf.nn.embedding_lookup(self.ent_im, id_h)
-        e_h    = tf.nn.embedding_lookup(self.ent_embeddings, id_h)
-        e_re_t = tf.nn.embedding_lookup(self.ent_re, id_t)
-        e_im_t = tf.nn.embedding_lookup(self.ent_im, id_t)
-        e_t    = tf.nn.embedding_lookup(self.ent_embeddings, id_t)
-        r_re   = tf.nn.embedding_lookup(self.rel_re, id_r)
-        r_im   = tf.nn.embedding_lookup(self.rel_im, id_r)
-        r      = tf.nn.embedding_lookup(self.rel_embeddings, id_r)
-        # calculating loss with regularization
-        res = self._calc(e_re_h, e_im_h, e_h, e_re_t, e_im_t, e_t, r_re, r_im, r)
-        loss = tf.reduce_mean(tf.nn.softplus(- y * res))
-        regul = tf.reduce_mean(e_re_h**2)+tf.reduce_mean(e_im_h**2)*tf.reduce_mean(e_h**2)+tf.reduce_mean(e_re_t**2)+tf.reduce_mean(e_im_t**2)+tf.reduce_mean(e_t**2)+tf.reduce_mean(r_re**2)+tf.reduce_mean(r_im**2)+tf.reduce_mean(r**2)
-        self.loss = loss + self.config.lmbda * regul
-
-    def predict_def(self):
-        config = self.get_config()
-        id_h, id_t, id_r = self.get_predict_instance()
-        e_re_h = tf.nn.embedding_lookup(self.ent_re, id_h)
-        e_im_h = tf.nn.embedding_lookup(self.ent_im, id_h)
-        e_h    = tf.nn.embedding_lookup(self.ent_embeddings, id_h)
-        e_re_t = tf.nn.embedding_lookup(self.ent_re, id_t)
-        e_im_t = tf.nn.embedding_lookup(self.ent_im, id_t)
-        e_t    = tf.nn.embedding_lookup(self.ent_embeddings, id_t)
-        r_re   = tf.nn.embedding_lookup(self.rel_re, id_r)
-        r_im   = tf.nn.embedding_lookup(self.rel_im, id_r)
-        r      = tf.nn.embedding_lookup(self.rel_embeddings, id_r)
-        self.predict = -self._calc(e_re_h, e_im_h, e_h, e_re_t, e_im_t, e_t, r_re, r_im, r)
+	def predict_def(self):
+		config = self.get_config()
+		predict_h, predict_t, predict_r = self.get_predict_instance()
+		predict_h_e1 = tf.nn.embedding_lookup(self.ent1_embeddings, predict_h)
+		predict_t_e1 = tf.nn.embedding_lookup(self.ent1_embeddings, predict_t)
+		predict_r_e1 = tf.nn.embedding_lookup(self.rel1_embeddings, predict_r)
+		predict_h_e2 = tf.nn.embedding_lookup(self.ent2_embeddings, predict_h)
+		predict_t_e2 = tf.nn.embedding_lookup(self.ent2_embeddings, predict_t)
+		predict_r_e2 = tf.nn.embedding_lookup(self.rel2_embeddings, predict_r)
+		predict_h_e = tf.nn.embedding_lookup(self.ent_embeddings, predict_h)
+		predict_t_e = tf.nn.embedding_lookup(self.ent_embeddings, predict_t)
+		predict_rel = tf.nn.embedding_lookup(self.rel_embeddings, predict_r)
+		self.predict = -tf.reduce_sum(self._calc_comp(predict_h_e1, predict_h_e2, predict_t_e1, predict_t_e2, predict_r_e1, predict_r_e2), 1, keep_dims = True) - tf.reduce_sum(self._calc_dist(predict_h_e, predict_t_e, predict_rel), 1, keep_dims = True)
 
