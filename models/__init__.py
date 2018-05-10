@@ -16,3 +16,5 @@ from . import HolE
 from HolE import *
 from . import ComplEx
 from ComplEx import *
+from . import Analogy
+from Analogy import *
