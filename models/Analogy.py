@@ -4,6 +4,7 @@ import tensorflow as tf
 from Model import *
 
 class Analogy(Model):
+	
 	def embedding_def(self):
 		config = self.get_config()
 		self.ent1_embeddings = tf.get_variable(name = "ent1_embeddings", shape = [config.entTotal, config.hidden_size/2], initializer = tf.contrib.layers.xavier_initializer(uniform = True))
@@ -22,8 +23,10 @@ class Analogy(Model):
 
 	def _calc_comp(self, e1_h, e2_h, e1_t, e2_t, r1, r2):
 		return e1_h * e1_t * r1 + e2_h * e2_t * r1 + e1_h * e2_t * r2 - e2_h * e1_t * r2
+	
 	def _calc_dist(self, e_h, e_t, rel):
 		return e_h * e_t * rel
+	
 	def loss_def(self):
 		#Obtaining the initial configuration of the model
 		config = self.get_config()
