@@ -29,7 +29,8 @@ conR = config.Config()
 #Input training files from benchmarks/FB15K/ folder.
 conR.set_in_path("./benchmarks/FB15K/")
 #True: Input test files from the same folder.
-conR.set_test_flag(True)
+conR.set_test_link_prediction(True)
+conR.set_test_triple_classification(True)
 
 conR.set_work_threads(4)
 conR.set_train_times(500)
