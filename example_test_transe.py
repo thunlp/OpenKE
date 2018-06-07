@@ -4,7 +4,7 @@ import tensorflow as tf
 import numpy as np
 import json
 import os
-os.environ['CUDA_VISIBLE_DEVICES']='0'
+os.environ['CUDA_VISIBLE_DEVICES']='4,5,6'
 # (1) Set import files and OpenKE will automatically load models via tf.Saver().
 con = config.Config()
 con.set_in_path("./benchmarks/FB15K/")

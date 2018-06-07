@@ -3,7 +3,7 @@ import models
 import tensorflow as tf
 import numpy as np
 import os
-os.environ['CUDA_VISIBLE_DEVICES']='6'
+os.environ['CUDA_VISIBLE_DEVICES']='4,5,6'
 #Input training files from benchmarks/FB15K/ folder.
 con = config.Config()
 #True: Input test files from the same folder.

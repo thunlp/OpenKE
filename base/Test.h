@@ -12,6 +12,8 @@ INT lastTail = 0;
 REAL l1_filter_tot = 0, l1_tot = 0, r1_tot = 0, r1_filter_tot = 0, l_tot = 0, r_tot = 0, l_filter_rank = 0, l_rank = 0, l_filter_reci_rank = 0, l_reci_rank = 0;
 REAL l3_filter_tot = 0, l3_tot = 0, r3_tot = 0, r3_filter_tot = 0, l_filter_tot = 0, r_filter_tot = 0, r_filter_rank = 0, r_rank = 0, r_filter_reci_rank = 0, r_reci_rank = 0;
 
+REAL l1_filter_tot_constrain = 0, l1_tot_constrain = 0, r1_tot_constrain = 0, r1_filter_tot_constrain = 0, l_tot_constrain = 0, r_tot_constrain = 0, l_filter_rank_constrain = 0, l_rank_constrain = 0, l_filter_reci_rank_constrain = 0, l_reci_rank_constrain = 0;
+REAL l3_filter_tot_constrain = 0, l3_tot_constrain = 0, r3_tot_constrain = 0, r3_filter_tot_constrain = 0, l_filter_tot_constrain = 0, r_filter_tot_constrain = 0, r_filter_rank_constrain = 0, r_rank_constrain = 0, r_filter_reci_rank_constrain = 0, r_reci_rank_constrain = 0;
 extern "C"
 void getHeadBatch(INT *ph, INT *pt, INT *pr) {
     for (INT i = 0; i < entityTotal; i++) {
@@ -35,18 +37,31 @@ void testHead(REAL *con) {
     INT h = testList[lastHead].h;
     INT t = testList[lastHead].t;
     INT r = testList[lastHead].r;
+    INT lef = head_lef[r], rig = head_rig[r];
 
     REAL minimal = con[h];
     INT l_s = 0;
     INT l_filter_s = 0;
     INT l_s_constrain = 0;
+    INT l_filter_s_constrain = 0;
 
     for (INT j = 0; j < entityTotal; j++) {
-        REAL value = con[j];
-        if (j != h && value < minimal) {
-            l_s += 1;
-            if (not _find(j, t, r))
-                l_filter_s += 1;
+        if (j != h) {
+            REAL value = con[j];
+            if (value < minimal) {
+                l_s += 1;
+                if (not _find(j, t, r))
+                    l_filter_s += 1;
+            }
+            while (lef < rig && head_type[lef] < j) lef ++;
+            if (lef < rig && j == head_type[lef]) {
+                if (value < minimal) {
+                    l_s_constrain += 1;
+                    if (not _find(j, t, r)) {
+                        l_filter_s_constrain += 1;
+                    }
+                }  
+            }
         }
     }
 
@@ -56,11 +71,26 @@ void testHead(REAL *con) {
     if (l_s < 3) l3_tot += 1;
     if (l_filter_s < 1) l1_filter_tot += 1;
     if (l_s < 1) l1_tot += 1;
+
+    if (l_filter_s_constrain < 10) l_filter_tot_constrain += 1;
+    if (l_s_constrain < 10) l_tot_constrain += 1;
+    if (l_filter_s_constrain < 3) l3_filter_tot_constrain += 1;
+    if (l_s_constrain < 3) l3_tot_constrain += 1;
+    if (l_filter_s_constrain < 1) l1_filter_tot_constrain += 1;
+    if (l_s_constrain < 1) l1_tot_constrain += 1;
+
     l_filter_rank += (l_filter_s+1);
     l_rank += (1+l_s);
     l_filter_reci_rank += 1.0/(l_filter_s+1);
     l_reci_rank += 1.0/(l_s+1);
+
+    l_filter_rank_constrain += (l_filter_s_constrain+1);
+    l_rank_constrain += (1+l_s_constrain);
+    l_filter_reci_rank_constrain += 1.0/(l_filter_s_constrain+1);
+    l_reci_rank_constrain += 1.0/(l_s_constrain+1);
+
     lastHead++;
+
     printf("l_filter_s: %ld\n", l_filter_s);
     printf("%f %f %f %f \n", l_tot / lastHead, l_filter_tot / lastHead, l_rank / lastHead, l_filter_rank / lastHead);
 }
@@ -70,19 +100,31 @@ void testTail(REAL *con) {
     INT h = testList[lastTail].h;
     INT t = testList[lastTail].t;
     INT r = testList[lastTail].r;
-
+    INT lef = tail_lef[r], rig = tail_rig[r];
     REAL minimal = con[t];
     INT r_s = 0;
     INT r_filter_s = 0;
     INT r_s_constrain = 0;
-
+    INT r_filter_s_constrain = 0;
     for (INT j = 0; j < entityTotal; j++) {
-        REAL value = con[j];
-        if (j != t && value < minimal) {
-            r_s += 1;
-            if (not _find(h, j, r))
-                r_filter_s += 1;
+        if (j != t) {
+            REAL value = con[j];
+            if (value < minimal) {
+                r_s += 1;
+                if (not _find(h, j, r))
+                    r_filter_s += 1;
+            }
+            while (lef < rig && tail_type[lef] < j) lef ++;
+            if (lef < rig && j == tail_type[lef]) {
+                    if (value < minimal) {
+                        r_s_constrain += 1;
+                        if (not _find(h, j ,r)) {
+                            r_filter_s_constrain += 1;
+                        }
+                    }
+            }
         }
+        
     }
 
     if (r_filter_s < 10) r_filter_tot += 1;
@@ -91,10 +133,24 @@ void testTail(REAL *con) {
     if (r_s < 3) r3_tot += 1;
     if (r_filter_s < 1) r1_filter_tot += 1;
     if (r_s < 1) r1_tot += 1;
+
+    if (r_filter_s_constrain < 10) r_filter_tot_constrain += 1;
+    if (r_s_constrain < 10) r_tot_constrain += 1;
+    if (r_filter_s_constrain < 3) r3_filter_tot_constrain += 1;
+    if (r_s_constrain < 3) r3_tot_constrain += 1;
+    if (r_filter_s_constrain < 1) r1_filter_tot_constrain += 1;
+    if (r_s_constrain < 1) r1_tot_constrain += 1;
+
     r_filter_rank += (1+r_filter_s);
     r_rank += (1+r_s);
     r_filter_reci_rank += 1.0/(1+r_filter_s);
     r_reci_rank += 1.0/(1+r_s);
+
+    r_filter_rank_constrain += (1+r_filter_s_constrain);
+    r_rank_constrain += (1+r_s_constrain);
+    r_filter_reci_rank_constrain += 1.0/(1+r_filter_s_constrain);
+    r_reci_rank_constrain += 1.0/(1+r_s_constrain);
+
     lastTail++;
     printf("r_filter_s: %ld\n", r_filter_s);
     printf("%f %f %f %f\n", r_tot /lastTail, r_filter_tot /lastTail, r_rank /lastTail, r_filter_rank /lastTail);
@@ -129,7 +185,7 @@ void test_link_prediction() {
     r3_filter_tot /= testTotal;
     r1_filter_tot /= testTotal;
 
-    printf("Overall results:\n");
+    printf("no type constraint results:\n");
     
     printf("metric:\t\t\t MRR \t\t MR \t\t hit@10 \t hit@3  \t hit@1 \n");
     printf("l(raw):\t\t\t %f \t %f \t %f \t %f \t %f \n", l_reci_rank, l_rank, l_tot, l3_tot, l1_tot);
@@ -141,6 +197,47 @@ void test_link_prediction() {
     printf("r(filter):\t\t %f \t %f \t %f \t %f \t %f \n", r_filter_reci_rank, r_filter_rank, r_filter_tot, r3_filter_tot, r1_filter_tot);
     printf("averaged(filter):\t %f \t %f \t %f \t %f \t %f \n",
             (l_filter_reci_rank+r_filter_reci_rank)/2, (l_filter_rank+r_filter_rank)/2, (l_filter_tot+r_filter_tot)/2, (l3_filter_tot+r3_filter_tot)/2, (l1_filter_tot+r1_filter_tot)/2);
+
+    //type constrain
+    l_rank_constrain /= testTotal;
+    r_rank_constrain /= testTotal;
+    l_reci_rank_constrain /= testTotal;
+    r_reci_rank_constrain /= testTotal;
+ 
+    l_tot_constrain /= testTotal;
+    l3_tot_constrain /= testTotal;
+    l1_tot_constrain /= testTotal;
+ 
+    r_tot_constrain /= testTotal;
+    r3_tot_constrain /= testTotal;
+    r1_tot_constrain /= testTotal;
+
+    // with filter
+    l_filter_rank_constrain /= testTotal;
+    r_filter_rank_constrain /= testTotal;
+    l_filter_reci_rank_constrain /= testTotal;
+    r_filter_reci_rank_constrain /= testTotal;
+ 
+    l_filter_tot_constrain /= testTotal;
+    l3_filter_tot_constrain /= testTotal;
+    l1_filter_tot_constrain /= testTotal;
+ 
+    r_filter_tot_constrain /= testTotal;
+    r3_filter_tot_constrain /= testTotal;
+    r1_filter_tot_constrain /= testTotal;
+
+    printf("type constraint results:\n");
+    
+    printf("metric:\t\t\t MRR \t\t MR \t\t hit@10 \t hit@3  \t hit@1 \n");
+    printf("l(raw):\t\t\t %f \t %f \t %f \t %f \t %f \n", l_reci_rank_constrain, l_rank_constrain, l_tot_constrain, l3_tot_constrain, l1_tot_constrain);
+    printf("r(raw):\t\t\t %f \t %f \t %f \t %f \t %f \n", r_reci_rank_constrain, r_rank_constrain, r_tot_constrain, r3_tot_constrain, r1_tot_constrain);
+    printf("averaged(raw):\t\t %f \t %f \t %f \t %f \t %f \n",
+            (l_reci_rank_constrain+r_reci_rank_constrain)/2, (l_rank_constrain+r_rank_constrain)/2, (l_tot_constrain+r_tot_constrain)/2, (l3_tot_constrain+r3_tot_constrain)/2, (l1_tot_constrain+r1_tot_constrain)/2);
+    printf("\n");
+    printf("l(filter):\t\t %f \t %f \t %f \t %f \t %f \n", l_filter_reci_rank_constrain, l_filter_rank_constrain, l_filter_tot_constrain, l3_filter_tot_constrain, l1_filter_tot_constrain);
+    printf("r(filter):\t\t %f \t %f \t %f \t %f \t %f \n", r_filter_reci_rank_constrain, r_filter_rank_constrain, r_filter_tot_constrain, r3_filter_tot_constrain, r1_filter_tot_constrain);
+    printf("averaged(filter):\t %f \t %f \t %f \t %f \t %f \n",
+            (l_filter_reci_rank_constrain+r_filter_reci_rank_constrain)/2, (l_filter_rank_constrain+r_filter_rank_constrain)/2, (l_filter_tot_constrain+r_filter_tot_constrain)/2, (l3_filter_tot_constrain+r3_filter_tot_constrain)/2, (l1_filter_tot_constrain+r1_filter_tot_constrain)/2);
 }
 
 /*=====================================================================================
@@ -266,7 +363,7 @@ void test_triple_classification(REAL *score_pos, REAL *score_neg) {
         testAcc[r] = 1.0 * correct / total;
         aveCorrect += correct; 
         aveTotal += total;
-    //    printf("relation %ld: triple classification accuracy is %lf\n", r, testAcc[r]);
+       // printf("relation %ld: triple classification accuracy is %lf\n", r, testAcc[r]);
     }
     aveAcc = 1.0 * aveCorrect / aveTotal;
     printf("triple classification accuracy is %lf\n", aveAcc);

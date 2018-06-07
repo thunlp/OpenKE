@@ -68,6 +68,7 @@ class Config(object):
 			self.batch_y_addr = self.batch_y.__array_interface__['data'][0]
 		if self.test_link_prediction:
 			self.lib.importTestFiles()
+			self.lib.importTypeFiles()
 			self.test_h = np.zeros(self.lib.getEntityTotal(), dtype = np.int64)
 			self.test_t = np.zeros(self.lib.getEntityTotal(), dtype = np.int64)
 			self.test_r = np.zeros(self.lib.getEntityTotal(), dtype = np.int64)
