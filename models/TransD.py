@@ -19,7 +19,7 @@ class TransD(Model):
 		nn.init.xavier_uniform(self.ent_transfer.weight.data)
 		nn.init.xavier_uniform(self.rel_transfer.weight.data)
 	def _transfer(self,e,t,r):
-		return e+torch.sum(e*t,1,True)*r
+		return F.normalize(e+torch.sum(e*t,1,True)*r,2,1)
 	def _calc(self,h,t,r):
 		return torch.abs(h+r-t)
 	def loss_func(self,p_score,n_score):

@@ -37,6 +37,16 @@ class TransH(Model):
 		p_norm=self.norm_vector(pos_r)
 		n_norm=self.norm_vector(neg_r)
 
+		p_h_e=F.normalize(p_h_e,2,1)
+		p_t_e=F.normalize(p_t_e,2,1)
+		p_r_e=F.normalize(p_r_e,2,1)
+		n_h_e=F.normalize(n_h_e,2,1)
+		n_t_e=F.normalize(n_t_e,2,1)
+		n_r_e=F.normalize(n_r_e,2,1)
+		
+		p_norm=F.normalize(p_norm,2,1)
+		n_norm=F.normalize(n_norm,2,1)
+
 		p_h=self._transfer(p_h_e,p_norm)
 		p_t=self._transfer(p_t_e,p_norm)
 		p_r=p_r_e
@@ -56,6 +66,10 @@ class TransH(Model):
 		p_t_e=self.ent_embeddings(Variable(torch.from_numpy(predict_t)).cuda())
 		p_r_e=self.rel_embeddings(Variable(torch.from_numpy(predict_r)).cuda())
 		p_norm=self.norm_vector(Variable(torch.from_numpy(predict_r)).cuda())
+		p_h_e=F.normalize(p_h_e,2,1)
+		p_t_e=F.normalize(p_t_e,2,1)
+		p_r_e=F.normalize(p_r_e,2,1)
+		p_norm=F.normalize(p_norm,2,1)
 		p_h=self._transfer(p_h_e,p_norm)
 		p_t=self._transfer(p_t_e,p_norm)
 		p_r=p_r_e
