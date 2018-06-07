@@ -6,8 +6,7 @@ from Model import *
 class TransH(Model):
 
 	def _transfer(self, e, n):
-		norm = n
-		return e - tf.reduce_sum(e * norm, 1, keep_dims = True) * norm
+		return e - tf.reduce_sum(e * n, 1, keep_dims = True) * n
 
 	def _calc(self, h, t, r):
 		return abs(h + r - t)
@@ -41,6 +40,17 @@ class TransH(Model):
 		#Getting the required normal vectors of planes to transfer entity embeddings
 		pos_norm = tf.nn.embedding_lookup(self.normal_vectors, pos_r)
 		neg_norm = tf.nn.embedding_lookup(self.normal_vectors, neg_r)
+		
+		pos_h_e = tf.nn.l2_normalize(pos_h_e, 1)
+		pos_t_e = tf.nn.l2_normalize(pos_t_e, 1)
+		pos_r_e = tf.nn.l2_normalize(pos_r_e, 1)
+		neg_h_e = tf.nn.l2_normalize(neg_h_e, 1)
+		neg_t_e = tf.nn.l2_normalize(neg_t_e, 1)
+		neg_r_e = tf.nn.l2_normalize(neg_r_e, 1)
+		
+		pos_norm = tf.nn.l2_normalize(pos_norm, 1)
+		neg_norm = tf.nn.l2_normalize(neg_norm, 1)
+	
 		#Calculating score functions for all positive triples and negative triples
 		p_h = self._transfer(pos_h_e, pos_norm)
 		p_t = self._transfer(pos_t_e, pos_norm)
@@ -69,6 +79,12 @@ class TransH(Model):
 		predict_t_e = tf.nn.embedding_lookup(self.ent_embeddings, predict_t)
 		predict_r_e = tf.nn.embedding_lookup(self.rel_embeddings, predict_r)
 		predict_norm = tf.nn.embedding_lookup(self.normal_vectors, predict_r)
+		
+		predict_h_e = tf.nn.l2_normalize(predict_h_e, 1)
+		predict_t_e = tf.nn.l2_normalize(predict_t_e, 1)
+		predict_r_e = tf.nn.l2_normalize(predict_r_e, 1)
+		predict_norm = tf.nn.l2_normalize(predict_norm, 1)
+
 		h_e = self._transfer(predict_h_e, predict_norm)
 		t_e = self._transfer(predict_t_e, predict_norm)
 		r_e = predict_r_e

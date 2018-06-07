@@ -6,7 +6,7 @@ from Model import *
 class RESCAL(Model):
 
 	def _calc(self, h, t, r):
-		return h * tf.batch_matmul(r, t)
+		return h * tf.matmul(r, t)
 
 	def embedding_def(self):
 		#Obtaining the initial configuration of the model

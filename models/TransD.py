@@ -6,7 +6,7 @@ from Model import *
 class TransD(Model):
 
 	def _transfer(self, e, t, r):
-		return e + tf.reduce_sum(e * t, 1, keep_dims = True) * r
+		return tf.nn.l2_normalize(e + tf.reduce_sum(e * t, 1, keep_dims = True) * r, -1)
 
 	def _calc(self, h, t, r):
 		return abs(h + r - t)
