@@ -132,3 +132,6 @@ venv.bak/
 *.exe
 *.out
 *.app
+
+# Backups
+*~
