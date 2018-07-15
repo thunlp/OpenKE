@@ -13,7 +13,8 @@ import json
 class Config(object):
 
 	def __init__(self):
-		self.lib = ctypes.cdll.LoadLibrary("./release/Base.so")
+		base_file = os.path.abspath(os.path.join(os.path.dirname(__file__), '../release/Base.so'))		
+		self.lib = ctypes.cdll.LoadLibrary(base_file)
 		self.lib.sampling.argtypes = [ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_int64, ctypes.c_int64, ctypes.c_int64]
 		self.lib.getHeadBatch.argtypes = [ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p]
 		self.lib.getTailBatch.argtypes = [ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p]
@@ -51,7 +52,7 @@ class Config(object):
 	def init(self):
 		self.trainModel = None
 		if self.in_path != None:
-			self.lib.setInPath(ctypes.create_string_buffer(self.in_path, len(self.in_path) * 2))
+			self.lib.setInPath(ctypes.create_string_buffer(self.in_path.encode(), len(self.in_path) * 2))
 			self.lib.setBern(self.bern)
 			self.lib.setWorkThreads(self.workThreads)
 			self.lib.randReset()
@@ -61,7 +62,7 @@ class Config(object):
 			self.trainTotal = self.lib.getTrainTotal()
 			self.testTotal = self.lib.getTestTotal()
 			self.validTotal = self.lib.getValidTotal()
-			self.batch_size = self.lib.getTrainTotal() / self.nbatches
+			self.batch_size = int(self.lib.getTrainTotal() / self.nbatches)
 			self.batch_seq_size = self.batch_size * (1 + self.negative_ent + self.negative_rel)
 			self.batch_h = np.zeros(self.batch_size * (1 + self.negative_ent + self.negative_rel), dtype = np.int64)
 			self.batch_t = np.zeros(self.batch_size * (1 + self.negative_ent + self.negative_rel), dtype = np.int64)
@@ -275,8 +276,8 @@ class Config(object):
 			if self.exportName != None and (self.export_steps!=0 and epoch % self.export_steps == 0):
 				self.save_pytorch()
 			if self.log_on == 1:
-				print epoch
-				print res
+				print(epoch)
+				print(res)
 		if self.exportName != None:
 			self.save_pytorch()
 		if self.out_path != None:
@@ -296,7 +297,7 @@ class Config(object):
 				res = self.trainModel.predict(self.test_h, self.test_t, self.test_r)
 				self.lib.testTail(res.data.numpy().__array_interface__['data'][0])
 				if self.log_on:
-					print epoch
+					print(epoch)
 			self.lib.test_link_prediction()
 		if self.test_triple_classification:
 			self.lib.getValidBatch(self.valid_pos_h_addr, self.valid_pos_t_addr, self.valid_pos_r_addr, self.valid_neg_h_addr, self.valid_neg_t_addr, self.valid_neg_r_addr)

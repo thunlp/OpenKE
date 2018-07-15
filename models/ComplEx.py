@@ -4,7 +4,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 import numpy as np
-from Model import *
+from .Model import Model
+
 class ComplEx(Model):
 	def __init__(self,config):
 		super(ComplEx,self).__init__(config)
