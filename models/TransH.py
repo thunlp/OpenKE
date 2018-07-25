@@ -5,6 +5,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 import numpy as np
 from .Model import Model
+from torch.autograd import Variable
 
 class TransH(Model):
 	def __init__(self,config):
