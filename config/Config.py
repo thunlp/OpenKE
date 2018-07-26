@@ -22,8 +22,8 @@ class Config(object):
 		self.lib.testTail.argtypes = [ctypes.c_void_p]
 		self.lib.getTestBatch.argtypes = [ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p]
 		self.lib.getValidBatch.argtypes = [ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p]
-		self.lib.getBestThreshold.argtypes = [ctypes.c_void_p, ctypes.c_void_p]
-		self.lib.test_triple_classification.argtypes = [ctypes.c_void_p, ctypes.c_void_p]
+		self.lib.getBestThreshold.argtypes = [ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p]
+		self.lib.test_triple_classification.argtypes = [ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p]
 		self.test_flag = False
 		self.in_path = "./"
 		self.out_path = "./"
@@ -49,6 +49,45 @@ class Config(object):
 		self.optimizer = None
 		self.test_link_prediction = False
 		self.test_triple_classification = False
+	def init_link_prediction(self):
+                self.lib.importTestFiles()
+                self.lib.importTypeFiles()
+		self.test_h = np.zeros(self.lib.getEntityTotal(), dtype = np.int64)	
+		self.test_t = np.zeros(self.lib.getEntityTotal(), dtype = np.int64)
+               	self.test_r = np.zeros(self.lib.getEntityTotal(), dtype = np.int64)
+               	self.test_h_addr = self.test_h.__array_interface__['data'][0]
+                self.test_t_addr = self.test_t.__array_interface__['data'][0]
+                self.test_r_addr = self.test_r.__array_interface__['data'][0]
+	def init_triple_classification(self):
+		self.lib.importTestFiles()
+                self.lib.importTypeFiles()
+                self.test_pos_h = np.zeros(self.lib.getTestTotal(), dtype = np.int64)
+                self.test_pos_t = np.zeros(self.lib.getTestTotal(), dtype = np.int64)
+                self.test_pos_r = np.zeros(self.lib.getTestTotal(), dtype = np.int64)
+                self.test_neg_h = np.zeros(self.lib.getTestTotal(), dtype = np.int64)
+                self.test_neg_t = np.zeros(self.lib.getTestTotal(), dtype = np.int64)
+                self.test_neg_r = np.zeros(self.lib.getTestTotal(), dtype = np.int64)
+                self.test_pos_h_addr = self.test_pos_h.__array_interface__['data'][0]
+                self.test_pos_t_addr = self.test_pos_t.__array_interface__['data'][0]
+                self.test_pos_r_addr = self.test_pos_r.__array_interface__['data'][0]
+                self.test_neg_h_addr = self.test_neg_h.__array_interface__['data'][0]
+                self.test_neg_t_addr = self.test_neg_t.__array_interface__['data'][0]
+                self.test_neg_r_addr = self.test_neg_r.__array_interface__['data'][0]
+		self.valid_pos_h = np.zeros(self.lib.getValidTotal(), dtype = np.int64)
+                self.valid_pos_t = np.zeros(self.lib.getValidTotal(), dtype = np.int64)
+                self.valid_pos_r = np.zeros(self.lib.getValidTotal(), dtype = np.int64)
+                self.valid_neg_h = np.zeros(self.lib.getValidTotal(), dtype = np.int64)
+                self.valid_neg_t = np.zeros(self.lib.getValidTotal(), dtype = np.int64)
+                self.valid_neg_r = np.zeros(self.lib.getValidTotal(), dtype = np.int64)
+                self.valid_pos_h_addr = self.valid_pos_h.__array_interface__['data'][0]
+                self.valid_pos_t_addr = self.valid_pos_t.__array_interface__['data'][0]
+                self.valid_pos_r_addr = self.valid_pos_r.__array_interface__['data'][0]
+                self.valid_neg_h_addr = self.valid_neg_h.__array_interface__['data'][0]
+                self.valid_neg_t_addr = self.valid_neg_t.__array_interface__['data'][0]
+                self.valid_neg_r_addr = self.valid_neg_r.__array_interface__['data'][0]
+		self.relThresh = np.zeros(self.lib.getRelationTotal(), dtype = np.float32)
+		self.relThresh_addr = self.relThresh.__array_interface__['data'][0]
+
 	def init(self):
 		self.trainModel = None
 		if self.in_path != None:
@@ -73,44 +112,9 @@ class Config(object):
 			self.batch_r_addr = self.batch_r.__array_interface__['data'][0]
 			self.batch_y_addr = self.batch_y.__array_interface__['data'][0]
 		if self.test_link_prediction:
-			self.lib.importTestFiles()
-			self.lib.importTypeFiles()
-			
-			self.test_h = np.zeros(self.lib.getEntityTotal(), dtype = np.int64)
-			self.test_t = np.zeros(self.lib.getEntityTotal(), dtype = np.int64)
-			self.test_r = np.zeros(self.lib.getEntityTotal(), dtype = np.int64)
-			self.test_h_addr = self.test_h.__array_interface__['data'][0]
-			self.test_t_addr = self.test_t.__array_interface__['data'][0]
-			self.test_r_addr = self.test_r.__array_interface__['data'][0]
+			self.init_link_prediction()
 		if self.test_triple_classification:
-			self.lib.importTestFiles()
-			self.lib.importTypeFiles()
-
-			self.test_pos_h = np.zeros(self.lib.getTestTotal(), dtype = np.int64)
-			self.test_pos_t = np.zeros(self.lib.getTestTotal(), dtype = np.int64)
-			self.test_pos_r = np.zeros(self.lib.getTestTotal(), dtype = np.int64)
-			self.test_neg_h = np.zeros(self.lib.getTestTotal(), dtype = np.int64)
-			self.test_neg_t = np.zeros(self.lib.getTestTotal(), dtype = np.int64)
-			self.test_neg_r = np.zeros(self.lib.getTestTotal(), dtype = np.int64)
-			self.test_pos_h_addr = self.test_pos_h.__array_interface__['data'][0]
-			self.test_pos_t_addr = self.test_pos_t.__array_interface__['data'][0]
-			self.test_pos_r_addr = self.test_pos_r.__array_interface__['data'][0]
-			self.test_neg_h_addr = self.test_neg_h.__array_interface__['data'][0]
-			self.test_neg_t_addr = self.test_neg_t.__array_interface__['data'][0]
-			self.test_neg_r_addr = self.test_neg_r.__array_interface__['data'][0]
-
-			self.valid_pos_h = np.zeros(self.lib.getValidTotal(), dtype = np.int64)
-			self.valid_pos_t = np.zeros(self.lib.getValidTotal(), dtype = np.int64)
-			self.valid_pos_r = np.zeros(self.lib.getValidTotal(), dtype = np.int64)
-			self.valid_neg_h = np.zeros(self.lib.getValidTotal(), dtype = np.int64)
-			self.valid_neg_t = np.zeros(self.lib.getValidTotal(), dtype = np.int64)
-			self.valid_neg_r = np.zeros(self.lib.getValidTotal(), dtype = np.int64)
-			self.valid_pos_h_addr = self.valid_pos_h.__array_interface__['data'][0]
-			self.valid_pos_t_addr = self.valid_pos_t.__array_interface__['data'][0]
-			self.valid_pos_r_addr = self.valid_pos_r.__array_interface__['data'][0]
-			self.valid_neg_h_addr = self.valid_neg_h.__array_interface__['data'][0]
-			self.valid_neg_t_addr = self.valid_neg_t.__array_interface__['data'][0]
-			self.valid_neg_r_addr = self.valid_neg_r.__array_interface__['data'][0]
+			self.init_triple_classification()
 
 	def get_ent_total(self):
 		return self.entTotal
@@ -303,10 +307,34 @@ class Config(object):
 			self.lib.getValidBatch(self.valid_pos_h_addr, self.valid_pos_t_addr, self.valid_pos_r_addr, self.valid_neg_h_addr, self.valid_neg_t_addr, self.valid_neg_r_addr)
 			res_pos = self.trainModel.predict(self.valid_pos_h, self.valid_pos_t, self.valid_pos_r)
 			res_neg = self.trainModel.predict(self.valid_neg_h, self.valid_neg_t, self.valid_neg_r)
-			self.lib.getBestThreshold(res_pos.data.numpy().__array_interface__['data'][0], res_neg.data.numpy().__array_interface__['data'][0])
-
+			self.lib.getBestThreshold(self.relThresh_addr, res_pos.data.numpy().__array_interface__['data'][0], res_neg.data.numpy().__array_interface__['data'][0])
 			self.lib.getTestBatch(self.test_pos_h_addr, self.test_pos_t_addr, self.test_pos_r_addr, self.test_neg_h_addr, self.test_neg_t_addr, self.test_neg_r_addr)
 
 			res_pos = self.trainModel.predict(self.test_pos_h, self.test_pos_t, self.test_pos_r)
 			res_neg = self.trainModel.predict(self.test_neg_h, self.test_neg_t, self.test_neg_r)
-			self.lib.test_triple_classification(res_pos.data.numpy().__array_interface__['data'][0], res_neg.data.numpy().__array_interface__['data'][0])
+			self.lib.test_triple_classification(self.relThresh_addr, res_pos.data.numpy().__array_interface__['data'][0], res_neg.data.numpy().__array_interface__['data'][0])
+
+	def show_link_prediction(self, h, r):
+		self.init_link_prediction()
+		if self.importName != None:
+                        self.restore_pytorch()
+		test_h = np.array([h] * self.entTotal)
+		test_r = np.array([r] * self.entTotal)
+		test_t = np.array(range(self.entTotal))
+                res = self.trainModel.predict(test_h, test_t, test_r).data.numpy().reshape(-1).argsort()[:10]
+		print(res)
+		return res
+		print res
+	def show_triple_classification(self, h, t, r):
+                self.init_triple_classification()
+                if self.importName != None:
+                        self.restore_pytorch()
+                self.lib.getValidBatch(self.valid_pos_h_addr, self.valid_pos_t_addr, self.valid_pos_r_addr, self.valid_neg_h_addr, self.valid_neg_t_addr, self.valid_neg_r_addr)
+                res_pos = self.trainModel.predict(self.valid_pos_h, self.valid_pos_t, self.valid_pos_r)
+                res_neg = self.trainModel.predict(self.valid_neg_h, self.valid_neg_t, self.valid_neg_r)
+                self.lib.getBestThreshold(self.relThresh_addr, res_pos.data.numpy().__array_interface__['data'][0], res_neg.data.numpy().__array_interface__['data'][0])
+                res = self.trainModel.predict(np.array([h]), np.array([t]), np.array([r])).data.numpy()
+                if res < self.relThresh[r]:
+                        print("triple (%d,%d,%d) is correct" % (h, t, r))
+                else: 
+                        print("triple (%d,%d,%d) is wrong" % (h, t, r))

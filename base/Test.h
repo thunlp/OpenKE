@@ -301,13 +301,11 @@ void getValidBatch(INT *ph, INT *pt, INT *pr, INT *nh, INT *nt, INT *nr) {
         nr[i] = negValidList[i].r;
     }
 }
-
-REAL *relThresh;
+//REAL* relThresh;
 REAL threshEntire;
 extern "C"
-void getBestThreshold(REAL *score_pos, REAL *score_neg) {
+void getBestThreshold(REAL *relThresh, REAL *score_pos, REAL *score_neg) {
     REAL interval = 0.01;
-    relThresh = (REAL *)calloc(relationTotal, sizeof(REAL));
     REAL min_score, max_score, bestThresh, tmpThresh, bestAcc, tmpAcc;
     INT n_interval, correct, total;
     for (INT r = 0; r < relationTotal; r++) {
@@ -341,14 +339,13 @@ void getBestThreshold(REAL *score_pos, REAL *score_neg) {
             }
         }
         relThresh[r] = bestThresh;
-       // printf("relation %ld: bestThresh is %lf, bestAcc is %lf\n", r, bestThresh, bestAcc);
     }
 }
 
 REAL *testAcc;
 REAL aveAcc;
 extern "C"
-void test_triple_classification(REAL *score_pos, REAL *score_neg) {
+void test_triple_classification(REAL *relThresh, REAL *score_pos, REAL *score_neg) {
     testAcc = (REAL *)calloc(relationTotal, sizeof(REAL));
     INT aveCorrect = 0, aveTotal = 0;
     REAL aveAcc;
@@ -363,7 +360,6 @@ void test_triple_classification(REAL *score_pos, REAL *score_neg) {
         testAcc[r] = 1.0 * correct / total;
         aveCorrect += correct; 
         aveTotal += total;
-       // printf("relation %ld: triple classification accuracy is %lf\n", r, testAcc[r]);
     }
     aveAcc = 1.0 * aveCorrect / aveTotal;
     printf("triple classification accuracy is %lf\n", aveAcc);
