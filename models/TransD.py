@@ -3,6 +3,7 @@ import torch.autograd as autograd
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
+from torch.autograd import Variable
 import numpy as np
 from .Model import Model
 
@@ -51,8 +52,10 @@ class TransD(Model):
 		n_r=n_r_e
 		_p_score = self._calc(p_h, p_t, p_r)
 		_n_score = self._calc(n_h, n_t, n_r)
-		p_score=torch.sum(_p_score,1)
-		n_score=torch.sum(_n_score,1)
+		_p_score = _p_score.view(-1, 1, self.config.hidden_size)
+                _n_score = _n_score.view(-1, self.config.negative_ent + self.config.negative_rel, self.config.hidden_size)
+                p_score=torch.sum(torch.mean(_p_score, 1),1)
+                n_score=torch.sum(torch.mean(_n_score, 1),1)
 		loss=self.loss_func(p_score,n_score)
 		return loss
 	def predict(self, predict_h, predict_t, predict_r):

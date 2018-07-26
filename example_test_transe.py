@@ -28,7 +28,6 @@ content = json.loads(f.read())
 f.close()
 con.set_parameters(content)
 con.test()
-
 #(3) Manually load models via torch.load()
 con = config.Config()
 con.set_in_path("./benchmarks/FB15K/")
