@@ -8,7 +8,9 @@ import ctypes
 import json
 
 class Config(object):
-
+	r'''
+	use ctypes to call C functions from python and set essential parameters.
+	'''
 	def __init__(self):
 		base_file = os.path.abspath(os.path.join(os.path.dirname(__file__), '../release/Base.so'))
 		self.lib = ctypes.cdll.LoadLibrary(base_file)
@@ -44,6 +46,9 @@ class Config(object):
 		self.optimizer = None
 		self.test_link_prediction = False
 		self.test_triple_classification = False
+	r'''
+	import essential files and set essential interfaces for link prediction
+	'''
 	def init_link_prediction(self):
                 self.lib.importTestFiles()
                 self.lib.importTypeFiles()
@@ -53,6 +58,9 @@ class Config(object):
                 self.test_h_addr = self.test_h.__array_interface__['data'][0]
                 self.test_t_addr = self.test_t.__array_interface__['data'][0]
                 self.test_r_addr = self.test_r.__array_interface__['data'][0]
+    r'''
+    import essential files and set essential interfaces for triple classification
+    '''
 	def init_triple_classification(self):
 		self.lib.importTestFiles()
                 self.lib.importTypeFiles()
@@ -85,6 +93,7 @@ class Config(object):
 		self.relThresh = np.zeros(self.lib.getRelationTotal(), dtype = np.float32)
 		self.relThresh_addr = self.relThresh.__array_interface__['data'][0]
 
+	# prepare for train and test
 	def init(self):
 		self.trainModel = None
 		if self.in_path != None:
@@ -187,15 +196,16 @@ class Config(object):
 
 	def set_export_steps(self, steps):
 		self.export_steps = steps
-
+	# call C function for sampling
 	def sampling(self):
 		self.lib.sampling(self.batch_h_addr, self.batch_t_addr, self.batch_r_addr, self.batch_y_addr, self.batch_size, self.negative_ent, self.negative_rel)
 
+	# save model
 	def save_tensorflow(self):
 		with self.graph.as_default():
 			with self.sess.as_default():
 				self.saver.save(self.sess, self.exportName)
-
+    # restore model
 	def restore_tensorflow(self):
 		with self.graph.as_default():
 			with self.sess.as_default():

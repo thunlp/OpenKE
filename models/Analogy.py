@@ -20,10 +20,10 @@ class Analogy(Model):
 								"ent_embeddings":self.ent_embeddings,\
 								"rel_embeddings":self.rel_embeddings
 								}
-
+	# score function for ComplEx
 	def _calc_comp(self, e1_h, e2_h, e1_t, e2_t, r1, r2):
 		return e1_h * e1_t * r1 + e2_h * e2_t * r1 + e1_h * e2_t * r2 - e2_h * e1_t * r2
-	
+	# score function for DistMult
 	def _calc_dist(self, e_h, e_t, rel):
 		return e_h * e_t * rel
 	

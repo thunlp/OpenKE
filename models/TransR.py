@@ -4,7 +4,10 @@ import tensorflow as tf
 from .Model import Model
 
 class TransR(Model):
-
+	r'''
+	TransR first projects entities from entity space to corresponding relation space 
+	and then builds translations between projected entities. 
+	'''
 	def _transfer(self, transfer_matrix, embeddings):
 		return tf.batch_matmul(transfer_matrix, embeddings)
 

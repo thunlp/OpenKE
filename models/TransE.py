@@ -4,7 +4,10 @@ import tensorflow as tf
 from .Model import Model
 
 class TransE(Model):
-
+	r'''
+	TransE is the first model to introduce translation-based embedding, 
+	which interprets relations as the translations operating on entities.
+	'''
 	def _calc(self, h, t, r):
 		return abs(h + r - t)
 

@@ -4,7 +4,10 @@ import tensorflow as tf
 from .Model import Model
 
 class DistMult(Model):
-
+	r'''
+	DistMult is based on the bilinear model where each relation is represented by a diagonal rather than a full matrix. 
+	DistMult enjoys the same scalable property as TransE and it achieves superior performance over TransE.
+	'''
 	def _calc(self, h, t, r):
 		return h * r * t
 

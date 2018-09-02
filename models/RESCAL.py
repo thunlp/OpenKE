@@ -16,7 +16,10 @@ class RESCAL(Model):
 		self.rel_matrices = tf.get_variable(name = "rel_matrices", shape = [config.relTotal, config.hidden_size * config.hidden_size], initializer = tf.contrib.layers.xavier_initializer(uniform = False))
 		self.parameter_lists = {"ent_embeddings":self.ent_embeddings, \
 								"rel_matrices":self.rel_matrices}
-
+	r'''
+	RESCAL is a tensor factorization approach to knowledge representation learning, 
+	which is able to perform collective learning via the latent components of the factorization.
+	'''
 	def loss_def(self):
 		#Obtaining the initial configuration of the model
 		config = self.get_config()

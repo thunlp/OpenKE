@@ -15,7 +15,10 @@ class ComplEx(Model):
 								"ent_im_embeddings":self.ent2_embeddings, \
 								"rel_re_embeddings":self.rel1_embeddings, \
 								"rel_im_embeddings":self.rel2_embeddings}
-
+	r'''
+	ComplEx extends DistMult by introducing complex-valued embeddings so as to better model asymmetric relations. 
+	It is proved that HolE is subsumed by ComplEx as a special case.
+	'''
 	def _calc(self, e1_h, e2_h, e1_t, e2_t, r1, r2):
 		return e1_h * e1_t * r1 + e2_h * e2_t * r1 + e1_h * e2_t * r2 - e2_h * e1_t * r2
 
