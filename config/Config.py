@@ -11,7 +11,9 @@ import ctypes
 import json
 
 class Config(object):
-
+	r'''
+	use ctypes to call C functions from python and set essential parameters.
+	'''
 	def __init__(self):
 		base_file = os.path.abspath(os.path.join(os.path.dirname(__file__), '../release/Base.so'))		
 		self.lib = ctypes.cdll.LoadLibrary(base_file)
@@ -49,6 +51,9 @@ class Config(object):
 		self.optimizer = None
 		self.test_link_prediction = False
 		self.test_triple_classification = False
+	r'''
+	import essential files and set essential interfaces for link prediction
+	'''
 	def init_link_prediction(self):
                 self.lib.importTestFiles()
                 self.lib.importTypeFiles()
@@ -58,6 +63,9 @@ class Config(object):
                	self.test_h_addr = self.test_h.__array_interface__['data'][0]
                 self.test_t_addr = self.test_t.__array_interface__['data'][0]
                 self.test_r_addr = self.test_r.__array_interface__['data'][0]
+    r'''
+	import essential files and set essential interfaces for triple classification
+	'''
 	def init_triple_classification(self):
 		self.lib.importTestFiles()
                 self.lib.importTypeFiles()
@@ -88,6 +96,7 @@ class Config(object):
 		self.relThresh = np.zeros(self.lib.getRelationTotal(), dtype = np.float32)
 		self.relThresh_addr = self.relThresh.__array_interface__['data'][0]
 
+	# prepare for train and test
 	def init(self):
 		self.trainModel = None
 		if self.in_path != None:
@@ -195,17 +204,19 @@ class Config(object):
 	
 	def set_weight_decay(self,weight_decay):
 		self.weight_decay=weight_decay
-	
+
+	# call c function for sampling
 	def sampling(self):
 		self.lib.sampling(self.batch_h_addr, self.batch_t_addr, self.batch_r_addr, self.batch_y_addr, self.batch_size, self.negative_ent, self.negative_rel)
 
+	# save model
 	def save_pytorch(self):
 		torch.save(self.trainModel.state_dict(), self.exportName)
-
+	# restore model
 	def restore_pytorch(self):
 		self.trainModel.load_state_dict(torch.load(self.importName))
-		#self.trainModel.cuda()
-
+	
+    # save model
 	def export_variables(self, path = None):
 		if path == None:
 			torch.save(self.trainModel.state_dict(), self.exportName)
@@ -223,7 +234,8 @@ class Config(object):
 
 	def get_parameters_by_name(self, var_name):
 		return self.trainModel.cpu().state_dict().get(var_name)
-
+    # return dict of parameters
+    # parameter_name -> parameters
 	def get_parameters(self, mode = "numpy"):
 		res = {}
 		lists = self.get_parameter_lists()

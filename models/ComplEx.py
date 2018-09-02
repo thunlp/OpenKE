@@ -20,6 +20,7 @@ class ComplEx(Model):
 		nn.init.xavier_uniform(self.ent_im_embeddings.weight.data)
 		nn.init.xavier_uniform(self.rel_re_embeddings.weight.data)
 		nn.init.xavier_uniform(self.rel_im_embeddings.weight.data)
+	#score function of ComplEx
 	def _calc(self,e_re_h,e_im_h,e_re_t,e_im_t,r_re,r_im):
 		return torch.sum(r_re * e_re_h * e_re_t + r_re * e_im_h * e_im_t + r_im * e_re_h * e_im_t - r_im * e_im_h * e_re_t,1,False)
 	def loss_func(self,loss,regul):

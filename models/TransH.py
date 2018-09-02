@@ -18,10 +18,15 @@ class TransH(Model):
 		nn.init.xavier_uniform(self.ent_embeddings.weight.data)
 		nn.init.xavier_uniform(self.rel_embeddings.weight.data)
 		nn.init.xavier_uniform(self.norm_vector.weight.data)
+	r'''
+	To preserve the mapping propertities of 1-N/N-1/N-N relations, 
+	TransH inperprets a relation as a translating operation on a hyperplane.
+	'''
 	def _transfer(self,e,norm):
 		return e - torch.sum(e * norm, 1, True) * norm
 	def _calc(self,h,t,r):
 		return torch.abs(h+r-t)
+	# margin-based loss
 	def loss_func(self,p_score,n_score):
 		criterion= nn.MarginRankingLoss(self.config.margin,False).cuda()
 		y=Variable(torch.Tensor([-1])).cuda()

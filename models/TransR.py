@@ -20,8 +20,13 @@ class TransR(Model):
 		nn.init.xavier_uniform(self.transfer_matrix.weight.data)
 	def _transfer(self,transfer_matrix,embeddings):
 		return torch.matmul(transfer_matrix,embeddings)
+	r'''
+	TransR first projects entities from entity space to corresponding relation space 
+	and then builds translations between projected entities.
+	'''
 	def _calc(self,h,t,r):
 		return torch.abs(h+r-t)
+	# margin-based loss
 	def loss_func(self,p_score,n_score):
 		criterion= nn.MarginRankingLoss(self.config.margin,False).cuda()
 		y=Variable(torch.Tensor([-1])).cuda()

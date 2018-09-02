@@ -15,8 +15,10 @@ class RESCAL(Model):
 	def init_weights(self):
 		nn.init.xavier_uniform(self.ent_embeddings.weight.data)
 		nn.init.xavier_uniform(self.rel_matrices.weight.data)
+	# score function of RESCAL 
 	def _calc(self,h,t,r):
 		return h*torch.matmul(r,t)
+	# margin-based loss
 	def loss_func(self,p_score,n_score):
 		criterion= nn.MarginRankingLoss(self.config.margin,False).cuda()
 		y=Variable(torch.Tensor([1])).cuda()

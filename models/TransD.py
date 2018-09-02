@@ -20,6 +20,12 @@ class TransD(Model):
 		nn.init.xavier_uniform(self.rel_embeddings.weight.data)
 		nn.init.xavier_uniform(self.ent_transfer.weight.data)
 		nn.init.xavier_uniform(self.rel_transfer.weight.data)
+	r'''
+	TransD constructs a dynamic mapping matrix for each entity-relation pair by 
+	considering the diversity of entities and relations simultaneously. 
+	Compared with TransR/CTransR, TransD has fewer parameters and 
+	has no matrix vector multiplication.
+	'''
 	def _transfer(self,e,t,r):
 		return F.normalize(e+torch.sum(e*t,1,True)*r,2,1)
 	def _calc(self,h,t,r):

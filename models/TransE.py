@@ -19,10 +19,15 @@ class TransE(Model):
 	def init_weights(self):
 		nn.init.xavier_uniform(self.ent_embeddings.weight.data)
 		nn.init.xavier_uniform(self.rel_embeddings.weight.data)
-		
+	
+	r'''
+	TransE is the first model to introduce translation-based embedding, 
+	which interprets relations as the translations operating on entities.
+	'''
 	def _calc(self,h,t,r):
 		return torch.abs(h + r - t)
 
+	# margin-based loss
 	def loss_func(self,p_score,n_score):
 		criterion = nn.MarginRankingLoss(self.config.margin, False).cuda()
 		y = Variable(torch.Tensor([-1])).cuda()

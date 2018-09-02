@@ -16,6 +16,7 @@ class DistMult(Model):
 	def init_weights(self):
 		nn.init.xavier_uniform(self.ent_embeddings.weight.data)
 		nn.init.xavier_uniform(self.rel_embeddings.weight.data)
+	# score function of DistMult
 	def _calc(self,h,t,r):
 		return torch.sum(h*t*r,1,False)
 	def loss_func(self,loss,regul):

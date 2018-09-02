@@ -24,10 +24,14 @@ class Analogy(Model):
 		nn.init.xavier_uniform(self.rel_im_embeddings.weight.data)
 		nn.init.xavier_uniform(self.ent_embeddings.weight.data)
 		nn.init.xavier_uniform(self.rel_embeddings.weight.data)
+
+	# score function of Analogy, which is the hybrid of ComplEx and DistMult
 	def _calc(self,e_re_h,e_im_h,e_h,e_re_t,e_im_t,e_t,r_re,r_im,r):
 		return torch.sum(r_re * e_re_h * e_re_t + r_re * e_im_h * e_im_t + r_im * e_re_h * e_im_t - r_im * e_im_h * e_re_t,1,False) + torch.sum(e_h*e_t*r,1,False)
+
 	def loss_func(self,loss,regul):
 		return loss+self.config.lmbda*regul
+
 	def forward(self):
 		batch_h,batch_t,batch_r=self.get_all_instance()
 		batch_y=self.get_all_labels()
