@@ -174,7 +174,7 @@ There are four approaches to test models:
     con.set_in_path("./benchmarks/FB15K/")
 
     #True: Input test files from the same folder.
-    con.set_test_triple_classfication(True)
+    con.set_test_triple_classification(True)
     con.set_test_link_prediction(True)
 
     con.set_work_threads(4)
