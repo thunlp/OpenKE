@@ -6,6 +6,8 @@ More information is available on our website
 
 ## Citation
 
+If you use the code, please cite the following paper:
+
 ```
  @inproceedings{han2018neural,
    title={OpenKE: An Open Toolkit for Knowledge Embedding},
