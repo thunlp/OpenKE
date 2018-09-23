@@ -4,12 +4,10 @@ An Open-source Framework for Knowledge Embedding implemented with PyTorch.
 More information is available on our website 
 [http://openke.thunlp.org/](http://openke.thunlp.org/)
 
-## Citation
-
 If you use the code, please cite the following paper:
 
 ```
- @inproceedings{han2018neural,
+ @inproceedings{han2018openke,
    title={OpenKE: An Open Toolkit for Knowledge Embedding},
    author={Han, Xu and Cao, Shulin and Lv Xin and Lin, Yankai and Liu, Zhiyuan and Sun, Maosong and Li, Juanzi},
    booktitle={Proceedings of EMNLP},
