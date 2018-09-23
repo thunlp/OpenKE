@@ -4,6 +4,18 @@ An Open-source Framework for Knowledge Embedding.
 More information is available on our website 
 [http://openke.thunlp.org/](http://openke.thunlp.org/)
 
+If you use the code, please cite the following paper:
+
+```
+ @inproceedings{han2018openke,
+   title={OpenKE: An Open Toolkit for Knowledge Embedding},
+   author={Han, Xu and Cao, Shulin and Lv Xin and Lin, Yankai and Liu, Zhiyuan and Sun, Maosong and Li, Juanzi},
+   booktitle={Proceedings of EMNLP},
+   year={2018}
+ }
+```
+
+
 ## Overview
 
 This is an Efficient implementation based on TensorFlow for knowledge representation learning (KRL). We use C++ to implement some underlying operations such as data preprocessing and negative sampling. For each specific model, it is implemented by TensorFlow with Python interfaces so that there is a convenient platform to run models on GPUs. OpenKE composes 4 repositories:
