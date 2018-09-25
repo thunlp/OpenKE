@@ -41,4 +41,3 @@ class Model(nn.Module):
 
 	def loss_func(self):
 		pass
-

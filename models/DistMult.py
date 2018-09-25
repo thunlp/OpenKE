@@ -41,4 +41,3 @@ class DistMult(Model):
 		p_e_r=self.rel_embeddings(Variable(torch.from_numpy(predict_r)).cuda())
 		p_score=-self._calc(p_e_h,p_e_t,p_e_r)
 		return p_score.cpu()
-		

@@ -59,5 +59,3 @@ class TransE(Model):
 		_p_score = self._calc(p_h, p_t, p_r)
 		p_score=torch.sum(_p_score,1)
 		return p_score.cpu()
-
-

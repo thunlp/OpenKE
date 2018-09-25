@@ -63,10 +63,3 @@ class Analogy(Model):
 		p_r=self.rel_im_embeddings(Variable(torch.from_numpy(predict_r)).cuda())
 		p_score = -self._calc(p_re_h, p_im_h, p_h, p_re_t, p_im_t, p_t, p_re_r, p_im_r, p_r)
 		return p_score.cpu()
-
-
-
-	
-	
-	
-		
