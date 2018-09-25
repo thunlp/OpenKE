@@ -80,4 +80,3 @@ class Model(object):
 
 		with tf.name_scope("predict"):
 			self.predict_def()
-

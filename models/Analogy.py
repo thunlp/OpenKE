@@ -67,4 +67,3 @@ class Analogy(Model):
 		predict_t_e = tf.nn.embedding_lookup(self.ent_embeddings, predict_t)
 		predict_rel = tf.nn.embedding_lookup(self.rel_embeddings, predict_r)
 		self.predict = -tf.reduce_sum(self._calc_comp(predict_h_e1, predict_h_e2, predict_t_e1, predict_t_e2, predict_r_e1, predict_r_e2), 1, keep_dims = True) - tf.reduce_sum(self._calc_dist(predict_h_e, predict_t_e, predict_rel), 1, keep_dims = True)
-

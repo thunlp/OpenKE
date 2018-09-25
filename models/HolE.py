@@ -12,7 +12,7 @@ class HolE(Model):
 		a = tf.cast(a, tf.complex64)
 		b = tf.cast(b, tf.complex64)
 		return tf.real(tf.ifft(tf.conj(tf.fft(a)) * tf.fft(b)))
-    r'''
+	r'''
     HolE employs circular correlations to create compositional representations. 
     HolE can capture rich interactions but simultaneously remains efficient to compute.
     '''

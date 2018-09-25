@@ -92,7 +92,3 @@ class TransH(Model):
 		t_e = self._transfer(predict_t_e, predict_norm)
 		r_e = predict_r_e
 		self.predict = tf.reduce_sum(self._calc(h_e, t_e, r_e), 1, keep_dims = True)
-
-
-
-		
