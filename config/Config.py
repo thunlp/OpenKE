@@ -8,7 +8,7 @@ import ctypes
 import json
 
 class Config(object):
-	r'''
+	'''
 	use ctypes to call C functions from python and set essential parameters.
 	'''
 	def __init__(self):
@@ -59,8 +59,8 @@ class Config(object):
 		self.test_t_addr = self.test_t.__array_interface__['data'][0]
 		self.test_r_addr = self.test_r.__array_interface__['data'][0]
 	def init_triple_classification(self):
-    		r'''
-	    	import essential files and set essential interfaces for triple classification
+		r'''
+		import essential files and set essential interfaces for triple classification
 		'''
 		self.lib.importTestFiles()
 		self.lib.importTypeFiles()
