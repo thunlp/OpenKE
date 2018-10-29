@@ -8,7 +8,7 @@ import ctypes
 import json
 
 class Config(object):
-	r'''
+	'''
 	use ctypes to call C functions from python and set essential parameters.
 	'''
 	def __init__(self):
@@ -46,10 +46,10 @@ class Config(object):
 		self.optimizer = None
 		self.test_link_prediction = False
 		self.test_triple_classification = False
-	r'''
-	import essential files and set essential interfaces for link prediction
-	'''
 	def init_link_prediction(self):
+		r'''
+		import essential files and set essential interfaces for link prediction
+		'''
 		self.lib.importTestFiles()
 		self.lib.importTypeFiles()
 		self.test_h = np.zeros(self.lib.getEntityTotal(), dtype = np.int64)
@@ -58,10 +58,11 @@ class Config(object):
 		self.test_h_addr = self.test_h.__array_interface__['data'][0]
 		self.test_t_addr = self.test_t.__array_interface__['data'][0]
 		self.test_r_addr = self.test_r.__array_interface__['data'][0]
-	r'''
-	import essential files and set essential interfaces for triple classification
-	'''
+
 	def init_triple_classification(self):
+		r'''
+		import essential files and set essential interfaces for triple classification
+		'''
 		self.lib.importTestFiles()
 		self.lib.importTypeFiles()
 
