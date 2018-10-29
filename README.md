@@ -4,7 +4,7 @@ An Open-source Framework for Knowledge Embedding.
 More information is available on our website 
 [http://openke.thunlp.org/](http://openke.thunlp.org/)
 
-If you use the code, please cite the following paper:
+If you use the code, please cite the following [paper](http://aclweb.org/anthology/D18-2024):
 
 ```
  @inproceedings{han2018openke,
