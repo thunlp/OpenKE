@@ -65,7 +65,7 @@ class Config(object):
 		self.test_r_addr = self.test_r.__array_interface__['data'][0]
 
 	def init_triple_classification(self):
-    		r'''
+		r'''
 		import essential files and set essential interfaces for triple classification
 		'''
 		self.lib.importTestFiles()
