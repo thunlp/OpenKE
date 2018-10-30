@@ -206,7 +206,7 @@ class Config(object):
 		with self.graph.as_default():
 			with self.sess.as_default():
 				self.saver.save(self.sess, self.exportName)
-    # restore model
+	# restore model
 	def restore_tensorflow(self):
 		with self.graph.as_default():
 			with self.sess.as_default():
