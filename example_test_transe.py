@@ -4,7 +4,7 @@ import tensorflow as tf
 import numpy as np
 import json
 import os
-os.environ['CUDA_VISIBLE_DEVICES']='0'
+os.environ['CUDA_VISIBLE_DEVICES']='7'
 # (1) Set import files and OpenKE will automatically load models via tf.Saver().
 con = config.Config()
 con.set_in_path("./benchmarks/FB15K/")
@@ -16,8 +16,13 @@ con.set_import_files("./res/model.vec.tf")
 con.init()
 con.set_model(models.TransE)
 con.test()
-con.show_link_prediction(2,1)
-con.show_triple_classification(2,1,3)
+con.predict_head_entity(152, 9, 5)
+con.predict_tail_entity(151, 9, 5)
+con.predict_relation(151, 152, 5)
+con.predict_triple(151, 152, 9)
+con.predict_triple(151, 152, 8)
+#con.show_link_prediction(2,1)
+#con.show_triple_classification(2,1,3)
 # (2) Read model parameters from json files and manually load parameters.
 # con = config.Config()
 # con.set_in_path("./benchmarks/FB15K/")
