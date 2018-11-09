@@ -168,6 +168,92 @@ Triple classification aims to judge whether a given triple (h, r, t) is correct 
 task. For triple classification, we set a relationspecific threshold δr. For a triple (h, r, t), if the dissimilarity
 score obtained by fr is below δr, the triple will be classified as positive, otherwise negative. δr is optimized by maximizing classification accuracies on the validation set.
 
+#### Predict Head Entity
+
+Given tail entity and relation, predict the top k possible head entities. All the objects are represented by their id.
+	
+	def predict_head_entity(self, t, r, k):
+		r'''This mothod predicts the top k head entities given tail entity and relation.
+		
+		Args: 
+			t (int): tail entity id
+			r (int): relation id
+			k (int): top k head entities
+		
+		Returns:
+			list: k possible head entity ids 	  	
+		'''
+		self.init_link_prediction()
+		if self.importName != None:
+			self.restore_tensorflow()
+		test_h = np.array(range(self.entTotal))
+                test_r = np.array([r] * self.entTotal)
+                test_t = np.array([t] * self.entTotal)
+                res = self.test_step(test_h, test_t, test_r).reshape(-1).argsort()[:k]
+		print(res)
+		return res
+		
+#### Predict Tail Entity
+
+This is similar to predicting the head entity.
+
+#### Predict Relation
+
+Given the head entity and tail entity, predict the top k possible relations. All the objects are represented by their id.
+
+	def predict_relation(self, h, t, k):
+		r'''This methods predict the relation id given head entity and tail entity.
+		
+		Args:
+			h (int): head entity id
+			t (int): tail entity id
+			k (int): top k relations
+		
+		Returns:
+			list: k possible relation ids
+		'''
+                self.init_link_prediction()
+                if self.importName != None:
+                        self.restore_tensorflow()
+                test_h = np.array([h] * self.relTotal)
+                test_r = np.array(range(self.relTotal))
+                test_t = np.array([t] * self.relTotal)
+                res = self.test_step(test_h, test_t, test_r).reshape(-1).argsort()[:k]
+                print(res)
+                return res
+		
+#### Predict triple
+
+Given a triple (h, r, t), this funtion tells us whether the triple is correct or not. If the threshold is not given, this function calculates the threshold for the relation from the valid dataset.
+
+	def predict_triple(self, h, t, r, thresh = None):
+		r'''This method tells you whether the given triple (h, t, r) is correct of wrong
+	
+		Args:
+			h (int): head entity id
+			t (int): tail entity id
+			r (int): relation id
+			thresh (fload): threshold for the triple
+		'''
+		self.init_triple_classification()
+		if self.importName != None:
+			self.restore_tensorflow()
+		res = self.test_step(np.array([h]), np.array([t]), np.array([r]))
+		if thresh != None:
+			if res < thresh:
+				print("triple (%d,%d,%d) is correct" % (h, t, r))
+			else:
+				print("triple (%d,%d,%d) is wrong" % (h, t, r))
+			return
+		self.lib.getValidBatch(self.valid_pos_h_addr, self.valid_pos_t_addr, self.valid_pos_r_addr, self.valid_neg_h_addr, self.valid_neg_t_addr, self.valid_neg_r_addr)
+		res_pos = self.test_step(self.valid_pos_h, self.valid_pos_t, self.valid_pos_r)
+		res_neg = self.test_step(self.valid_neg_h, self.valid_neg_t, self.valid_neg_r)
+		self.lib.getBestThreshold(self.relThresh_addr, res_pos.__array_interface__['data'][0], res_neg.__array_interface__['data'][0])
+		if res < self.relThresh[r]:
+			print("triple (%d,%d,%d) is correct" % (h, t, r))
+		else: 
+			print("triple (%d,%d,%d) is wrong" % (h, t, r))
+			
 #### Implementation
 
 To evaluate the model, first import datasets and set essential configure paramters, then set model parameters and test the model. For instance, we write an example_test_transe.py to test TransE.
