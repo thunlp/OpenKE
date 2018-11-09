@@ -327,27 +327,54 @@ class Config(object):
 			res_neg = self.trainModel.predict(self.test_neg_h, self.test_neg_t, self.test_neg_r)
 			self.lib.test_triple_classification(self.relThresh_addr, res_pos.data.numpy().__array_interface__['data'][0], res_neg.data.numpy().__array_interface__['data'][0])
 
-	def show_link_prediction(self, h, r):
+	def predict_head_entity(self, t, r, k):
+		self.init_link_prediction()
+		if self.importName != None:
+			self.restore_pytorch()
+		test_h = np.array(range(self.entTotal))
+		test_r = np.array([r] * self.entTotal)
+		test_t = np.array([t] * self.entTotal)
+		res = self.trainModel.predict(test_h, test_t, test_r).data.numpy().reshape(-1).argsort()[:k]
+		print(res)
+		return res
+	
+	def predict_tail_entity(self, h, r, k):
 		self.init_link_prediction()
 		if self.importName != None:
 			self.restore_pytorch()
 		test_h = np.array([h] * self.entTotal)
 		test_r = np.array([r] * self.entTotal)
 		test_t = np.array(range(self.entTotal))
-		res = self.trainModel.predict(test_h, test_t, test_r).data.numpy().reshape(-1).argsort()[:10]
+		res = self.trainModel.predict(test_h, test_t, test_r).data.numpy().reshape(-1).argsort()[:k]
 		print(res)
 		return res
-		print res
 
-	def show_triple_classification(self, h, t, r):
-		self.init_triple_classification()
+	def predict_relation(self, h, t, k):
+		self.init_link_prediction()
 		if self.importName != None:
 			self.restore_pytorch()
+		test_h = np.array([h] * self.relTotal)
+		test_r = np.array(range(self.relTotal))
+		test_t = np.array([t] * self.relTotal)
+		res = self.trainModel.predict(test_h, test_t, test_r).data.numpy().reshape(-1).argsort()[:k]
+		print(res)
+		return res
+
+	def predict_triple(self, h, t, r, thresh = None):
+		self.init_triple_classification()
+		if self.importName != None:
+			self.restore_pytorch()	
+		res = self.trainModel.predict(np.array([h]), np.array([t]), np.array([r])).data.numpy()
+		if thresh != None:
+			if res < thresh:
+                        	print("triple (%d,%d,%d) is correct" % (h, t, r))
+                	else:
+	                        print("triple (%d,%d,%d) is wrong" % (h, t, r))	
+			return
 		self.lib.getValidBatch(self.valid_pos_h_addr, self.valid_pos_t_addr, self.valid_pos_r_addr, self.valid_neg_h_addr, self.valid_neg_t_addr, self.valid_neg_r_addr)
 		res_pos = self.trainModel.predict(self.valid_pos_h, self.valid_pos_t, self.valid_pos_r)
 		res_neg = self.trainModel.predict(self.valid_neg_h, self.valid_neg_t, self.valid_neg_r)
 		self.lib.getBestThreshold(self.relThresh_addr, res_pos.data.numpy().__array_interface__['data'][0], res_neg.data.numpy().__array_interface__['data'][0])
-		res = self.trainModel.predict(np.array([h]), np.array([t]), np.array([r])).data.numpy()
 		if res < self.relThresh[r]:
 			print("triple (%d,%d,%d) is correct" % (h, t, r))
 		else: 

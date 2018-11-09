@@ -14,8 +14,11 @@ con.set_dimension(100)
 con.set_import_files("./res/transe.pt")
 con.init()
 con.set_model(models.TransE)
-con.show_link_prediction(8,4)
-con.show_triple_classification(8,9,4)
+con.predict_head_entity(11, 5, 5)
+con.predict_tail_entity(151, 9, 5)
+con.predict_relation(151, 152, 5)
+con.predict_triple(151, 152, 9)
+con.predict_triple(151, 152, 10)
 '''
 #(2) Read model parameters from json files and manually load parameters. 
 con = config.Config()
