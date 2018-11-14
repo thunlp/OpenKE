@@ -375,9 +375,9 @@ class Config(object):
 		if self.importName != None:
 			self.restore_tensorflow()
 		test_h = np.array(range(self.entTotal))
-                test_r = np.array([r] * self.entTotal)
-                test_t = np.array([t] * self.entTotal)
-                res = self.test_step(test_h, test_t, test_r).reshape(-1).argsort()[:k]
+		test_r = np.array([r] * self.entTotal)
+		test_t = np.array([t] * self.entTotal)
+		res = self.test_step(test_h, test_t, test_r).reshape(-1).argsort()[:k]
 		print(res)
 		return res
 
@@ -392,15 +392,15 @@ class Config(object):
 		Returns:
 			list: k possible tail entity ids 	  	
 		'''
-                self.init_link_prediction()
-                if self.importName != None:
-                        self.restore_tensorflow()
-                test_h = np.array([h] * self.entTotal)
-                test_r = np.array([r] * self.entTotal)
-                test_t = np.array(range(self.entTotal))
-                res = self.test_step(test_h, test_t, test_r).reshape(-1).argsort()[:k]
-                print(res)
-                return res
+		self.init_link_prediction()
+		if self.importName != None:
+			self.restore_tensorflow()
+		test_h = np.array([h] * self.entTotal)
+		test_r = np.array([r] * self.entTotal)
+		test_t = np.array(range(self.entTotal))
+		res = self.test_step(test_h, test_t, test_r).reshape(-1).argsort()[:k]
+		print(res)
+		return res
 
 	def predict_relation(self, h, t, k):
 		r'''This methods predict the relation id given head entity and tail entity.
@@ -413,15 +413,15 @@ class Config(object):
 		Returns:
 			list: k possible relation ids
 		'''
-                self.init_link_prediction()
-                if self.importName != None:
-                        self.restore_tensorflow()
-                test_h = np.array([h] * self.relTotal)
-                test_r = np.array(range(self.relTotal))
-                test_t = np.array([t] * self.relTotal)
-                res = self.test_step(test_h, test_t, test_r).reshape(-1).argsort()[:k]
-                print(res)
-                return res
+		self.init_link_prediction()
+		if self.importName != None:
+			self.restore_tensorflow()
+		test_h = np.array([h] * self.relTotal)
+		test_r = np.array(range(self.relTotal))
+		test_t = np.array([t] * self.relTotal)
+		res = self.test_step(test_h, test_t, test_r).reshape(-1).argsort()[:k]
+		print(res)
+		return res
 
 	def predict_triple(self, h, t, r, thresh = None):
 		r'''This method tells you whether the given triple (h, t, r) is correct of wrong
