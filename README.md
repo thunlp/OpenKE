@@ -34,13 +34,16 @@ OpenKE: the main project based on TensorFlow, which provides the optimized and s
 
 2. Clone the OpenKE repository:
 
-	$ git clone https://github.com/thunlp/OpenKE
-	
-	$ cd OpenKE
+```bash
+$ git clone https://github.com/thunlp/OpenKE
+$ cd OpenKE
+```
 
 3. Compile C++ files
 	
-	$ bash make.sh
+```bash
+$ bash make.sh
+```
 
 ## Data
 
@@ -66,43 +69,46 @@ OpenKE: the main project based on TensorFlow, which provides the optimized and s
 ### Training
 
 To compute a knowledge graph embedding, first import datasets and set configure parameters for training, then train models and export results. For instance, we write an example_train_transe.py to train TransE:
-	
 
-	import config
-	import models
-	import tensorflow as tf
-	import numpy as np
+```python
+import config
+import models
+import tensorflow as tf
+import numpy as np
 
-	con = config.Config()
-	#Input training files from benchmarks/FB15K/ folder.
-	con.set_in_path("./benchmarks/FB15K/")
+con = config.Config()
+#Input training files from benchmarks/FB15K/ folder.
+con.set_in_path("./benchmarks/FB15K/")
 
-	con.set_work_threads(4)
-	con.set_train_times(500)
-	con.set_nbatches(100)
-	con.set_alpha(0.001)
-	con.set_margin(1.0)
-	con.set_bern(0)
-	con.set_dimension(50)
-	con.set_ent_neg_rate(1)
-	con.set_rel_neg_rate(0)
-	con.set_opt_method("SGD")
+con.set_work_threads(4)
+con.set_train_times(500)
+con.set_nbatches(100)
+con.set_alpha(0.001)
+con.set_margin(1.0)
+con.set_bern(0)
+con.set_dimension(50)
+con.set_ent_neg_rate(1)
+con.set_rel_neg_rate(0)
+con.set_opt_method("SGD")
 
-	#Models will be exported via tf.Saver() automatically.
-	con.set_export_files("./res/model.vec.tf", 0)
-	#Model parameters will be exported to json files automatically.
-	con.set_out_files("./res/embedding.vec.json")
-	#Initialize experimental settings.
-	con.init()
-	#Set the knowledge embedding model
-	con.set_model(models.TransE)
-	#Train the model.
-	con.run()	
+#Models will be exported via tf.Saver() automatically.
+con.set_export_files("./res/model.vec.tf", 0)
+#Model parameters will be exported to json files automatically.
+con.set_out_files("./res/embedding.vec.json")
+#Initialize experimental settings.
+con.init()
+#Set the knowledge embedding model
+con.set_model(models.TransE)
+#Train the model.
+con.run()
+```
 
 #### Step 1: Import datasets
 
-	con.set_in_path("benchmarks/FB15K/")
-	
+```python
+con.set_in_path("benchmarks/FB15K/")
+```
+
 We import knowledge graphs from benchmarks/FB15K/ folder. The data consists of three essential files mentioned before:
 
 *	train2id.txt
@@ -111,44 +117,56 @@ We import knowledge graphs from benchmarks/FB15K/ folder. The data consists of t
 
 Validation and test files are required and used to evaluate the training results, However, they are not indispensable for training.
 
-	con.set_work_threads(8)
+```python
+con.set_work_threads(8)
+```
 
 We can allocate several threads to sample positive and negative cases.
 
 
 #### Step 2: Set configure parameters for training.
 
-	con.set_train_times(500)
-	con.set_nbatches(100)
-	con.set_alpha(0.5)
-	con.set_dimension(200)
-	con.set_margin(1)
+```python
+con.set_train_times(500)
+con.set_nbatches(100)
+con.set_alpha(0.5)
+con.set_dimension(200)
+con.set_margin(1)
+```
 
 We set essential parameters, including the data traversing rounds, learning rate, batch size, and dimensions of entity and relation embeddings.
 
-	con.set_bern(0)
-	con.set_ent_neg_rate(1)
-	con.set_rel_neg_rate(0)
+```python
+con.set_bern(0)
+con.set_ent_neg_rate(1)
+con.set_rel_neg_rate(0)
+```
 
 For negative sampling, we can corrupt entities and relations to construct negative triples. set\_bern(0) will use the traditional sampling method, and set\_bern(1) will use the method in (Wang et al. 2014) denoted as "bern".
-	
-	con.set_optimizer("SGD")
-	
+
+```python
+con.set_optimizer("SGD")
+```
+
 We can select a proper gradient descent optimization algorithm to train models.
 
 #### Step 3: Export results
 
-	con.set_export_files("./res/model.vec.tf", 0)
+```python
+con.set_export_files("./res/model.vec.tf", 0)
 
-	con.set_out_files("./res/embedding.vec.json")
+con.set_out_files("./res/embedding.vec.json")
+```
 
 Models will be exported via tf.Saver() automatically every few rounds. Also, model parameters will be exported to json files finally. 
 
 #### Step 4: Train models
 
-	con.init()
-	con.set_model(models.TransE)
-	con.run()
+```python
+con.init()
+con.set_model(models.TransE)
+con.run()
+```
   
 We set the knowledge graph embedding model and start the training process.
 
@@ -171,28 +189,30 @@ score obtained by fr is below δr, the triple will be classified as positive, ot
 #### Predict Head Entity
 
 Given tail entity and relation, predict the top k possible head entities. All the objects are represented by their id.
-	
-	def predict_head_entity(self, t, r, k):
-		r'''This mothod predicts the top k head entities given tail entity and relation.
-		
-		Args: 
-			t (int): tail entity id
-			r (int): relation id
-			k (int): top k head entities
-		
-		Returns:
-			list: k possible head entity ids 	  	
-		'''
-		self.init_link_prediction()
-		if self.importName != None:
-			self.restore_tensorflow()
-		test_h = np.array(range(self.entTotal))
-                test_r = np.array([r] * self.entTotal)
-                test_t = np.array([t] * self.entTotal)
-                res = self.test_step(test_h, test_t, test_r).reshape(-1).argsort()[:k]
-		print(res)
-		return res
-		
+
+```python
+def predict_head_entity(self, t, r, k):
+	r'''This mothod predicts the top k head entities given tail entity and relation.
+
+	Args: 
+		t (int): tail entity id
+		r (int): relation id
+		k (int): top k head entities
+
+	Returns:
+		list: k possible head entity ids 	  	
+	'''
+	self.init_link_prediction()
+	if self.importName != None:
+		self.restore_tensorflow()
+	test_h = np.array(range(self.entTotal))
+	test_r = np.array([r] * self.entTotal)
+	test_t = np.array([t] * self.entTotal)
+	res = self.test_step(test_h, test_t, test_r).reshape(-1).argsort()[:k]
+	print(res)
+	return res
+```
+
 #### Predict Tail Entity
 
 This is similar to predicting the head entity.
@@ -201,58 +221,62 @@ This is similar to predicting the head entity.
 
 Given the head entity and tail entity, predict the top k possible relations. All the objects are represented by their id.
 
-	def predict_relation(self, h, t, k):
-		r'''This methods predict the relation id given head entity and tail entity.
-		
-		Args:
-			h (int): head entity id
-			t (int): tail entity id
-			k (int): top k relations
-		
-		Returns:
-			list: k possible relation ids
-		'''
-                self.init_link_prediction()
-                if self.importName != None:
-                        self.restore_tensorflow()
-                test_h = np.array([h] * self.relTotal)
-                test_r = np.array(range(self.relTotal))
-                test_t = np.array([t] * self.relTotal)
-                res = self.test_step(test_h, test_t, test_r).reshape(-1).argsort()[:k]
-                print(res)
-                return res
-		
+```python
+def predict_relation(self, h, t, k):
+	r'''This methods predict the relation id given head entity and tail entity.
+
+	Args:
+		h (int): head entity id
+		t (int): tail entity id
+		k (int): top k relations
+
+	Returns:
+		list: k possible relation ids
+	'''
+	self.init_link_prediction()
+	if self.importName != None:
+		self.restore_tensorflow()
+	test_h = np.array([h] * self.relTotal)
+	test_r = np.array(range(self.relTotal))
+	test_t = np.array([t] * self.relTotal)
+	res = self.test_step(test_h, test_t, test_r).reshape(-1).argsort()[:k]
+	print(res)
+	return res
+```
+
 #### Predict triple
 
 Given a triple (h, r, t), this funtion tells us whether the triple is correct or not. If the threshold is not given, this function calculates the threshold for the relation from the valid dataset.
 
-	def predict_triple(self, h, t, r, thresh = None):
-		r'''This method tells you whether the given triple (h, t, r) is correct of wrong
-	
-		Args:
-			h (int): head entity id
-			t (int): tail entity id
-			r (int): relation id
-			thresh (fload): threshold for the triple
-		'''
-		self.init_triple_classification()
-		if self.importName != None:
-			self.restore_tensorflow()
-		res = self.test_step(np.array([h]), np.array([t]), np.array([r]))
-		if thresh != None:
-			if res < thresh:
-				print("triple (%d,%d,%d) is correct" % (h, t, r))
-			else:
-				print("triple (%d,%d,%d) is wrong" % (h, t, r))
-			return
-		self.lib.getValidBatch(self.valid_pos_h_addr, self.valid_pos_t_addr, self.valid_pos_r_addr, self.valid_neg_h_addr, self.valid_neg_t_addr, self.valid_neg_r_addr)
-		res_pos = self.test_step(self.valid_pos_h, self.valid_pos_t, self.valid_pos_r)
-		res_neg = self.test_step(self.valid_neg_h, self.valid_neg_t, self.valid_neg_r)
-		self.lib.getBestThreshold(self.relThresh_addr, res_pos.__array_interface__['data'][0], res_neg.__array_interface__['data'][0])
-		if res < self.relThresh[r]:
+```python
+def predict_triple(self, h, t, r, thresh = None):
+	r'''This method tells you whether the given triple (h, t, r) is correct of wrong
+
+	Args:
+		h (int): head entity id
+		t (int): tail entity id
+		r (int): relation id
+		thresh (fload): threshold for the triple
+	'''
+	self.init_triple_classification()
+	if self.importName != None:
+		self.restore_tensorflow()
+	res = self.test_step(np.array([h]), np.array([t]), np.array([r]))
+	if thresh != None:
+		if res < thresh:
 			print("triple (%d,%d,%d) is correct" % (h, t, r))
-		else: 
+		else:
 			print("triple (%d,%d,%d) is wrong" % (h, t, r))
+		return
+	self.lib.getValidBatch(self.valid_pos_h_addr, self.valid_pos_t_addr, self.valid_pos_r_addr, self.valid_neg_h_addr, self.valid_neg_t_addr, self.valid_neg_r_addr)
+	res_pos = self.test_step(self.valid_pos_h, self.valid_pos_t, self.valid_pos_r)
+	res_neg = self.test_step(self.valid_neg_h, self.valid_neg_t, self.valid_neg_r)
+	self.lib.getBestThreshold(self.relThresh_addr, res_pos.__array_interface__['data'][0], res_neg.__array_interface__['data'][0])
+	if res < self.relThresh[r]:
+		print("triple (%d,%d,%d) is correct" % (h, t, r))
+	else: 
+		print("triple (%d,%d,%d) is wrong" % (h, t, r))
+```
 			
 #### Implementation
 
@@ -262,98 +286,106 @@ There are four approaches to test models:
 
 (1) Test models right after training.
 
-    import config
-    import models
-    import tensorflow as tf
-    import numpy as np
+```python
+import config
+import models
+import tensorflow as tf
+import numpy as np
 
 
-    con = config.Config()
-    con.set_in_path("./benchmarks/FB15K/")
+con = config.Config()
+con.set_in_path("./benchmarks/FB15K/")
 
-    #True: Input test files from the same folder.
-    con.set_test_triple_classification(True)
-    con.set_test_link_prediction(True)
+#True: Input test files from the same folder.
+con.set_test_triple_classification(True)
+con.set_test_link_prediction(True)
 
-    con.set_work_threads(4)
-    con.set_train_times(500)
-    con.set_nbatches(100)
-    con.set_alpha(0.001)
-    con.set_margin(1.0)
-    con.set_bern(0)
-    con.set_dimension(50)
-    con.set_ent_neg_rate(1)
-    con.set_rel_neg_rate(0)
-    con.set_opt_method("SGD")
-    con.set_export_files("./res/model.vec.tf", 0)
-    con.set_out_files("./res/embedding.vec.json")
-    con.init()
-    con.set_model(models.TransE)
-    con.run()
+con.set_work_threads(4)
+con.set_train_times(500)
+con.set_nbatches(100)
+con.set_alpha(0.001)
+con.set_margin(1.0)
+con.set_bern(0)
+con.set_dimension(50)
+con.set_ent_neg_rate(1)
+con.set_rel_neg_rate(0)
+con.set_opt_method("SGD")
+con.set_export_files("./res/model.vec.tf", 0)
+con.set_out_files("./res/embedding.vec.json")
+con.init()
+con.set_model(models.TransE)
+con.run()
 
-    #To test link prediction after training needs "set_test_link_prediction True)".
-    #To test triple classfication after training needs "set_test_triple_classification(True)"
-    con.test()
+#To test link prediction after training needs "set_test_link_prediction True)".
+#To test triple classfication after training needs "set_test_triple_classification(True)"
+con.test()
+```
 
 (2) Set import files and OpenKE will automatically load models via tf.Saver().
 
-    import config
-    import models
-    import tensorflow as tf
-    import numpy as np
-    import json
+```python
+import config
+import models
+import tensorflow as tf
+import numpy as np
+import json
 
-    con = config.Config()
-    con.set_in_path("./benchmarks/FB15K/")
-    con.set_test_link_prediction(True)
-    con.set_test_triple_classification(True)
-    con.set_work_threads(4)
-    con.set_dimension(50)
-    con.set_import_files("./res/model.vec.tf")
-    con.init()
-    con.set_model(models.TransE)
-    con.test()
+con = config.Config()
+con.set_in_path("./benchmarks/FB15K/")
+con.set_test_link_prediction(True)
+con.set_test_triple_classification(True)
+con.set_work_threads(4)
+con.set_dimension(50)
+con.set_import_files("./res/model.vec.tf")
+con.init()
+con.set_model(models.TransE)
+con.test()
+```
 
 (3) Read model parameters from json files and manually load parameters.
 
-	import config
-	import models
-	import tensorflow as tf
-	import numpy as np
-	import json
+```python
+import config
+import models
+import tensorflow as tf
+import numpy as np
+import json
 
-	con = config.Config()
-	con.set_in_path("./benchmarks/FB15K/")
-    con.set_test_link_prediction(True)
-    con.set_test_triple_classification(True)
-	con.set_work_threads(4)
-	con.set_dimension(50)
-	con.init()
-	con.set_model(models.TransE)
-	f = open("./res/embedding.vec.json", "r")
-	content = json.loads(f.read())
-	f.close()
-	con.set_parameters(content)
-	con.test()
+con = config.Config()
+con.set_in_path("./benchmarks/FB15K/")
+con.set_test_link_prediction(True)
+con.set_test_triple_classification(True)
+con.set_work_threads(4)
+con.set_dimension(50)
+con.init()
+con.set_model(models.TransE)
+f = open("./res/embedding.vec.json", "r")
+content = json.loads(f.read())
+f.close()
+con.set_parameters(content)
+con.test()
+```
 
 (4) Manually load models via tf.Saver().
 
-    import config
-    import models
-    import tensorflow as tf
-    import numpy as np
-    import json
+```python
+import config
+import models
+import tensorflow as tf
+import numpy as np
+import json
 
-    con = config.Config()
-    con.set_in_path("./benchmarks/FB15K/")
-    con.set_test_link_prediction(True)
-    con.set_test_triple_classification(True)
-    con.set_work_threads(4)
-    con.set_dimension(50)
-    con.init()
-    con.set_model(models.TransE)
-    con.import_variables("./res/model.vec.tf")
-    con.test()
+con = config.Config()
+con.set_in_path("./benchmarks/FB15K/")
+con.set_test_link_prediction(True)
+con.set_test_triple_classification(True)
+con.set_work_threads(4)
+con.set_dimension(50)
+con.init()
+con.set_model(models.TransE)
+con.import_variables("./res/model.vec.tf")
+con.test()
+```
 
 Note that you can only load model parameters when model configuration finished.
 
@@ -363,233 +395,239 @@ There are four approaches to get the embedding matrix.
 
 (1) Set import files and OpenKE will automatically load models via tf.Saver().
 
-	con = config.Config()
-	con.set_in_path("./benchmarks/FB15K/")
-    con.set_test_link_prediction(True)
-    con.set_test_triple_classification(True)
-	con.set_work_threads(4)
-	con.set_dimension(50)
-	con.set_import_files("./res/model.vec.tf")
-	con.init()
-	con.set_model(models.TransE)
-	# Get the embeddings (numpy.array)
-	embeddings = con.get_parameters("numpy")
-	# Get the embeddings (python list)
-	embeddings = con.get_parameters()
+```python
+con = config.Config()
+con.set_in_path("./benchmarks/FB15K/")
+con.set_test_link_prediction(True)
+con.set_test_triple_classification(True)
+con.set_work_threads(4)
+con.set_dimension(50)
+con.set_import_files("./res/model.vec.tf")
+con.init()
+con.set_model(models.TransE)
+# Get the embeddings (numpy.array)
+embeddings = con.get_parameters("numpy")
+# Get the embeddings (python list)
+embeddings = con.get_parameters()
+```
 
 (2) Read model parameters from json files and manually load parameters.
 
-	con = config.Config()
-	con.set_in_path("./benchmarks/FB15K/")
-    con.set_test_link_prediction(True)
-    con.set_test_triple_classification(True)
-	con.set_work_threads(4)
-	con.set_dimension(50)
-	con.init()
-	con.set_model(models.TransE)
-	f = open("./res/embedding.vec.json", "r")
-	embeddings = json.loads(f.read())
-	f.close()
+```python
+con = config.Config()
+con.set_in_path("./benchmarks/FB15K/")
+con.set_test_link_prediction(True)
+con.set_test_triple_classification(True)
+con.set_work_threads(4)
+con.set_dimension(50)
+con.init()
+con.set_model(models.TransE)
+f = open("./res/embedding.vec.json", "r")
+embeddings = json.loads(f.read())
+f.close()
+```
 
 (3) Manually load models via tf.Saver().
 
-	con = config.Config()
-	con.set_in_path("./benchmarks/FB15K/")
-    con.set_test_link_prediction(True)
-    con.set_test_triple_classification(True)
-	con.set_work_threads(4)
-	con.set_dimension(50)
-	con.init()
-	con.set_model(models.TransE)
-	con.import_variables("./res/model.vec.tf")
-	# Get the embeddings (numpy.array)
-	embeddings = con.get_parameters("numpy")
-	# Get the embeddings (python list)
-	embeddings = con.get_parameters()
-  
+```python
+con = config.Config()
+con.set_in_path("./benchmarks/FB15K/")
+con.set_test_link_prediction(True)
+con.set_test_triple_classification(True)
+con.set_work_threads(4)
+con.set_dimension(50)
+con.init()
+con.set_model(models.TransE)
+con.import_variables("./res/model.vec.tf")
+# Get the embeddings (numpy.array)
+embeddings = con.get_parameters("numpy")
+# Get the embeddings (python list)
+embeddings = con.get_parameters()
+```
+
 (4) Immediately get the embeddings after training the model.
 
-	...
-	...
-	...
-	#Models will be exported via tf.Saver() automatically.
-	con.set_export_files("./res/model.vec.tf", 0)
-	#Model parameters will be exported to json files automatically.
-	con.set_out_files("./res/embedding.vec.json")
-	#Initialize experimental settings.
-	con.init()
-	#Set the knowledge embedding model
-	con.set_model(models.TransE)
-	#Train the model.
-	con.run()
-	#Get the embeddings (numpy.array)
-	embeddings = con.get_parameters("numpy")
-	#Get the embeddings (python list)
-	embeddings = con.get_parameters()
+```python
+...
+...
+...
+#Models will be exported via tf.Saver() automatically.
+con.set_export_files("./res/model.vec.tf", 0)
+#Model parameters will be exported to json files automatically.
+con.set_out_files("./res/embedding.vec.json")
+#Initialize experimental settings.
+con.init()
+#Set the knowledge embedding model
+con.set_model(models.TransE)
+#Train the model.
+con.run()
+#Get the embeddings (numpy.array)
+embeddings = con.get_parameters("numpy")
+#Get the embeddings (python list)
+embeddings = con.get_parameters()
+```
 
 ## Interfaces
 
 ### Config
-	
-	class Config(object):
-			
-		#To set the learning rate
-		def set_alpha(alpha = 0.001)
-		
-		#To set the degree of the regularization on the parameters
-		def set_lmbda(lmbda = 0.0)
-		
-		#To set the gradient descent optimization algorithm (SGD, Adagrad, Adadelta, Adam)
-		def set_optimizer(optimizer = "SGD")
-		
-		#To set the data traversing rounds
-		def set_train_times(self, times)
-		
-		#To split the training triples into several batches, nbatches is the number of batches
-		def set_nbatches(nbatches = 100)
-		
-		#To set the margin for the loss function
-		def set_margin(margin = 1.0)
-		
-		#To set the dimensions of the entities and relations at the same time
-		def set_dimension(dim)
-		
-		#To set the dimensions of the entities
-		def set_ent_dimension(self, dim)
-		
-		#To set the dimensions of the relations
-		def set_rel_dimension(self, dim)
-		
-		#To allocate threads for each batch sampling
-		def set_work_threads(threads = 1)
-		
-		#To set negative sampling algorithms, unif (bern = 0) or bern (bern = 1)
-		def set_bern(bern = 1)
-		
-		#For each positive triple, we construct rate negative triples by corrupt the entity
-		def set_ent_neg_rate(rate = 1)
-		
-		#For each positive triple, we construct rate negative triples by corrupt the relation
-		def set_rel_neg_rate(rate = 0)
-		
-		#To sample a batch of training triples, including positive and negative ones.
-		def sampling()
 
-		#To import dataset from the benchmark folder
-		def set_in_path(self, path)
-		
-		#To export model parameters to json files when training completed
-		def set_out_files(self, path)
-		
-		#To set the import files, all parameters can be restored from the import files
-		def set_import_files(self, path)
-		
-		#To set the export file of model paramters, and export results every few rounds
-		def set_export_files(self, path, steps = 0)
+```python
+class Config(object):
 
-		#To export results every few rounds
-		def set_export_steps(self, steps)
+	#To set the learning rate
+	def set_alpha(alpha = 0.001)
 
-		#To save model via tf.saver
-		def save_tensorflow(self)
+	#To set the degree of the regularization on the parameters
+	def set_lmbda(lmbda = 0.0)
 
-		#To restore model via tf.saver
-		def restore_tensorflow(self)
+	#To set the gradient descent optimization algorithm (SGD, Adagrad, Adadelta, Adam)
+	def set_optimizer(optimizer = "SGD")
 
-		#To export model paramters, when path is none, equivalent to save_tensorflow()
-		def export_variables(self, path = None)
+	#To set the data traversing rounds
+	def set_train_times(self, times)
 
-		#To import model paramters, when path is none, equivalent to restore_tensorflow()
-		def import_variables(self, path = None)
-		
-		#To export model paramters to designated path
-		def save_parameters(self, path = None)
+	#To split the training triples into several batches, nbatches is the number of batches
+	def set_nbatches(nbatches = 100)
 
-		#To manually load parameters which are read from json files
-		def set_parameters(self, lists)
-		
-		#To get model paramters, if using mode "numpy", you can get np.array , else you can get python lists
-		def get_parameters(self, mode = "numpy")
- 
-		#To set the knowledge embedding model
-		def set_model(model)
-		
-		#The framework will print loss values during training if flag = 1
-		def set_log_on(flag = 1)
+	#To set the margin for the loss function
+	def set_margin(margin = 1.0)
 
-		#This is essential when testing
-		def set_test_link_prediction(True)
-    	def set_test_triple_classification(True)
-	
+	#To set the dimensions of the entities and relations at the same time
+	def set_dimension(dim)
+
+	#To set the dimensions of the entities
+	def set_ent_dimension(self, dim)
+
+	#To set the dimensions of the relations
+	def set_rel_dimension(self, dim)
+
+	#To allocate threads for each batch sampling
+	def set_work_threads(threads = 1)
+
+	#To set negative sampling algorithms, unif (bern = 0) or bern (bern = 1)
+	def set_bern(bern = 1)
+
+	#For each positive triple, we construct rate negative triples by corrupt the entity
+	def set_ent_neg_rate(rate = 1)
+
+	#For each positive triple, we construct rate negative triples by corrupt the relation
+	def set_rel_neg_rate(rate = 0)
+
+	#To sample a batch of training triples, including positive and negative ones.
+	def sampling()
+
+	#To import dataset from the benchmark folder
+	def set_in_path(self, path)
+
+	#To export model parameters to json files when training completed
+	def set_out_files(self, path)
+
+	#To set the import files, all parameters can be restored from the import files
+	def set_import_files(self, path)
+
+	#To set the export file of model paramters, and export results every few rounds
+	def set_export_files(self, path, steps = 0)
+
+	#To export results every few rounds
+	def set_export_steps(self, steps)
+
+	#To save model via tf.saver
+	def save_tensorflow(self)
+
+	#To restore model via tf.saver
+	def restore_tensorflow(self)
+
+	#To export model paramters, when path is none, equivalent to save_tensorflow()
+	def export_variables(self, path = None)
+
+	#To import model paramters, when path is none, equivalent to restore_tensorflow()
+	def import_variables(self, path = None)
+
+	#To export model paramters to designated path
+	def save_parameters(self, path = None)
+
+	#To manually load parameters which are read from json files
+	def set_parameters(self, lists)
+
+	#To get model paramters, if using mode "numpy", you can get np.array , else you can get python lists
+	def get_parameters(self, mode = "numpy")
+
+	#To set the knowledge embedding model
+	def set_model(model)
+
+	#The framework will print loss values during training if flag = 1
+	def set_log_on(flag = 1)
+
+	#This is essential when testing
+	def set_test_link_prediction(True)
+def set_test_triple_classification(True)
+```
 
 
 ### Model
 
-	class Model(object)
-	
-		# return config which saves the training parameters.
-		get_config(self)
-		
-		# in_batch = True, return [positive_head, positive_tail, positive_relation]
-		# The shape of positive_head is [batch_size, 1]
-		# in_batch = False, return [positive_head, positive_tail, positive_relation]
-		# The shape of positive_head is [batch_size]
-		get_positive_instance(in_batch = True)
-		
-		# in_batch = True, return [negative_head, negative_tail, negative_relation]
-		# The shape of positive_head is [batch_size, negative_ent_rate + negative_rel_rate]
-		# in_batch = False, return [negative_head, negative_tail, negative_relation]
-		# The shape of positive_head is [(negative_ent_rate + negative_rel_rate) * batch_size]		
-		get_negative_instance(in_batch = True)
+```python
+class Model(object)
 
-		# in_batch = True, return all training instances with the shape [batch_size, (1 + negative_ent_rate + negative_rel_rate)]
-		# in_batch = False, return all training instances with the shape [(negative_ent_rate + negative_rel_rate + 1) * batch_size]
-		def get_all_instance(in_batch = False)
+	# return config which saves the training parameters.
+	get_config(self)
 
-		# in_batch = True, return all training labels with the shape [batch_size, (1 + negative_ent_rate + negative_rel_rate)]
-		# in_batch = False, return all training labels with the shape [(negative_ent_rate + negative_rel_rate + 1) * batch_size]
-		# The positive triples are labeled as 1, and the negative triples are labeled as -1
-		def get_all_labels(in_batch = False)
-		
-		# To define containers for training triples
-		def input_def()
-		
-		# To define embedding parameters for knowledge embedding models
-		def embedding_def()
+	# in_batch = True, return [positive_head, positive_tail, positive_relation]
+	# The shape of positive_head is [batch_size, 1]
+	# in_batch = False, return [positive_head, positive_tail, positive_relation]
+	# The shape of positive_head is [batch_size]
+	get_positive_instance(in_batch = True)
 
-		# To define loss functions for knowledge embedding models
-		def loss_def()
-		
-		# To define the prediction functions for knowledge embedding models
-		def predict_def(self)
+	# in_batch = True, return [negative_head, negative_tail, negative_relation]
+	# The shape of positive_head is [batch_size, negative_ent_rate + negative_rel_rate]
+	# in_batch = False, return [negative_head, negative_tail, negative_relation]
+	# The shape of positive_head is [(negative_ent_rate + negative_rel_rate) * batch_size]		
+	get_negative_instance(in_batch = True)
 
-		def __init__(config)
+	# in_batch = True, return all training instances with the shape [batch_size, (1 + negative_ent_rate + negative_rel_rate)]
+	# in_batch = False, return all training instances with the shape [(negative_ent_rate + negative_rel_rate + 1) * batch_size]
+	def get_all_instance(in_batch = False)
 
-	#The implementation for TransE
-	class TransE(Model)
+	# in_batch = True, return all training labels with the shape [batch_size, (1 + negative_ent_rate + negative_rel_rate)]
+	# in_batch = False, return all training labels with the shape [(negative_ent_rate + negative_rel_rate + 1) * batch_size]
+	# The positive triples are labeled as 1, and the negative triples are labeled as -1
+	def get_all_labels(in_batch = False)
 
-	#The implementation for TransH	
-	class TransH(Model)
+	# To define containers for training triples
+	def input_def()
 
-	#The implementation for TransR
-	class TransR(Model)
+	# To define embedding parameters for knowledge embedding models
+	def embedding_def()
 
-	#The implementation for TransD
-	class TransD(Model)
-	
-	#The implementation for RESCAL
-	class RESCAL(Model)
-	
-	#The implementation for DistMult
-	class DistMult(Model)
-	
-	#The implementation for HolE
-	class HolE(Model)					
-	
-	#The implementation for ComplEx
-	class ComplEx(Model)
-	
-		
-	
-	
-	
+	# To define loss functions for knowledge embedding models
+	def loss_def()
+
+	# To define the prediction functions for knowledge embedding models
+	def predict_def(self)
+
+	def __init__(config)
+
+#The implementation for TransE
+class TransE(Model)
+
+#The implementation for TransH	
+class TransH(Model)
+
+#The implementation for TransR
+class TransR(Model)
+
+#The implementation for TransD
+class TransD(Model)
+
+#The implementation for RESCAL
+class RESCAL(Model)
+
+#The implementation for DistMult
+class DistMult(Model)
+
+#The implementation for HolE
+class HolE(Model)					
+
+#The implementation for ComplEx
+class ComplEx(Model)
+```
