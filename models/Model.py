@@ -6,38 +6,36 @@ import torch.optim as optim
 from torch.autograd import Variable
 
 class Model(nn.Module):
-
-	def __init__(self,config):
-		super(Model,self).__init__()
+	def __init__(self, config):
+		super(Model, self).__init__()
 		self.config = config
+		self.batch_h = None
+		self.batch_t = None
+		self.batch_r = None
+		self.batch_y = None
+	'''
+	def get_positive_instance(self):
+		self.positive_h = self.batch_h[0:self.config.batch_size]
+		self.positive_t = self.batch_t[0:self.config.batch_size]
+		self.positive_r = self.batch_r[0:self.config.batch_size]
+		return self.positive_h, self.positive_t, self.positive_r
 
-	def get_postive_instance(self):
-		self.postive_h = Variable(torch.from_numpy(self.config.batch_h[0:self.config.batch_size])).cuda()
-		self.postive_t = Variable(torch.from_numpy(self.config.batch_t[0:self.config.batch_size])).cuda()
-		self.postive_r = Variable(torch.from_numpy(self.config.batch_r[0:self.config.batch_size])).cuda()
-		return self.postive_h,self.postive_t,self.postive_r
+	def get_negative_instance(self):
+		self.negative_h = self.batch_h[self.config.batch_size, self.config.batch_seq_size]
+		self.negative_t = self.batch_t[self.config.batch_size, self.config.batch_seq_size]
+		self.negative_r = self.batch_r[self.config.batch_size, self.config.batch_seq_size]
+		return self.negative_h, self.negative_t, self.negative_r
+ 	'''
+	def get_positive_score(self, score):
+		return score[0:self.config.batch_size]
 
-	def get_negtive_instance(self):
-		self.negtive_h = Variable(torch.from_numpy(self.config.batch_h[self.config.batch_size:self.config.batch_seq_size])).cuda()
-		self.negtive_t = Variable(torch.from_numpy(self.config.batch_t[self.config.batch_size:self.config.batch_seq_size])).cuda()
-		self.negtive_r = Variable(torch.from_numpy(self.config.batch_r[self.config.batch_size:self.config.batch_seq_size])).cuda()
-		return self.negtive_h,self.negtive_t,self.negtive_r
-
-	def get_all_instance(self):
-		self.batch_h = Variable(torch.from_numpy(self.config.batch_h)).cuda()
-		self.batch_t = Variable(torch.from_numpy(self.config.batch_t)).cuda()
-		self.batch_r = Variable(torch.from_numpy(self.config.batch_r)).cuda()
-		return self.batch_h, self.batch_t, self.batch_r
-
-	def get_all_labels(self):
-		self.batch_y=Variable(torch.from_numpy(self.config.batch_y)).cuda()
-		return self.batch_y
-
-	def predict(self):
-		pass
-
+	def get_negative_score(self, score):
+		negative_score = score[self.config.batch_size:self.config.batch_seq_size]
+		negative_score = negative_score.view(-1, self.config.batch_size)
+		negative_score = torch.mean(negative_score, 0)
+		return negative_score
 	def forward(self):
-		pass
-
-	def loss_func(self):
-		pass
+		raise NotImplementedError
+	
+	def predict(self):
+		raise NotImplementedError	

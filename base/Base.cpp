@@ -3,6 +3,7 @@
 #include "Reader.h"
 #include "Corrupt.h"
 #include "Test.h"
+#include "Valid.h"
 #include <cstdlib>
 #include <pthread.h>
 

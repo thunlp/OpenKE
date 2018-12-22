@@ -79,7 +79,8 @@ rellef = {}
 totlef = {}
 relrig = {}
 totrig = {}
-
+# lef: (h, r)
+# rig: (r, t)
 for i in lef:
 	if not i[1] in rellef:
 		rellef[i[1]] = 0
@@ -105,13 +106,13 @@ for i in range(tot):
 	h,t,r = content.strip().split()
 	rign = rellef[r] / totlef[r]
 	lefn = relrig[r] / totrig[r]
-	if (rign <= 1.5 and lefn <= 1.5):
+	if (rign < 1.5 and lefn < 1.5):
 		s11+=1
-	if (rign > 1.5 and lefn <= 1.5):
+	if (rign >= 1.5 and lefn < 1.5):
 		s1n+=1
-	if (rign <= 1.5 and lefn > 1.5):
+	if (rign < 1.5 and lefn >= 1.5):
 		sn1+=1
-	if (rign > 1.5 and lefn > 1.5):
+	if (rign >= 1.5 and lefn >= 1.5):
 		snn+=1
 f.close()
 
@@ -133,16 +134,16 @@ for i in range(tot):
 	h,t,r = content.strip().split()
 	rign = rellef[r] / totlef[r]
 	lefn = relrig[r] / totrig[r]
-	if (rign <= 1.5 and lefn <= 1.5):
+	if (rign < 1.5 and lefn < 1.5):
 		f11.write(content)
 		fall.write("0"+"\t"+content)
-	if (rign > 1.5 and lefn <= 1.5):
+	if (rign >= 1.5 and lefn < 1.5):
 		f1n.write(content)
 		fall.write("1"+"\t"+content)
-	if (rign <= 1.5 and lefn > 1.5):
+	if (rign < 1.5 and lefn >= 1.5):
 		fn1.write(content)
 		fall.write("2"+"\t"+content)
-	if (rign > 1.5 and lefn > 1.5):
+	if (rign >= 1.5 and lefn >= 1.5):
 		fnn.write(content)
 		fall.write("3"+"\t"+content)
 fall.close()

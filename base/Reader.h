@@ -129,11 +129,11 @@ void importTestFiles() {
     FILE *fin;
     INT tmp;
     
-	fin = fopen((inPath + "relation2id.txt").c_str(), "r");
+    fin = fopen((inPath + "relation2id.txt").c_str(), "r");
     tmp = fscanf(fin, "%ld", &relationTotal);
     fclose(fin);
 
-	fin = fopen((inPath + "entity2id.txt").c_str(), "r");
+    fin = fopen((inPath + "entity2id.txt").c_str(), "r");
     tmp = fscanf(fin, "%ld", &entityTotal);
     fclose(fin);
 
@@ -175,31 +175,30 @@ void importTestFiles() {
     printf("The total of valid triples is %ld.\n", validTotal);
 
     testLef = (INT *)calloc(relationTotal, sizeof(INT));
-	testRig = (INT *)calloc(relationTotal, sizeof(INT));
-	memset(testLef, -1, sizeof(INT)*relationTotal);
-	memset(testRig, -1, sizeof(INT)*relationTotal);
-	for (INT i = 1; i < testTotal; i++) {
-		if (testList[i].r != testList[i-1].r) {
-			testRig[testList[i-1].r] = i - 1;
-			testLef[testList[i].r] = i;
-		}
+    testRig = (INT *)calloc(relationTotal, sizeof(INT));
+    memset(testLef, -1, sizeof(INT) * relationTotal);
+    memset(testRig, -1, sizeof(INT) * relationTotal);
+    for (INT i = 1; i < testTotal; i++) {
+	if (testList[i].r != testList[i-1].r) {
+	    testRig[testList[i-1].r] = i - 1;
+	    testLef[testList[i].r] = i;
 	}
-	testLef[testList[0].r] = 0;
-	testRig[testList[testTotal - 1].r] = testTotal - 1;
+    }
+    testLef[testList[0].r] = 0;
+    testRig[testList[testTotal - 1].r] = testTotal - 1;
 
-
-	validLef = (INT *)calloc(relationTotal, sizeof(INT));
-	validRig = (INT *)calloc(relationTotal, sizeof(INT));
-	memset(validLef, -1, sizeof(INT)*relationTotal);
-	memset(validRig, -1, sizeof(INT)*relationTotal);
-	for (INT i = 1; i < validTotal; i++) {
-		if (validList[i].r != validList[i-1].r) {
-			validRig[validList[i-1].r] = i - 1;
-			validLef[validList[i].r] = i;
-		}
+    validLef = (INT *)calloc(relationTotal, sizeof(INT));
+    validRig = (INT *)calloc(relationTotal, sizeof(INT));
+    memset(validLef, -1, sizeof(INT)*relationTotal);
+    memset(validRig, -1, sizeof(INT)*relationTotal);
+    for (INT i = 1; i < validTotal; i++) {
+	if (validList[i].r != validList[i-1].r) {
+	    validRig[validList[i-1].r] = i - 1;
+	    validLef[validList[i].r] = i;
 	}
-	validLef[validList[0].r] = 0;
-	validRig[validList[validTotal - 1].r] = validTotal - 1;
+    }
+    validLef[validList[0].r] = 0;
+    validRig[validList[validTotal - 1].r] = validTotal - 1;
 }
 
 INT* head_lef;
@@ -212,12 +211,11 @@ INT* tail_type;
 extern "C"
 void importTypeFiles() {
 
-	head_lef = (INT *)calloc(relationTotal, sizeof(INT));
-	head_rig = (INT *)calloc(relationTotal, sizeof(INT));
-	tail_lef = (INT *)calloc(relationTotal, sizeof(INT));
-	tail_rig = (INT *)calloc(relationTotal, sizeof(INT));
-
-	INT total_lef = 0;
+    head_lef = (INT *)calloc(relationTotal, sizeof(INT));
+    head_rig = (INT *)calloc(relationTotal, sizeof(INT));
+    tail_lef = (INT *)calloc(relationTotal, sizeof(INT));
+    tail_rig = (INT *)calloc(relationTotal, sizeof(INT));
+    INT total_lef = 0;
     INT total_rig = 0;
     FILE* f_type = fopen((inPath + "type_constrain.txt").c_str(),"r");
     INT tmp;
@@ -236,10 +234,9 @@ void importTypeFiles() {
         }
     }
     fclose(f_type);
-
-	head_type = (INT *)calloc(total_lef, sizeof(INT));
-	tail_type = (INT *)calloc(total_rig, sizeof(INT));
-	total_lef = 0;
+    head_type = (INT *)calloc(total_lef, sizeof(INT)); 
+    tail_type = (INT *)calloc(total_rig, sizeof(INT));
+    total_lef = 0;
     total_rig = 0;
     f_type = fopen((inPath + "type_constrain.txt").c_str(),"r");
     tmp = fscanf(f_type, "%ld", &tmp);

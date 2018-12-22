@@ -1,48 +1,15 @@
 import config
-import models
-import numpy as np
+from models import *
 import json
-import os
+import os 
 os.environ['CUDA_VISIBLE_DEVICES']='6'
-#(1) Set import files and OpenKE will automatically load models via torch.load().
 con = config.Config()
+#Input training files from benchmarks/FB15K/ folder.
 con.set_in_path("./benchmarks/FB15K/")
-#con.set_test_link_prediction(True)
-#con.set_test_triple_classification(True)
-con.set_work_threads(4)
-con.set_dimension(100)
-con.set_import_files("./res/transe.pt")
+#True: Input test files from the same folder.
+con.set_result_dir("./result")
+con.set_test_link(True)
+con.set_test_triple(True)
 con.init()
-con.set_model(models.TransE)
-con.predict_head_entity(11, 5, 5)
-con.predict_tail_entity(151, 9, 5)
-con.predict_relation(151, 152, 5)
-con.predict_triple(151, 152, 9)
-con.predict_triple(151, 152, 10)
-'''
-#(2) Read model parameters from json files and manually load parameters. 
-con = config.Config()
-con.set_in_path("./benchmarks/FB15K/")
-con.set_test_link_prediction(True)
-con.set_test_triple_classification(True)
-con.set_work_threads(4)
-con.set_dimension(100)
-con.init()
-con.set_model(models.TransE)
-f = open("./res/embedding.vec.json", "r")
-content = json.loads(f.read())
-f.close()
-con.set_parameters(content)
+con.set_test_model(TransE)
 con.test()
-#(3) Manually load models via torch.load()
-con = config.Config()
-con.set_in_path("./benchmarks/FB15K/")
-con.set_test_link_prediction(True)
-con.set_test_triple_classification(True)
-con.set_work_threads(4)
-con.set_dimension(100)
-con.init()
-con.set_model(models.TransE)
-con.import_variables("./res/transe.pt")
-con.test()
-'''
