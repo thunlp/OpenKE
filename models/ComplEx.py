@@ -42,7 +42,7 @@ class ComplEx(Model):
 
 	def predict(self):
 		h_re = self.ent_re_embeddings(self.batch_h)
-                h_im = self.ent_im_embeddings(self.batch_h)
+		h_im = self.ent_im_embeddings(self.batch_h)
                 t_re = self.ent_re_embeddings(self.batch_t)
                 t_im = self.ent_im_embeddings(self.batch_t)
                 r_re = self.rel_re_embeddings(self.batch_r)
