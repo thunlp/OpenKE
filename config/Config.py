@@ -359,7 +359,7 @@ class Config(object):
         loss = self.trainModel()
         loss.backward()
         self.optimizer.step()
-        return loss.data[0]
+        return loss.item()
 
     def test_one_step(self, model, test_h, test_t, test_r):
         model.batch_h = to_var(test_h)
