@@ -8,7 +8,7 @@ If you use the code, please cite the following [paper](http://aclweb.org/antholo
 
 ```
  @inproceedings{han2018openke,
-   title={OpenKE: An Open Toolkit for Knowledge Embedding},
+   title={{OpenKE}: An Open Toolkit for Knowledge Embedding},
    author={Han, Xu and Cao, Shulin and Lv Xin and Lin, Yankai and Liu, Zhiyuan and Sun, Maosong and Li, Juanzi},
    booktitle={Proceedings of EMNLP},
    year={2018}
