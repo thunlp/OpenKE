@@ -10,7 +10,7 @@ import datetime
 import ctypes
 import json
 import numpy as np
-
+import copy
 
 def to_var(x):
     return Variable(torch.from_numpy(x).cuda())
@@ -409,7 +409,7 @@ class Config(object):
                 if hit10 > best_hit10:
                     best_hit10 = hit10
                     best_epoch = epoch
-                    best_model = self.trainModel.state_dict()
+                    best_model = copy.deepcopy(self.trainModel.state_dict())
                     print("Best model | hit@10 of valid set is %f" % (best_hit10))
                     bad_counts = 0
                 else:
