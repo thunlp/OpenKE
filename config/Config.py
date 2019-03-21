@@ -46,6 +46,8 @@ class Config(object):
 		self.optimizer = None
 		self.test_link_prediction = False
 		self.test_triple_classification = False
+		self.early_stopping = None # It expects a tuple of the following: (patience, min_delta)
+
 	def init_link_prediction(self):
 		r'''
 		import essential files and set essential interfaces for link prediction
@@ -90,7 +92,7 @@ class Config(object):
 		self.valid_pos_r_addr = self.valid_pos_r.__array_interface__['data'][0]
 		self.valid_neg_h_addr = self.valid_neg_h.__array_interface__['data'][0]
 		self.valid_neg_t_addr = self.valid_neg_t.__array_interface__['data'][0]
-		self.valid_neg_r_addr = self.valid_neg_r.__array_interface__['data'][0]	
+		self.valid_neg_r_addr = self.valid_neg_r.__array_interface__['data'][0]
 		self.relThresh = np.zeros(self.lib.getRelationTotal(), dtype = np.float32)
 		self.relThresh_addr = self.relThresh.__array_interface__['data'][0]
 
@@ -197,6 +199,10 @@ class Config(object):
 
 	def set_export_steps(self, steps):
 		self.export_steps = steps
+
+	def set_early_stopping(self, early_stopping):
+		self.early_stopping = early_stopping
+
 	# call C function for sampling
 	def sampling(self):
 		self.lib.sampling(self.batch_h_addr, self.batch_t_addr, self.batch_r_addr, self.batch_y_addr, self.batch_size, self.negative_ent, self.negative_rel)
@@ -315,16 +321,30 @@ class Config(object):
 			with self.sess.as_default():
 				if self.importName != None:
 					self.restore_tensorflow()
+				if self.early_stopping is not None:
+					patience, min_delta = self.early_stopping
+					best_loss = np.finfo('float32').max
+					wait_steps = 0
 				for times in range(self.train_times):
-					res = 0.0
+					loss = 0.0
 					for batch in range(self.nbatches):
 						self.sampling()
-						res += self.train_step(self.batch_h, self.batch_t, self.batch_r, self.batch_y)
+						loss += self.train_step(self.batch_h, self.batch_t, self.batch_r, self.batch_y)
 					if self.log_on:
-						print(times)
-						print(res)
+						t_init = time.time()
+						t_end = time.time()
+						print('Epoch: {}, loss: {}, time: {}'.format(times, loss, (t_end - t_init)))
 					if self.exportName != None and (self.export_steps!=0 and times % self.export_steps == 0):
 						self.save_tensorflow()
+					if self.early_stopping is not None:
+						if loss + min_delta < best_loss:
+							best_loss = loss
+							wait_steps = 0
+						elif wait_steps < patience:
+							wait_steps += 1
+						else:
+							print('Early stopping. Losses have not been improved enough in {} times'.format(patience))
+							break
 				if self.exportName != None:
 					self.save_tensorflow()
 				if self.out_path != None:
@@ -448,5 +468,5 @@ class Config(object):
 		self.lib.getBestThreshold(self.relThresh_addr, res_pos.__array_interface__['data'][0], res_neg.__array_interface__['data'][0])
 		if res < self.relThresh[r]:
 			print("triple (%d,%d,%d) is correct" % (h, t, r))
-		else: 
+		else:
 			print("triple (%d,%d,%d) is wrong" % (h, t, r))

@@ -135,3 +135,7 @@ venv.bak/
 
 # Backups
 *~
+
+# PyCharm & VSCode
+.idea
+.vscode
