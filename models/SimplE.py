@@ -21,10 +21,10 @@ class SimplE(Model):
         nn.init.xavier_uniform(self.rel_inv_embeddings.weight.data)
 
     def _calc_avg(self, h, t, r, r_inv):
-        return (- torch.sum(h * t * r, -1) - torch.sum(h*r_inv*t, -1))/2
+        return (- torch.sum(h * r * t, -1) - torch.sum(h * r_inv * t, -1))/2
 
     def _calc_ingr(self, h, r, t):
-        return -torch.sum(h*r*t, -1)
+        return -torch.sum(h * r * t, -1)
 
     def loss(self, score, regul):
         return torch.mean(self.criterion(score * self.batch_y)) + self.config.lmbda * regul
@@ -43,5 +43,5 @@ class SimplE(Model):
         h = self.ent_embeddings(self.batch_h)
         t = self.ent_embeddings(self.batch_t)
         r = self.rel_embeddings(self.batch_r)
-        score = self._calc_ingr(h, t, r)
+        score = self._calc_ingr(h, r, t)
         return score.cpu().data.numpy()
