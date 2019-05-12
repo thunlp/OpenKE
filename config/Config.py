@@ -327,12 +327,12 @@ class Config(object):
 					wait_steps = 0
 				for times in range(self.train_times):
 					loss = 0.0
+					t_init = time.time()
 					for batch in range(self.nbatches):
 						self.sampling()
 						loss += self.train_step(self.batch_h, self.batch_t, self.batch_r, self.batch_y)
+					t_end = time.time()
 					if self.log_on:
-						t_init = time.time()
-						t_end = time.time()
 						print('Epoch: {}, loss: {}, time: {}'.format(times, loss, (t_end - t_init)))
 					if self.exportName != None and (self.export_steps!=0 and times % self.export_steps == 0):
 						self.save_tensorflow()
