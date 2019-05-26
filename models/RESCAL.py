@@ -41,8 +41,8 @@ class RESCAL(Model):
 		_n_score = tf.reshape(self._calc(n_h, n_t, n_r), [-1, config.negative_ent + config.negative_rel, config.hidden_size])
 		#The shape of p_score is (batch_size, 1)
 		#The shape of n_score is (batch_size, 1)
-		p_score =  tf.reduce_sum(tf.reduce_mean(_p_score, 1, keep_dims = False), 1, keep_dims = True)
-		n_score =  tf.reduce_sum(tf.reduce_mean(_n_score, 1, keep_dims = False), 1, keep_dims = True)
+		p_score =  tf.reduce_sum(tf.reduce_mean(_p_score, 1, keepdims = False), 1, keepdims = True)
+		n_score =  tf.reduce_sum(tf.reduce_mean(_n_score, 1, keepdims = False), 1, keepdims = True)
 		#Calculating loss to get what the framework will optimize
 		self.loss = tf.reduce_sum(tf.maximum(n_score - p_score + config.margin, 0))
 	
@@ -52,4 +52,4 @@ class RESCAL(Model):
 		predict_h_e = tf.reshape(tf.nn.embedding_lookup(self.ent_embeddings, predict_h), [-1, config.hidden_size, 1])
 		predict_t_e = tf.reshape(tf.nn.embedding_lookup(self.ent_embeddings, predict_t), [-1, config.hidden_size, 1])
 		predict_r_e = tf.reshape(tf.nn.embedding_lookup(self.rel_matrices, predict_r), [-1, config.hidden_size, config.hidden_size])
-		self.predict = -tf.reduce_sum(self._calc(predict_h_e, predict_t_e, predict_r_e), 1, keep_dims = False)
+		self.predict = -tf.reduce_sum(self._calc(predict_h_e, predict_t_e, predict_r_e), 1, keepdims = False)

@@ -46,10 +46,10 @@ class Analogy(Model):
 		r2 = tf.nn.embedding_lookup(self.rel2_embeddings, r)
 		rel = tf.nn.embedding_lookup(self.rel_embeddings, r)
 		#Calculating score functions for all positive triples and negative triples
-		res_comp = tf.reduce_sum(self._calc_comp(e1_h, e2_h, e1_t, e2_t, r1, r2), 1, keep_dims = False)
-		res_dist = tf.reduce_sum(self._calc_dist(e_h, e_t, rel), 1, keep_dims = False)
+		res_comp = tf.reduce_sum(self._calc_comp(e1_h, e2_h, e1_t, e2_t, r1, r2), 1, keepdims = False)
+		res_dist = tf.reduce_sum(self._calc_dist(e_h, e_t, rel), 1, keepdims = False)
 		res = res_comp + res_dist
-		loss_func = tf.reduce_mean(tf.nn.softplus(- y * res), 0, keep_dims = False)
+		loss_func = tf.reduce_mean(tf.nn.softplus(- y * res), 0, keepdims = False)
 		regul_func = tf.reduce_mean(e1_h ** 2) + tf.reduce_mean(e1_t ** 2) + tf.reduce_mean(e2_h ** 2) + tf.reduce_mean(e2_t ** 2) + tf.reduce_mean(r1 ** 2) + tf.reduce_mean(r2 ** 2) + tf.reduce_mean(e_h ** 2) + tf.reduce_mean(e_t ** 2) + tf.reduce_mean(rel ** 2)
 		#Calculating loss to get what the framework will optimize
 		self.loss =  loss_func + config.lmbda * regul_func
@@ -66,4 +66,4 @@ class Analogy(Model):
 		predict_h_e = tf.nn.embedding_lookup(self.ent_embeddings, predict_h)
 		predict_t_e = tf.nn.embedding_lookup(self.ent_embeddings, predict_t)
 		predict_rel = tf.nn.embedding_lookup(self.rel_embeddings, predict_r)
-		self.predict = -tf.reduce_sum(self._calc_comp(predict_h_e1, predict_h_e2, predict_t_e1, predict_t_e2, predict_r_e1, predict_r_e2), 1, keep_dims = True) - tf.reduce_sum(self._calc_dist(predict_h_e, predict_t_e, predict_rel), 1, keep_dims = True)
+		self.predict = -tf.reduce_sum(self._calc_comp(predict_h_e1, predict_h_e2, predict_t_e1, predict_t_e2, predict_r_e1, predict_r_e2), 1, keepdims = True) - tf.reduce_sum(self._calc_dist(predict_h_e, predict_t_e, predict_rel), 1, keepdims = True)
