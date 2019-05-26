@@ -21,7 +21,7 @@ class TransD(Model):
 	Compared with TransR/CTransR, TransD has fewer parameters and has no matrix vector multiplication.
 	'''
 	def _transfer(self, e, t, r):
-		return tf.nn.l2_normalize(tf_resize(e, axis = -1, size = r.get_shape()[-1]) + tf.reduce_sum(e * t, axis = -1, keepdims = True) * r, -1)
+		return tf.nn.l2_normalize(tf_resize(e, -1, r.get_shape()[-1]) + tf.reduce_sum(e * t, -1, keepdims = True) * r, -1)
 
 	def _calc(self, h, t, r):
 		return abs(h + r - t)
@@ -76,8 +76,8 @@ class TransD(Model):
 		_n_score = self._calc(n_h, n_t, n_r)
 		#The shape of p_score is (batch_size, 1)
 		#The shape of n_score is (batch_size, 1)
-		p_score =  tf.reduce_sum(tf.reduce_mean(_p_score, axis = 1, keepdims = False), axis = 1, keepdims = True)
-		n_score =  tf.reduce_sum(tf.reduce_mean(_n_score, axis = 1, keepdims = False), axis = 1, keepdims = True)
+		p_score =  tf.reduce_sum(tf.reduce_mean(_p_score, 1, keepdims = False), 1, keepdims = True)
+		n_score =  tf.reduce_sum(tf.reduce_mean(_n_score, 1, keepdims = False), 1, keepdims = True)
 		#Calculating loss to get what the framework will optimize
 		self.loss = tf.reduce_sum(tf.maximum(p_score - n_score + config.margin, 0))
 
@@ -93,4 +93,4 @@ class TransD(Model):
 		h_e = self._transfer(predict_h_e, predict_h_t, predict_r_t)
 		t_e = self._transfer(predict_t_e, predict_t_t, predict_r_t)
 		r_e = predict_r_e
-		self.predict = tf.reduce_sum(self._calc(h_e, t_e, r_e), axis = 1, keepdims = True)
+		self.predict = tf.reduce_sum(self._calc(h_e, t_e, r_e), 1, keepdims = True)
