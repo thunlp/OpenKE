@@ -42,8 +42,8 @@ class TransE(Model):
 		_n_score = self._calc(n_h, n_t, n_r)
 		#The shape of p_score is (batch_size, 1)
 		#The shape of n_score is (batch_size, 1)
-		p_score =  tf.reduce_sum(tf.reduce_mean(_p_score, 1, keep_dims = False), 1, keep_dims = True)
-		n_score =  tf.reduce_sum(tf.reduce_mean(_n_score, 1, keep_dims = False), 1, keep_dims = True)
+		p_score =  tf.reduce_sum(tf.reduce_mean(_p_score, 1, keepdims = False), 1, keepdims = True)
+		n_score =  tf.reduce_sum(tf.reduce_mean(_n_score, 1, keepdims = False), 1, keepdims = True)
 		#Calculating loss to get what the framework will optimize
 		self.loss = tf.reduce_sum(tf.maximum(p_score - n_score + config.margin, 0))
 
@@ -52,4 +52,4 @@ class TransE(Model):
 		predict_h_e = tf.nn.embedding_lookup(self.ent_embeddings, predict_h)
 		predict_t_e = tf.nn.embedding_lookup(self.ent_embeddings, predict_t)
 		predict_r_e = tf.nn.embedding_lookup(self.rel_embeddings, predict_r)
-		self.predict = tf.reduce_mean(self._calc(predict_h_e, predict_t_e, predict_r_e), 1, keep_dims = False)
+		self.predict = tf.reduce_mean(self._calc(predict_h_e, predict_t_e, predict_r_e), 1, keepdims = False)

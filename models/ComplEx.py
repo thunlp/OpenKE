@@ -38,8 +38,8 @@ class ComplEx(Model):
 		r1 = tf.nn.embedding_lookup(self.rel1_embeddings, r)
 		r2 = tf.nn.embedding_lookup(self.rel2_embeddings, r)
 		#Calculating score functions for all positive triples and negative triples
-		res = tf.reduce_sum(self._calc(e1_h, e2_h, e1_t, e2_t, r1, r2), 1, keep_dims = False)
-		loss_func = tf.reduce_mean(tf.nn.softplus(- y * res), 0, keep_dims = False)
+		res = tf.reduce_sum(self._calc(e1_h, e2_h, e1_t, e2_t, r1, r2), 1, keepdims = False)
+		loss_func = tf.reduce_mean(tf.nn.softplus(- y * res), 0, keepdims = False)
 		regul_func = tf.reduce_mean(e1_h ** 2) + tf.reduce_mean(e1_t ** 2) + tf.reduce_mean(e2_h ** 2) + tf.reduce_mean(e2_t ** 2) + tf.reduce_mean(r1 ** 2) + tf.reduce_mean(r2 ** 2)
 		#Calculating loss to get what the framework will optimize
 		self.loss =  loss_func + config.lmbda * regul_func
@@ -53,5 +53,5 @@ class ComplEx(Model):
 		predict_h_e2 = tf.nn.embedding_lookup(self.ent2_embeddings, predict_h)
 		predict_t_e2 = tf.nn.embedding_lookup(self.ent2_embeddings, predict_t)
 		predict_r_e2 = tf.nn.embedding_lookup(self.rel2_embeddings, predict_r)
-		self.predict = -tf.reduce_sum(self._calc(predict_h_e1, predict_h_e2, predict_t_e1, predict_t_e2, predict_r_e1, predict_r_e2), 1, keep_dims = True)
+		self.predict = -tf.reduce_sum(self._calc(predict_h_e1, predict_h_e2, predict_t_e1, predict_t_e2, predict_r_e1, predict_r_e2), 1, keepdims = True)
 

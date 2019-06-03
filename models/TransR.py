@@ -58,8 +58,8 @@ class TransR(Model):
 		_n_score = tf.reshape(_n_score, [-1, config.negative_ent + config.negative_rel, config.rel_size])
 		#The shape of p_score is (batch_size, 1)
 		#The shape of n_score is (batch_size, 1)
-		p_score =  tf.reduce_sum(tf.reduce_mean(_p_score, 1, keep_dims = False), 1, keep_dims = True)
-		n_score =  tf.reduce_sum(tf.reduce_mean(_n_score, 1, keep_dims = False), 1, keep_dims = True)
+		p_score =  tf.reduce_sum(tf.reduce_mean(_p_score, 1, keepdims = False), 1, keepdims = True)
+		n_score =  tf.reduce_sum(tf.reduce_mean(_n_score, 1, keepdims = False), 1, keepdims = True)
 		#Calculating loss to get what the framework will optimize
 		self.loss = tf.reduce_sum(tf.maximum(p_score - n_score + config.margin, 0))
 
@@ -73,4 +73,4 @@ class TransR(Model):
 		h_e = tf.reshape(self._transfer(predict_matrix, predict_h_e), [-1, config.rel_size])
 		t_e = tf.reshape(self._transfer(predict_matrix, predict_t_e), [-1, config.rel_size])
 		r_e = predict_r_e
-		self.predict = tf.reduce_sum(self._calc(h_e, t_e, r_e), 1, keep_dims = True)
+		self.predict = tf.reduce_sum(self._calc(h_e, t_e, r_e), 1, keepdims = True)
