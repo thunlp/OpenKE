@@ -3,13 +3,25 @@ import numpy as np
 import tensorflow as tf
 from .Model import Model
 
+def tf_resize(tensor, axis, size):
+	shape = tensor.get_shape().as_list()
+	osize = shape[axis]
+	if osize == size:
+		return tensor
+	if (osize > size):
+		shape[axis] = size
+		return tf.slice(tensor, begin = (0,) * len(shape), size = shape)
+	paddings = [[0, 0] for i in range(len(shape))]
+	paddings[axis][1] = size - osize
+	return tf.pad(tensor, paddings = paddings)
+
 class TransD(Model):
 	r'''
 	TransD constructs a dynamic mapping matrix for each entity-relation pair by considering the diversity of entities and relations simultaneously. 
 	Compared with TransR/CTransR, TransD has fewer parameters and has no matrix vector multiplication.
 	'''
 	def _transfer(self, e, t, r):
-		return tf.nn.l2_normalize(e + tf.reduce_sum(e * t, 1, keepdims = True) * r, -1)
+		return tf.nn.l2_normalize(tf_resize(e, -1, r.get_shape()[-1]) + tf.reduce_sum(e * t, -1, keepdims = True) * r, -1)
 
 	def _calc(self, h, t, r):
 		return abs(h + r - t)
@@ -31,8 +43,10 @@ class TransD(Model):
 		#Obtaining the initial configuration of the model
 		config = self.get_config()
 		#To get positive triples and negative triples for training
-		#The shapes of pos_h, pos_t, pos_r are (batch_size, 1)
-		#The shapes of neg_h, neg_t, neg_r are (batch_size, negative_ent + negative_rel)
+		#The shapes of pos_h, pos_t are (batch_size, 1, ent_size)
+		#The shapes of pos_r is (batch_size, 1, rel_size)
+		#The shapes of neg_h, neg_t (batch_size, negative_ent + negative_rel, ent_size)
+		#The shapes of neg_r is (batch_size, negative_ent + negative_rel, rel_size)
 		pos_h, pos_t, pos_r = self.get_positive_instance(in_batch = True)
 		neg_h, neg_t, neg_r = self.get_negative_instance(in_batch = True)
 		#Embedding entities and relations of triples, e.g. pos_h_e, pos_t_e and pos_r_e are embeddings for positive triples
@@ -56,8 +70,8 @@ class TransD(Model):
 		n_h = self._transfer(neg_h_e, neg_h_t, neg_r_t)
 		n_t = self._transfer(neg_t_e, neg_t_t, neg_r_t)
 		n_r = neg_r_e
-		#The shape of _p_score is (batch_size, 1, hidden_size)
-		#The shape of _n_score is (batch_size, negative_ent + negative_rel, hidden_size)
+		#The shape of _p_score is (batch_size, 1, rel_size)
+		#The shape of _n_score is (batch_size, negative_ent + negative_rel, rel_size)
 		_p_score = self._calc(p_h, p_t, p_r)
 		_n_score = self._calc(n_h, n_t, n_r)
 		#The shape of p_score is (batch_size, 1)
