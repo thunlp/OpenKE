@@ -88,10 +88,22 @@ INT getValidTotal() {
 */
 
 INT bernFlag = 0;
+bool head_batch = true;
+bool cross_sampling = false;
 
 extern "C"
 void setBern(INT con) {
 	bernFlag = con;
+}
+
+extern "C"
+void setHeadTailCrossSampling(bool judge){
+	cross_sampling = judge;
+}
+
+extern "C"
+bool judgeHeadBatch(){
+	return head_batch;
 }
 
 #endif

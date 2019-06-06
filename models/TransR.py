@@ -1,76 +1,68 @@
-#coding:utf-8
+import torch
+import torch.autograd as autograd
+import torch.nn as nn
+import torch.nn.functional as F
+import torch.optim as optim
+from torch.autograd import Variable
 import numpy as np
-import tensorflow as tf
 from .Model import Model
+from .TransE import TransE
 
 class TransR(Model):
-	r'''
-	TransR first projects entities from entity space to corresponding relation space 
-	and then builds translations between projected entities. 
-	'''
-	def _transfer(self, transfer_matrix, embeddings):
-		return tf.batch_matmul(transfer_matrix, embeddings)
-
+	def __init__(self, config):
+		super(TransR, self).__init__(config)
+		self.ent_embeddings = nn.Embedding(self.config.entTotal, self.config.ent_size)
+		self.rel_embeddings = nn.Embedding(self.config.relTotal, self.config.rel_size)
+		self.transfer_matrix = nn.Embedding(self.config.relTotal, self.config.ent_size * self.config.rel_size)
+		self.criterion = nn.MarginRankingLoss(self.config.margin, False)
+		self.init_weights()
+		
+	def init_weights(self):
+		if self.config.pretrain_model == None:
+			raise Exception("[ERROR] Pretrain model doesn't exist!")
+		self.ent_embeddings.weight.data = self.config.pretrain_model['ent_embeddings.weight']
+		self.rel_embeddings.weight.data = self.config.pretrain_model['rel_embeddings.weight']
+		identity = torch.zeros(self.config.rel_size, self.config.ent_size)
+		for i in range(self.config.rel_size):
+			identity[i][i] = 1
+			if i == self.config.ent_size - 1:
+				break
+		identity = identity.view(self.config.ent_size * self.config.rel_size)
+		for i in range(self.config.relTotal):
+			self.transfer_matrix.weight.data[i] = identity	
+	
 	def _calc(self, h, t, r):
-		return abs(h + r - t)
+		return torch.norm(h + r - t, self.config.p_norm, -1)
+	
+	def _transfer(self, e, r_transfer):
+		e = e.view(-1, self.config.ent_size, 1)
+		r_transfer = r_transfer.view(-1, self.config.rel_size, self.config.ent_size)
+		e = torch.matmul(r_transfer, e)
+		e = e.view(-1, self.config.rel_size)
+		return e
 
-	def embedding_def(self):
-		#Obtaining the initial configuration of the model
-		config = self.get_config()
-		#Defining required parameters of the model, including embeddings of entities and relations, and mapping matrices
-		self.ent_embeddings = tf.get_variable(name = "ent_embeddings", shape = [config.entTotal, config.ent_size], initializer = tf.contrib.layers.xavier_initializer(uniform = False))
-		self.rel_embeddings = tf.get_variable(name = "rel_embeddings", shape = [config.relTotal, config.rel_size], initializer = tf.contrib.layers.xavier_initializer(uniform = False))
-		self.transfer_matrix = tf.get_variable(name = "transfer_matrix", shape = [config.relTotal, config.ent_size * config.rel_size], initializer = tf.contrib.layers.xavier_initializer(uniform = False))
-		self.parameter_lists = {"ent_embeddings":self.ent_embeddings, \
-								"rel_embeddings":self.rel_embeddings, \
-								"transfer_matrix":self.transfer_matrix}
-
-	def loss_def(self):
-		#Obtaining the initial configuration of the model
-		config = self.get_config()
-		#To get positive triples and negative triples for training
-		#The shapes of pos_h, pos_t, pos_r are (batch_size, 1)
-		#The shapes of neg_h, neg_t, neg_r are (batch_size, negative_ent + negative_rel)
-		pos_h, pos_t, pos_r = self.get_positive_instance(in_batch = True)
-		neg_h, neg_t, neg_r = self.get_negative_instance(in_batch = True)
-		#Embedding entities and relations of triples, e.g. pos_h_e, pos_t_e and pos_r_e are embeddings for positive triples
-		pos_h_e = tf.reshape(tf.nn.embedding_lookup(self.ent_embeddings, pos_h), [-1, config.ent_size, 1])
-		pos_t_e = tf.reshape(tf.nn.embedding_lookup(self.ent_embeddings, pos_t), [-1, config.ent_size, 1])
-		pos_r_e = tf.reshape(tf.nn.embedding_lookup(self.rel_embeddings, pos_r), [-1, config.rel_size])
-		neg_h_e = tf.reshape(tf.nn.embedding_lookup(self.ent_embeddings, neg_h), [-1, config.ent_size, 1])
-		neg_t_e = tf.reshape(tf.nn.embedding_lookup(self.ent_embeddings, neg_t), [-1, config.ent_size, 1])
-		neg_r_e = tf.reshape(tf.nn.embedding_lookup(self.rel_embeddings, neg_r), [-1, config.rel_size])
-		#Getting the required mapping matrices
-		pos_matrix = tf.reshape(tf.nn.embedding_lookup(self.transfer_matrix, pos_r), [-1, config.rel_size, config.ent_size])
-		neg_matrix = tf.reshape(tf.nn.embedding_lookup(self.transfer_matrix, neg_r), [-1, config.rel_size, config.ent_size])
-		#Calculating score functions for all positive triples and negative triples
-		p_h = tf.reshape(self._transfer(pos_matrix, pos_h_e), [-1, config.rel_size])
-		p_t = tf.reshape(self._transfer(pos_matrix, pos_t_e), [-1, config.rel_size])
-		p_r = pos_r_e
-		n_h = tf.reshape(self._transfer(neg_matrix, neg_h_e), [-1, config.rel_size])
-		n_t = tf.reshape(self._transfer(neg_matrix, neg_t_e), [-1, config.rel_size])
-		n_r = neg_r_e
-		#The shape of _p_score is (batch_size, 1, hidden_size)
-		#The shape of _n_score is (batch_size, negative_ent + negative_rel, hidden_size)
-		_p_score = self._calc(p_h, p_t, p_r)
-		_p_score = tf.reshape(_p_score, [-1, 1, config.rel_size])
-		_n_score = self._calc(n_h, n_t, n_r)
-		_n_score = tf.reshape(_n_score, [-1, config.negative_ent + config.negative_rel, config.rel_size])
-		#The shape of p_score is (batch_size, 1)
-		#The shape of n_score is (batch_size, 1)
-		p_score =  tf.reduce_sum(tf.reduce_mean(_p_score, 1, keepdims = False), 1, keepdims = True)
-		n_score =  tf.reduce_sum(tf.reduce_mean(_n_score, 1, keepdims = False), 1, keepdims = True)
-		#Calculating loss to get what the framework will optimize
-		self.loss = tf.reduce_sum(tf.maximum(p_score - n_score + config.margin, 0))
-
-	def predict_def(self):
-		config = self.get_config()
-		predict_h, predict_t, predict_r = self.get_predict_instance()
-		predict_h_e = tf.reshape(tf.nn.embedding_lookup(self.ent_embeddings, predict_h), [-1, config.ent_size, 1])
-		predict_t_e = tf.reshape(tf.nn.embedding_lookup(self.ent_embeddings, predict_t), [-1, config.ent_size, 1])
-		predict_r_e = tf.reshape(tf.nn.embedding_lookup(self.rel_embeddings, predict_r), [-1, config.rel_size])
-		predict_matrix = tf.reshape(tf.nn.embedding_lookup(self.transfer_matrix, predict_r), [-1, config.rel_size, config.ent_size])
-		h_e = tf.reshape(self._transfer(predict_matrix, predict_h_e), [-1, config.rel_size])
-		t_e = tf.reshape(self._transfer(predict_matrix, predict_t_e), [-1, config.rel_size])
-		r_e = predict_r_e
-		self.predict = tf.reduce_sum(self._calc(h_e, t_e, r_e), 1, keepdims = True)
+	def loss(self, p_score, n_score):
+		y = Variable(torch.Tensor([-1]).cuda())
+		return self.criterion(p_score, n_score, y)
+	
+	def forward(self):
+		h = self.ent_embeddings(self.batch_h)
+		t = self.ent_embeddings(self.batch_t)
+		r = self.rel_embeddings(self.batch_r)
+		r_transfer = self.transfer_matrix(self.batch_r)
+		h = self._transfer(h, r_transfer)
+		t = self._transfer(t, r_transfer)	
+		score = self._calc(h ,t, r)
+		p_score = self.get_positive_score(score)
+		n_score = self.get_negative_score(score)
+		return self.loss(p_score, n_score)	
+	
+	def predict(self):
+		h = self.ent_embeddings(self.batch_h)
+		t = self.ent_embeddings(self.batch_t)
+		r = self.rel_embeddings(self.batch_r)
+		r_transfer = self.transfer_matrix(self.batch_r)
+		h = self._transfer(h, r_transfer)
+		t = self._transfer(t, r_transfer)
+		score = self._calc(h, t, r)
+		return score.cpu().data.numpy()	

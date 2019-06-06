@@ -1,55 +1,50 @@
-#coding:utf-8
+import torch
+import torch.autograd as autograd
+import torch.nn as nn
+import torch.nn.functional as F
+import torch.optim as optim
+from torch.autograd import Variable
 import numpy as np
-import tensorflow as tf
 from .Model import Model
 
+import pdb
+
 class TransE(Model):
-	r'''
-	TransE is the first model to introduce translation-based embedding, 
-	which interprets relations as the translations operating on entities.
-	'''
+	def __init__(self, config):
+		super(TransE, self).__init__(config)
+		self.ent_embeddings = nn.Embedding(self.config.entTotal, self.config.hidden_size)
+		self.rel_embeddings = nn.Embedding(self.config.relTotal, self.config.hidden_size)
+		if not self.config.self_adv:
+			self.criterion = nn.MarginRankingLoss(self.config.margin, False)
+		else:
+			self.criterion = self.SelfAdv(self.config)
+		self.init_weights()
+		
+	def init_weights(self):
+		nn.init.xavier_uniform_(self.ent_embeddings.weight.data)
+		nn.init.xavier_uniform_(self.rel_embeddings.weight.data)
+
 	def _calc(self, h, t, r):
-		return abs(h + r - t)
+		return torch.norm(h + r - t, self.config.p_norm, -1)
+	
+	def loss(self, p_score, n_score):
+		y = Variable(torch.Tensor([-1]).cuda())
+		return self.criterion(p_score, n_score, y)
 
-	def embedding_def(self):
-		#Obtaining the initial configuration of the model
-		config = self.get_config()
-		#Defining required parameters of the model, including embeddings of entities and relations
-		self.ent_embeddings = tf.get_variable(name = "ent_embeddings", shape = [config.entTotal, config.hidden_size], initializer = tf.contrib.layers.xavier_initializer(uniform = False))
-		self.rel_embeddings = tf.get_variable(name = "rel_embeddings", shape = [config.relTotal, config.hidden_size], initializer = tf.contrib.layers.xavier_initializer(uniform = False))
-		self.parameter_lists = {"ent_embeddings":self.ent_embeddings, \
-								"rel_embeddings":self.rel_embeddings}
-
-	def loss_def(self):
-		#Obtaining the initial configuration of the model
-		config = self.get_config()
-		#To get positive triples and negative triples for training
-		#The shapes of pos_h, pos_t, pos_r are (batch_size, 1)
-		#The shapes of neg_h, neg_t, neg_r are (batch_size, negative_ent + negative_rel)
-		pos_h, pos_t, pos_r = self.get_positive_instance(in_batch = True)
-		neg_h, neg_t, neg_r = self.get_negative_instance(in_batch = True)
-		#Embedding entities and relations of triples, e.g. p_h, p_t and p_r are embeddings for positive triples
-		p_h = tf.nn.embedding_lookup(self.ent_embeddings, pos_h)
-		p_t = tf.nn.embedding_lookup(self.ent_embeddings, pos_t)
-		p_r = tf.nn.embedding_lookup(self.rel_embeddings, pos_r)
-		n_h = tf.nn.embedding_lookup(self.ent_embeddings, neg_h)
-		n_t = tf.nn.embedding_lookup(self.ent_embeddings, neg_t)
-		n_r = tf.nn.embedding_lookup(self.rel_embeddings, neg_r)
-		#Calculating score functions for all positive triples and negative triples
-		#The shape of _p_score is (batch_size, 1, hidden_size)
-		#The shape of _n_score is (batch_size, negative_ent + negative_rel, hidden_size)
-		_p_score = self._calc(p_h, p_t, p_r)
-		_n_score = self._calc(n_h, n_t, n_r)
-		#The shape of p_score is (batch_size, 1)
-		#The shape of n_score is (batch_size, 1)
-		p_score =  tf.reduce_sum(tf.reduce_mean(_p_score, 1, keepdims = False), 1, keepdims = True)
-		n_score =  tf.reduce_sum(tf.reduce_mean(_n_score, 1, keepdims = False), 1, keepdims = True)
-		#Calculating loss to get what the framework will optimize
-		self.loss = tf.reduce_sum(tf.maximum(p_score - n_score + config.margin, 0))
-
-	def predict_def(self):
-		predict_h, predict_t, predict_r = self.get_predict_instance()
-		predict_h_e = tf.nn.embedding_lookup(self.ent_embeddings, predict_h)
-		predict_t_e = tf.nn.embedding_lookup(self.ent_embeddings, predict_t)
-		predict_r_e = tf.nn.embedding_lookup(self.rel_embeddings, predict_r)
-		self.predict = tf.reduce_mean(self._calc(predict_h_e, predict_t_e, predict_r_e), 1, keepdims = False)
+	def forward(self):
+		h = self.ent_embeddings(self.batch_h)
+		t = self.ent_embeddings(self.batch_t)
+		r = self.rel_embeddings(self.batch_r)
+		score = self._calc(h ,t, r)
+		p_score = self.get_positive_score(score)
+		if not self.config.self_adv:
+			n_score = self.get_negative_score(score)
+			return self.loss(p_score, n_score)
+		else:
+			return self.loss(p_score, score[self.config.batch_size:self.config.batch_seq_size])
+	def predict(self):
+		h = self.ent_embeddings(self.batch_h)
+		t = self.ent_embeddings(self.batch_t)
+		r = self.rel_embeddings(self.batch_r)
+		score = self._calc(h, t, r)
+		return score.cpu().data.numpy()	

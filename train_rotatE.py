@@ -1,0 +1,31 @@
+import config
+from models import *
+import json
+import os 
+os.environ['CUDA_VISIBLE_DEVICES']='7'
+con = config.Config()
+con.set_in_path("./benchmarks/WN18RR/")
+con.set_work_threads(16)
+con.set_train_times(1000)
+con.set_nbatches(169)	
+con.set_alpha(5e-5)
+con.set_bern(0)
+con.set_dimension(500)
+con.set_ent_double_embedding(True)
+con.set_margin(6.0)
+con.set_cross_sampling(True)
+con.set_self_adv(False)
+con.set_self_adv_temperature(0.5)
+con.set_ent_neg_rate(1024)
+con.set_rel_neg_rate(0)
+con.set_opt_method("Adam")
+con.set_save_steps(10)
+con.set_valid_steps(2)
+con.set_early_stopping_patience(10)
+con.set_checkpoint_dir("./checkpoint/FB15K237/transE")
+con.set_result_dir("./result/FB15K237/transE")
+con.set_test_link(True)
+con.set_test_triple(True)
+con.init()
+con.set_train_model(RotatE)
+con.train()
