@@ -3,7 +3,6 @@
 #include "Reader.h"
 #include "Corrupt.h"
 #include "Test.h"
-#include "Valid.h"
 #include <cstdlib>
 #include <pthread.h>
 
@@ -18,12 +17,6 @@ void setWorkThreads(INT threads);
 
 extern "C"
 void setBern(INT con);
-
-extern "C"
-void setHeadTailCrossSampling(bool judge);
-
-extern "C"
-bool judgeHeadBatch();
 
 extern "C"
 INT getWorkThreads();
@@ -91,33 +84,19 @@ void* getBatch(void* con) {
 		batch_y[batch] = 1;
 		INT last = batchSize;
 		for (INT times = 0; times < negRate; times ++) {
-			if (!cross_sampling){
-				if (bernFlag)
-					prob = 1000 * right_mean[trainList[i].r] / (right_mean[trainList[i].r] + left_mean[trainList[i].r]);
-				if (randd(id) % 1000 < prob) {
-					batch_h[batch + last] = trainList[i].h;
-					batch_t[batch + last] = corrupt_head(id, trainList[i].h, trainList[i].r);
-					batch_r[batch + last] = trainList[i].r;
-				} else {
-					batch_h[batch + last] = corrupt_tail(id, trainList[i].t, trainList[i].r);
-					batch_t[batch + last] = trainList[i].t;
-					batch_r[batch + last] = trainList[i].r;
-				}
-				batch_y[batch + last] = -1;
-				last += batchSize;
+			if (bernFlag)
+				prob = 1000 * right_mean[trainList[i].r] / (right_mean[trainList[i].r] + left_mean[trainList[i].r]);
+			if (randd(id) % 1000 < prob) {
+				batch_h[batch + last] = trainList[i].h;
+				batch_t[batch + last] = corrupt_head(id, trainList[i].h, trainList[i].r);
+				batch_r[batch + last] = trainList[i].r;
 			} else {
-				if(head_batch){
-					batch_h[batch + last] = corrupt_tail(id, trainList[i].t, trainList[i].r);
-					batch_t[batch + last] = trainList[i].t;
-					batch_r[batch + last] = trainList[i].r;
-				} else {
-					batch_h[batch + last] = trainList[i].h;
-					batch_t[batch + last] = corrupt_head(id, trainList[i].h, trainList[i].r);
-					batch_r[batch + last] = trainList[i].r;
-				}
-				batch_y[batch + last] = -1;
-				last += batchSize;
+				batch_h[batch + last] = corrupt_tail(id, trainList[i].t, trainList[i].r);;
+				batch_t[batch + last] = trainList[i].t;
+				batch_r[batch + last] = trainList[i].r;
 			}
+			batch_y[batch + last] = -1;
+			last += batchSize;
 		}
 		for (INT times = 0; times < negRelRate; times++) {
 			batch_h[batch + last] = trainList[i].h;
@@ -147,10 +126,6 @@ void sampling(INT *batch_h, INT *batch_t, INT *batch_r, REAL *batch_y, INT batch
 	}
 	for (INT threads = 0; threads < workThreads; threads++)
 		pthread_join(pt[threads], NULL);
-	if(head_batch == true)
-		head_batch = false;
-	else
-		head_batch = true;
 	free(pt);
 	free(para);
 }
