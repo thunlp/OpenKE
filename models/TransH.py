@@ -42,10 +42,14 @@ class TransH(Model):
 		score = self._calc(h ,t, r)
 		p_score = self.get_positive_score(score)
 		n_score = self.get_negative_score(score)
-		return self.loss(p_score, n_score)	
+		return self.loss(p_score, n_score)
+	
 	def predict(self):
 		h = self.ent_embeddings(self.batch_h)
 		t = self.ent_embeddings(self.batch_t)
 		r = self.rel_embeddings(self.batch_r)
+		r_norm = self.norm_vector(self.batch_r)
+		h = self._transfer(h, r_norm)
+		t = self._transfer(t, r_norm)
 		score = self._calc(h, t, r)
 		return score.cpu().data.numpy()	
