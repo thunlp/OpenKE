@@ -2,8 +2,8 @@
 #define READER_H
 #include "Setting.h"
 #include "Triple.h"
-#include <algorithm>
 #include <cstdlib>
+#include <algorithm>
 #include <iostream>
 
 INT *freqRel, *freqEnt;
@@ -22,6 +22,7 @@ INT *validLef, *validRig;
 
 extern "C"
 void importTrainFiles() {
+
 	printf("The toolkit is importing datasets.\n");
 	FILE *fin;
 	int tmp;
