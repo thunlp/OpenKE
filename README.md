@@ -136,6 +136,13 @@ con.run()
 con.set_in_path("benchmarks/FB15K/")
 ```
 
+	
+<font color="red">Note that, the following code cannot work to import datasets:</font>
+
+```python
+con.set_in_path("benchmarks/FB15K")
+```
+	
 We import knowledge graphs from benchmarks/FB15K/ folder. The data consists of three essential files mentioned before:
 
 *	train2id.txt
