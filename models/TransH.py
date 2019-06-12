@@ -1,3 +1,4 @@
+
 #coding:utf-8
 import numpy as np
 import tensorflow as tf
@@ -9,9 +10,13 @@ class TransH(Model):
 	TransH inperprets a relation as a translating operation on a hyperplane. 
 	'''
 	def _transfer(self, e, n):
-		return e - tf.reduce_sum(e * n, 1, keepdims = True) * n
+		n = tf.nn.l2_normalize(n, -1)
+		return e - tf.reduce_sum(e * n, -1, keepdims = True) * n
 
-	def _calc(self, h, t, r):
+	def _calc(self, h, t, r, flag = True):
+		h = tf.nn.l2_normalize(h, -1)
+		t = tf.nn.l2_normalize(t, -1)
+		r = tf.nn.l2_normalize(r, -1)
 		return abs(h + r - t)
 
 	def embedding_def(self):
@@ -29,10 +34,10 @@ class TransH(Model):
 		#Obtaining the initial configuration of the model
 		config = self.get_config()
 		#To get positive triples and negative triples for training
-		#The shapes of pos_h, pos_t, pos_r are (batch_size)
-		#The shapes of neg_h, neg_t, neg_r are ((negative_ent + negative_rel) × batch_size)
-		pos_h, pos_t, pos_r = self.get_positive_instance(in_batch = False)
-		neg_h, neg_t, neg_r = self.get_negative_instance(in_batch = False)
+		#The shapes of pos_h, pos_t, pos_r are (batch_size, 1)
+		#The shapes of neg_h, neg_t, neg_r are (batch_size, negative_ent + negative_rel)
+		pos_h, pos_t, pos_r = self.get_positive_instance(in_batch = True)
+		neg_h, neg_t, neg_r = self.get_negative_instance(in_batch = True)
 		#Embedding entities and relations of triples, e.g. pos_h_e, pos_t_e and pos_r_e are embeddings for positive triples
 		pos_h_e = tf.nn.embedding_lookup(self.ent_embeddings, pos_h)
 		pos_t_e = tf.nn.embedding_lookup(self.ent_embeddings, pos_t)
@@ -43,17 +48,7 @@ class TransH(Model):
 		#Getting the required normal vectors of planes to transfer entity embeddings
 		pos_norm = tf.nn.embedding_lookup(self.normal_vectors, pos_r)
 		neg_norm = tf.nn.embedding_lookup(self.normal_vectors, neg_r)
-		
-		pos_h_e = tf.nn.l2_normalize(pos_h_e, 1)
-		pos_t_e = tf.nn.l2_normalize(pos_t_e, 1)
-		pos_r_e = tf.nn.l2_normalize(pos_r_e, 1)
-		neg_h_e = tf.nn.l2_normalize(neg_h_e, 1)
-		neg_t_e = tf.nn.l2_normalize(neg_t_e, 1)
-		neg_r_e = tf.nn.l2_normalize(neg_r_e, 1)
-		
-		pos_norm = tf.nn.l2_normalize(pos_norm, 1)
-		neg_norm = tf.nn.l2_normalize(neg_norm, 1)
-	
+
 		#Calculating score functions for all positive triples and negative triples
 		p_h = self._transfer(pos_h_e, pos_norm)
 		p_t = self._transfer(pos_t_e, pos_norm)
@@ -62,18 +57,17 @@ class TransH(Model):
 		n_t = self._transfer(neg_t_e, neg_norm)
 		n_r = neg_r_e
 		#Calculating score functions for all positive triples and negative triples
-		#The shape of _p_score is (1, batch_size, hidden_size)
-		#The shape of _n_score is (negative_ent + negative_rel, batch_size, hidden_size)
+		#The shape of _p_score is (batch_size, 1, hidden_size)
+		#The shape of _n_score is (batch_size, negative_ent + negative_rel, hidden_size)
 		_p_score = self._calc(p_h, p_t, p_r)
-		_p_score = tf.reshape(_p_score, [1, -1, config.rel_size])
 		_n_score = self._calc(n_h, n_t, n_r)
-		_n_score = tf.reshape(_n_score, [config.negative_ent + config.negative_rel, -1, config.rel_size])
-		#The shape of p_score is (batch_size, 1)
-		#The shape of n_score is (batch_size, 1)
-		p_score =  tf.reduce_sum(tf.reduce_mean(_p_score, 0, keepdims = False), 1, keepdims = True)
-		n_score =  tf.reduce_sum(tf.reduce_mean(_n_score, 0, keepdims = False), 1, keepdims = True)
+		#The shape of p_score is (batch_size, 1, 1)
+		#The shape of n_score is (batch_size, negative_ent + negative_rel, 1)
+		p_score =  tf.reduce_sum(_p_score, -1, keep_dims = True)
+		n_score =  tf.reduce_sum(_n_score, -1, keep_dims = True)
 		#Calculating loss to get what the framework will optimize
-		self.loss = tf.reduce_sum(tf.maximum(p_score - n_score + config.margin, 0))
+		self.loss = tf.reduce_mean(tf.maximum(p_score - n_score + config.margin, 0))
+
 
 	def predict_def(self):
 		config = self.get_config()
@@ -81,14 +75,8 @@ class TransH(Model):
 		predict_h_e = tf.nn.embedding_lookup(self.ent_embeddings, predict_h)
 		predict_t_e = tf.nn.embedding_lookup(self.ent_embeddings, predict_t)
 		predict_r_e = tf.nn.embedding_lookup(self.rel_embeddings, predict_r)
-		predict_norm = tf.nn.embedding_lookup(self.normal_vectors, predict_r)
-		
-		predict_h_e = tf.nn.l2_normalize(predict_h_e, 1)
-		predict_t_e = tf.nn.l2_normalize(predict_t_e, 1)
-		predict_r_e = tf.nn.l2_normalize(predict_r_e, 1)
-		predict_norm = tf.nn.l2_normalize(predict_norm, 1)
-
+		predict_norm = tf.nn.embedding_lookup(self.normal_vectors, predict_r)	
 		h_e = self._transfer(predict_h_e, predict_norm)
 		t_e = self._transfer(predict_t_e, predict_norm)
 		r_e = predict_r_e
-		self.predict = tf.reduce_sum(self._calc(h_e, t_e, r_e), 1, keepdims = True)
+		self.predict = tf.reduce_sum(self._calc(h_e, t_e, r_e), -1, keepdims = True)

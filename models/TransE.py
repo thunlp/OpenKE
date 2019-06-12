@@ -9,6 +9,9 @@ class TransE(Model):
 	which interprets relations as the translations operating on entities.
 	'''
 	def _calc(self, h, t, r):
+		h = tf.nn.l2_normalize(h, -1)
+		t = tf.nn.l2_normalize(t, -1)
+		r = tf.nn.l2_normalize(r, -1)
 		return abs(h + r - t)
 
 	def embedding_def(self):
@@ -40,16 +43,16 @@ class TransE(Model):
 		#The shape of _n_score is (batch_size, negative_ent + negative_rel, hidden_size)
 		_p_score = self._calc(p_h, p_t, p_r)
 		_n_score = self._calc(n_h, n_t, n_r)
-		#The shape of p_score is (batch_size, 1)
-		#The shape of n_score is (batch_size, 1)
-		p_score =  tf.reduce_sum(tf.reduce_mean(_p_score, 1, keepdims = False), 1, keepdims = True)
-		n_score =  tf.reduce_sum(tf.reduce_mean(_n_score, 1, keepdims = False), 1, keepdims = True)
+		#The shape of p_score is (batch_size, 1, 1)
+		#The shape of n_score is (batch_size, negative_ent + negative_rel, 1)
+		p_score =  tf.reduce_sum(_p_score, -1, keep_dims = True)
+		n_score =  tf.reduce_sum(_n_score, -1, keep_dims = True)
 		#Calculating loss to get what the framework will optimize
-		self.loss = tf.reduce_sum(tf.maximum(p_score - n_score + config.margin, 0))
+		self.loss = tf.reduce_mean(tf.maximum(p_score - n_score + config.margin, 0))
 
 	def predict_def(self):
 		predict_h, predict_t, predict_r = self.get_predict_instance()
 		predict_h_e = tf.nn.embedding_lookup(self.ent_embeddings, predict_h)
 		predict_t_e = tf.nn.embedding_lookup(self.ent_embeddings, predict_t)
 		predict_r_e = tf.nn.embedding_lookup(self.rel_embeddings, predict_r)
-		self.predict = tf.reduce_mean(self._calc(predict_h_e, predict_t_e, predict_r_e), 1, keepdims = False)
+		self.predict = tf.reduce_mean(self._calc(predict_h_e, predict_t_e, predict_r_e), 1, keep_dims = False)

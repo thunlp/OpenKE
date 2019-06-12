@@ -9,7 +9,7 @@ class DistMult(Model):
 	DistMult enjoys the same scalable property as TransE and it achieves superior performance over TransE.
 	'''
 	def _calc(self, h, t, r):
-		return h * r * t
+		return tf.reduce_sum(h * r * t, -1, keep_dims = False)
 
 	def embedding_def(self):
 		config = self.get_config()
@@ -18,22 +18,23 @@ class DistMult(Model):
 		self.parameter_lists = {"ent_embeddings":self.ent_embeddings, \
 								"rel_embeddings":self.rel_embeddings}
 	def loss_def(self):
-		#Obtaining the initial configuration of the model
 		config = self.get_config()
-		#To get positive triples and negative triples for training
-		#To get labels for the triples, positive triples as 1 and negative triples as -1
-		#The shapes of h, t, r, y are (batch_size, 1 + negative_ent + negative_rel)
-		h, t, r = self.get_all_instance()
-		y = self.get_all_labels()
-		#Embedding entities and relations of triples
-		e_h = tf.nn.embedding_lookup(self.ent_embeddings, h)
-		e_t = tf.nn.embedding_lookup(self.ent_embeddings, t)
-		e_r = tf.nn.embedding_lookup(self.rel_embeddings, r)
-		#Calculating score functions for all positive triples and negative triples
-		res = tf.reduce_sum(self._calc(e_h, e_t, e_r), 1, keepdims = False)
-		loss_func = tf.reduce_mean(tf.nn.softplus(- y * res))
-		regul_func = tf.reduce_mean(e_h ** 2) + tf.reduce_mean(e_t ** 2) + tf.reduce_mean(e_r ** 2)
-		#Calculating loss to get what the framework will optimize
+		pos_h, pos_t, pos_r = self.get_positive_instance(in_batch = True)
+		neg_h, neg_t, neg_r = self.get_negative_instance(in_batch = True)
+		pos_y = self.get_positive_labels(in_batch = True)
+		neg_y = self.get_negative_labels(in_batch = True)
+		
+		p_h = tf.nn.embedding_lookup(self.ent_embeddings, pos_h)
+		p_t = tf.nn.embedding_lookup(self.ent_embeddings, pos_t)
+		p_r = tf.nn.embedding_lookup(self.rel_embeddings, pos_r)
+		n_h = tf.nn.embedding_lookup(self.ent_embeddings, neg_h)
+		n_t = tf.nn.embedding_lookup(self.ent_embeddings, neg_t)
+		n_r = tf.nn.embedding_lookup(self.rel_embeddings, neg_r)
+		_p_score = self._calc(p_h, p_t, p_r)
+		_n_score = self._calc(n_h, n_t, n_r)
+		print (_n_score.get_shape())
+		loss_func = tf.reduce_mean(tf.nn.softplus(- pos_y * _p_score) + tf.nn.softplus(- neg_y * _n_score))
+		regul_func = tf.reduce_mean(p_h ** 2 + p_t ** 2 + p_r ** 2 + n_h ** 2 + n_t ** 2 + n_r ** 2) 
 		self.loss =  loss_func + config.lmbda * regul_func
 
 	def predict_def(self):
@@ -42,4 +43,4 @@ class DistMult(Model):
 		predict_h_e = tf.nn.embedding_lookup(self.ent_embeddings, predict_h)
 		predict_t_e = tf.nn.embedding_lookup(self.ent_embeddings, predict_t)
 		predict_r_e = tf.nn.embedding_lookup(self.rel_embeddings, predict_r)
-		self.predict = -tf.reduce_sum(self._calc(predict_h_e, predict_t_e, predict_r_e), 1, keepdims = True)
+		self.predict = -self._calc(predict_h_e, predict_t_e, predict_r_e)
