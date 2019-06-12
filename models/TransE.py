@@ -34,6 +34,7 @@ class TransE(Model):
 		p_score = self.get_positive_score(score)
 		n_score = self.get_negative_score(score)
 		return self.loss(p_score, n_score)	
+
 	def predict(self):
 		h = self.ent_embeddings(self.batch_h)
 		t = self.ent_embeddings(self.batch_t)
