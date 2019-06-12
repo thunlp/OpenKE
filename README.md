@@ -27,6 +27,32 @@ OpenKE-PyTorch: the project based on PyTorch, which provides the optimized and s
 
 <a href="https://github.com/thunlp/Fast-TransX"> Fast-TransX</a>: efficient lightweight C++ inferences for TransE and its extended models utilizing the framework of OpenKE, including TransH, TransR, TransD, TranSparse and PTransE. 
 
+## Models
+
+OpenKE (Tensorflow): 
+
+*	RESCAL, HolE
+*  DistMult, ComplEx, Analogy
+*  TransE, TransH, TransR, TransD
+
+OpenKE (PyTorch): 
+
+*	RESCAL
+*  DistMult, ComplEx, Analogy
+*  TransE, TransH, TransR, TransD
+*  SimplE
+
+OpenKE (Alpha)
+
+*	RotatE
+
+We welcome any issues and requests for model implementation and bug fix.
+
+## Experiments
+
+We have provided the hyper-parameters of some models to achieve the state-of-the-art performace on FB15K237 and WN18RR. These scripts can be founded in the folder "./examples/". Up to now, these models include TransE, TransH, TransR, TransD, DistMult, ComplEx.
+
+
 ## Installation
 
 1. Install PyTorch
