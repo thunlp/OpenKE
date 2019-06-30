@@ -4,6 +4,7 @@ import json
 import os 
 os.environ['CUDA_VISIBLE_DEVICES']='6'
 con = config.Config()
+con.set_use_gpu(False)
 #Input training files from benchmarks/FB15K/ folder.
 con.set_in_path("./benchmarks/FB15K/")
 #True: Input test files from the same folder.

@@ -12,8 +12,12 @@ import json
 import numpy as np
 import copy
 
-def to_var(x):
-    return Variable(torch.from_numpy(x).cuda())
+def to_var(x, use_gpu):
+    if use_gpu:
+        return Variable(torch.from_numpy(x).cuda())
+    else:
+        return Variable(torch.from_numpy(x))
+
 
 
 class Config(object):
@@ -116,6 +120,7 @@ class Config(object):
         self.trainModel = None
         self.testModel = None
         self.pretrain_model = None
+        self.use_gpu = True
 
     def init(self):
         self.lib.setInPath(
@@ -187,6 +192,9 @@ class Config(object):
         self.test_neg_r_addr = self.test_neg_r.__array_interface__["data"][0]
         self.relThresh = np.zeros(self.relTotal, dtype=np.float32)
         self.relThresh_addr = self.relThresh.__array_interface__["data"][0]
+
+    def set_use_gpu(self, use_gpu):
+        self.use_gpu = use_gpu
 
     def set_test_link(self, test_link):
         self.test_link = test_link
@@ -288,7 +296,8 @@ class Config(object):
         print("Initializing training model...")
         self.model = model
         self.trainModel = self.model(config=self)
-        self.trainModel.cuda()
+        if self.use_gpu:
+            self.trainModel.cuda()
         if self.optimizer != None:
             pass
         elif self.opt_method == "Adagrad" or self.opt_method == "adagrad":
@@ -325,7 +334,8 @@ class Config(object):
         if path == None:
             path = os.path.join(self.result_dir, self.model.__name__ + ".ckpt")
         self.testModel.load_state_dict(torch.load(path))
-        self.testModel.cuda()
+        if self.use_gpu:
+            self.testModel.cuda()
         self.testModel.eval()
         print("Finish initializing")
 
@@ -351,10 +361,10 @@ class Config(object):
         torch.save(best_model, path)
 
     def train_one_step(self):
-        self.trainModel.batch_h = to_var(self.batch_h)
-        self.trainModel.batch_t = to_var(self.batch_t)
-        self.trainModel.batch_r = to_var(self.batch_r)
-        self.trainModel.batch_y = to_var(self.batch_y)
+        self.trainModel.batch_h = to_var(self.batch_h, self.use_gpu)
+        self.trainModel.batch_t = to_var(self.batch_t, self.use_gpu)
+        self.trainModel.batch_r = to_var(self.batch_r, self.use_gpu)
+        self.trainModel.batch_y = to_var(self.batch_y, self.use_gpu)
         self.optimizer.zero_grad()
         loss = self.trainModel()
         loss.backward()
@@ -362,9 +372,9 @@ class Config(object):
         return loss.item()
 
     def test_one_step(self, model, test_h, test_t, test_r):
-        model.batch_h = to_var(test_h)
-        model.batch_t = to_var(test_t)
-        model.batch_r = to_var(test_r)
+        model.batch_h = to_var(test_h, self.use_gpu)
+        model.batch_t = to_var(test_t, self.use_gpu)
+        model.batch_r = to_var(test_r, self.use_gpu)
         return model.predict()
 
     def valid(self, model):

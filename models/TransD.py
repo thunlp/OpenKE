@@ -32,7 +32,10 @@ class TransD(Model):
 		return e_norm
 
 	def loss(self, p_score, n_score):
-		y = Variable(torch.Tensor([-1]).cuda())
+		if self.config.use_gpu:
+			y = Variable(torch.Tensor([-1]).cuda())
+		else:
+			y = Variable(torch.Tensor([-1]))
 		return self.criterion(p_score, n_score, y)
 
 	def forward(self):

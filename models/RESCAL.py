@@ -27,7 +27,11 @@ class RESCAL(Model):
 		return - torch.sum(h * tr, -1)
 
 	def loss(self, p_score, n_score):
-		y = Variable(torch.Tensor([-1]).cuda())
+		if self.config.use_gpu:		
+			y = Variable(torch.Tensor([-1]).cuda())
+		else:
+			y = Variable(torch.Tensor([-1]))
+
 		return self.criterion(p_score, n_score, y)
 
 	def forward(self):
