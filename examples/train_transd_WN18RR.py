@@ -30,7 +30,7 @@ con.set_out_files("./res/embedding.vec.json")
 #Initialize experimental settings.
 con.init()
 #Set the knowledge embedding model
-con.set_model(models.TransH)
+con.set_model(models.TransD)
 #Train the model.
 con.run()
 #To test models after training needs "set_test_flag(True)".

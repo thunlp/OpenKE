@@ -28,7 +28,6 @@ con.set_model(models.TransE)
 con.run()
 
 parameters = con.get_parameters("numpy")
-parameters["transfer_matrix"] = np.array([(np.identity(50).reshape((50*50))) for i in range(conR.get_rel_total())])
 #++++++++++++++TransR++++++++++++++++++++
 
 conR = config.Config()
@@ -56,6 +55,7 @@ conR.set_opt_method("SGD")
 conR.init()
 #Load pretrained TransE results.
 conR.set_model(models.TransR)
+parameters["transfer_matrix"] = np.array([(np.identity(50).reshape((50*50))) for i in range(conR.get_rel_total())])
 conR.set_parameters(parameters)
 #Train the model.
 conR.run()

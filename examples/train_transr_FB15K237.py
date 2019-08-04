@@ -26,10 +26,8 @@ con.set_opt_method("SGD")
 con.init()
 con.set_model(models.TransE)
 con.run()
-# con.test()
 
 parameters = con.get_parameters("numpy")
-
 #++++++++++++++TransR++++++++++++++++++++
 
 conR = config.Config()
