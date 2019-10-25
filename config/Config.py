@@ -216,7 +216,7 @@ class Config(object):
 	def restore_tensorflow(self):
 		with self.graph.as_default():
 			with self.sess.as_default():
-				self.saver.restore(self.sess, self.importName)
+				self.ckpt.restore(tf.train.latest_checkpoint("./res"))
 
 
 	def export_variables(self, path = None):
@@ -242,7 +242,7 @@ class Config(object):
 		with self.graph.as_default():
 			with self.sess.as_default():
 				if var_name in self.trainModel.parameter_lists:
-					return self.sess.run(self.trainModel.parameter_lists[var_name])
+					return self.trainModel.get_layer(name=var_name)
 				else:
 					return None
 
@@ -259,15 +259,13 @@ class Config(object):
 	def save_parameters(self, path = None):
 		if path == None:
 			path = self.out_path
-		f = open(path, "w")
-		f.write(json.dumps(self.get_parameters("list")))
-		f.close()
+		self.trainModel.save_weights(path)
 
 	def set_parameters_by_name(self, var_name, tensor):
 		with self.graph.as_default():
 			with self.sess.as_default():
 				if var_name in self.trainModel.parameter_lists:
-					self.trainModel.parameter_lists[var_name].assign(tensor).eval()
+					self.trainModel.parameter_lists[var_name] = tensor
 
 	def set_parameters(self, lists):
 		for i in lists:
@@ -285,16 +283,17 @@ class Config(object):
 					if self.optimizer != None:
 						pass
 					elif self.opt_method == "Adagrad" or self.opt_method == "adagrad":
-						self.optimizer = tf.train.AdagradOptimizer(learning_rate = self.alpha, initial_accumulator_value=1e-20)
+						self.optimizer = tf.keras.optimizers.Adagrad(learning_rate = self.alpha, initial_accumulator_value=1e-20)
 					elif self.opt_method == "Adadelta" or self.opt_method == "adadelta":
-						self.optimizer = tf.train.AdadeltaOptimizer(self.alpha)
+						self.optimizer = tf.keras.optimizers.Adadelta(self.alpha)
 					elif self.opt_method == "Adam" or self.opt_method == "adam":
-						self.optimizer = tf.train.AdamOptimizer(self.alpha)
+						self.optimizer = tf.keras.optimizers.Adam(self.alpha)
 					else:
-						self.optimizer = tf.train.GradientDescentOptimizer(self.alpha)
-					grads_and_vars = self.optimizer.compute_gradients(self.trainModel.loss)
-					self.train_op = self.optimizer.apply_gradients(grads_and_vars)
+						self.optimizer = tf.keras.optimizers.SGD(self.alpha)
+					grads_and_vars = self.optimizer.get_gradients(self.trainModel.loss, self.trainModel.trainable_variables)
+					self.train_op = self.optimizer.apply_gradients(zip(grads_and_vars, self.trainModel.trainable_variables))
 				self.saver = tf.train.Saver()
+				self.ckpt = tf.train.Checkpoint(optimizer=self.optimizer, model=self.trainModel)
 				self.sess.run(tf.global_variables_initializer())
 
 	def train_step(self, batch_h, batch_t, batch_r, batch_y):
@@ -319,6 +318,7 @@ class Config(object):
 	def run(self):
 		with self.graph.as_default():
 			with self.sess.as_default():
+
 				if self.importName != None:
 					self.restore_tensorflow()
 				if self.early_stopping is not None:
@@ -328,7 +328,9 @@ class Config(object):
 				for times in range(self.train_times):
 					loss = 0.0
 					t_init = time.time()
+					step = 0
 					for batch in range(self.nbatches):
+						step = step + 1
 						self.sampling()
 						loss += self.train_step(self.batch_h, self.batch_t, self.batch_r, self.batch_y)
 					t_end = time.time()
@@ -347,6 +349,7 @@ class Config(object):
 							break
 				if self.exportName != None:
 					self.save_tensorflow()
+					self.ckpt.save(self.exportName + 'ckpt')
 				if self.out_path != None:
 					self.save_parameters(self.out_path)
 
