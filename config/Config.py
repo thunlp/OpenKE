@@ -110,7 +110,7 @@ class Config(object):
         self.lr_decay = 0
         self.weight_decay = 0
         self.lmbda = 0.0
-        self.alpah = 0.001
+        self.alpha = 0.001
         self.early_stopping_patience = 10
         self.nbatches = 100
         self.p_norm = 1
