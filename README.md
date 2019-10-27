@@ -46,10 +46,7 @@ OpenKE (PyTorch):
 *  DistMult, ComplEx, Analogy
 *  TransE, TransH, TransR, TransD
 *  SimplE
-
-OpenKE (Alpha)
-
-*	RotatE
+*  RotatE
 
 We welcome any issues and requests for model implementation and bug fix.
 
