@@ -100,10 +100,20 @@ We have provided the hyper-parameters of some models to achieve the state-of-the
 	$ git clone -b OpenKE-PyTorch https://github.com/thunlp/OpenKE
 	
 	$ cd OpenKE
+	
+	$ cd openke
 
 3. Compile C++ files
 	
 	$ bash make.sh
+	
+4. Quick Start
+
+	$ cd ../
+	
+	$ cp examples/train_transe_FB15K237.py ./
+	
+	$ python train_transe_FB15K237.py
 
 ## Data
 
