@@ -24,7 +24,7 @@ class TestDataSampler(object):
 
 class TestDataLoader(object):
 
-	def __init__(self, in_path = "./", sampling_mode = 'link'):
+	def __init__(self, in_path = "./", sampling_mode = 'link', type_constrain = True):
 		base_file = os.path.abspath(os.path.join(os.path.dirname(__file__), "../release/Base.so"))
 		self.lib = ctypes.cdll.LoadLibrary(base_file)
 		"""for link prediction"""
@@ -50,12 +50,17 @@ class TestDataLoader(object):
 		"""set essential parameters"""
 		self.in_path = in_path
 		self.sampling_mode = sampling_mode
+		self.type_constrain = type_constrain
 		self.read()
 
 	def read(self):
 		self.lib.setInPath(ctypes.create_string_buffer(self.in_path.encode(), len(self.in_path) * 2))
 		self.lib.randReset()
 		self.lib.importTestFiles()
+
+		if self.type_constrain:
+			self.lib.importTypeFiles()
+
 		self.relTotal = self.lib.getRelationTotal()
 		self.entTotal = self.lib.getEntityTotal()
 		self.testTotal = self.lib.getTestTotal()
