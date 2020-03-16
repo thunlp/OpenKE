@@ -10,6 +10,21 @@ extern "C"
 void setInPath(char *path);
 
 extern "C"
+void setTrainPath(char *path);
+
+extern "C"
+void setValidPath(char *path);
+
+extern "C"
+void setTestPath(char *path);
+
+extern "C"
+void setEntPath(char *path);
+
+extern "C"
+void setRelPath(char *path);
+
+extern "C"
 void setOutPath(char *path);
 
 extern "C"
