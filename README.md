@@ -93,28 +93,24 @@ We have provided the hyper-parameters of some models to achieve the state-of-the
 
 ## Installation
 
-1. Install PyTorch
+1. Install [PyTorch](https://pytorch.org/get-started/locally/)
 
 2. Clone the OpenKE-PyTorch branch:
-
-	$ git clone -b OpenKE-PyTorch https://github.com/thunlp/OpenKE
-	
-	$ cd OpenKE
-	
-	$ cd openke
-
+```bash
+git clone -b OpenKE-PyTorch https://github.com/thunlp/OpenKE --depth 1
+cd OpenKE
+cd openke
+```
 3. Compile C++ files
-	
-	$ bash make.sh
-	
+```bash
+bash make.sh
+```	
 4. Quick Start
-
-	$ cd ../
-	
-	$ cp examples/train_transe_FB15K237.py ./
-	
-	$ python train_transe_FB15K237.py
-
+```bash
+cd ../
+cp examples/train_transe_FB15K237.py ./
+python train_transe_FB15K237.py
+```
 ## Data
 
 * For training, datasets contain three files:
