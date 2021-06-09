@@ -90,6 +90,13 @@ We have provided the hyper-parameters of some models to achieve the state-of-the
 
 <strong> We are still trying more hyper-parameters and more training strategies (e.g., adversarial training and label smoothing regularization) for these models. </strong> Hence, this table is still in change. We welcome everyone to help us update this table and hyper-parameters.
 
+## Pip Install
+
+``` sh
+./build.sh
+twine upload -r <pypi-host> openke-***.whl
+pip install openke -i <pip-host>
+```
 
 ## Installation
 
