@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <iostream>
 #include <cmath>
+#include <vector>
 
 INT *freqRel, *freqEnt;
 INT *lefHead, *rigHead;
@@ -13,6 +14,25 @@ INT *lefTail, *rigTail;
 INT *lefRel, *rigRel;
 REAL *left_mean, *right_mean;
 REAL *prob;
+
+// Vector of collecting the global variables from different data loaders
+std::vector< Triple* > trainLists = std::vector<Triple*>();
+
+std::vector< Triple* > trainHeads = std::vector<Triple*>();
+std::vector< Triple* > trainTails = std::vector<Triple*>();
+std::vector< Triple* > trainRels = std::vector<Triple*>();
+
+std::vector< INT* > lefHeads = std::vector<INT*>();
+std::vector< INT* > rigHeads = std::vector<INT*>();
+std::vector< INT* > lefTails = std::vector<INT*>();
+std::vector< INT* > rigTails = std::vector<INT*>();
+std::vector< INT* > lefRels = std::vector<INT*>();
+std::vector< INT* > rigRels = std::vector<INT*>();
+
+std::vector< INT > trainTotals = std::vector<INT>();
+std::vector< INT > tripleTotals = std::vector<INT>();
+std::vector< INT > entityTotals = std::vector<INT>();
+std::vector< INT > relationTotals = std::vector<INT>();
 
 Triple *trainList;
 Triple *trainHead;
@@ -83,6 +103,16 @@ void importTrainFiles() {
 	trainRel = (Triple *)calloc(trainTotal, sizeof(Triple));
 	freqRel = (INT *)calloc(relationTotal, sizeof(INT));
 	freqEnt = (INT *)calloc(entityTotal, sizeof(INT));
+	
+	// Collect the address of train lists, thier heads, tails and relations
+	trainLists.push_back(trainList);
+	trainHeads.push_back(trainHead);
+	trainTails.push_back(trainTail);
+	trainRels.push_back(trainRel);
+	
+	// Collect number of entities and relations of this data loader
+	entityTotals.push_back(entityTotal);
+	relationTotals.push_back(relationTotal);
 	for (INT i = 0; i < trainTotal; i++) {
 		tmp = fscanf(fin, "%ld", &trainList[i].h);
 		tmp = fscanf(fin, "%ld", &trainList[i].t);
@@ -117,6 +147,18 @@ void importTrainFiles() {
 	rigRel = (INT *)calloc(entityTotal, sizeof(INT));
 	memset(rigHead, -1, sizeof(INT)*entityTotal);
 	memset(rigTail, -1, sizeof(INT)*entityTotal);
+	
+	// Collect left and rights of heads, tail and relations
+	lefHeads.push_back(lefHead);
+	rigHeads.push_back(rigHead);
+	lefTails.push_back(lefTail);
+	rigTails.push_back(rigTail);
+	lefRels.push_back(lefRel);
+	rigRels.push_back(rigRel);
+
+	// Collect train totals
+	trainTotals.push_back(trainTotal);
+	
 	memset(rigRel, -1, sizeof(INT)*entityTotal);
 	for (INT i = 1; i < trainTotal; i++) {
 		if (trainTail[i].t != trainTail[i - 1].t) {
