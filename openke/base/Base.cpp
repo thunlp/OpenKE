@@ -168,12 +168,32 @@ void sampling(
 		INT negRate = 1, 
 		INT negRelRate = 0, 
 		INT mode = 0,
+		INT domain_idx=0,
 		bool filter_flag = true,
 		bool p = false, 
 		bool val_loss = false
 ) {
 	pthread_t *pt = (pthread_t *)malloc(workThreads * sizeof(pthread_t));
 	Parameter *para = (Parameter *)malloc(workThreads * sizeof(Parameter));
+	
+	// Update the global variables to current loader index
+	trainList = trainLists[domain_idx];
+	trainTotal = trainTotals[domain_idx];
+
+	trainHead = trainHeads[domain_idx];
+	trainTail = trainTails[domain_idx];
+	trainRel = trainRels[domain_idx];
+
+	lefHead = lefHeads[domain_idx];
+	rigHead = rigHeads[domain_idx];
+	lefTail = lefTails[domain_idx];
+	rigTail = rigTails[domain_idx];
+	lefRel = lefRels[domain_idx];
+	rigRel = rigRels[domain_idx];
+
+	entityTotal = entityTotals[domain_idx];
+	relationTotal = relationTotals[domain_idx];
+	
 	for (INT threads = 0; threads < workThreads; threads++) {
 		para[threads].id = threads;
 		para[threads].batch_h = batch_h;
