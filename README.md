@@ -93,9 +93,8 @@ We have provided the hyper-parameters of some models to achieve the state-of-the
 ## Pip Install
 
 ``` sh
-./build.sh
-twine upload -r <pypi-host> openke-***.whl
-pip install openke -i <pip-host>
+./build.sh  # build wheel file 
+pip install openke_***.whl  # install 
 ```
 
 ## Installation
