@@ -1,5 +1,15 @@
 # OpenKE-PyTorch
 
+This repository is a subproject of THU-OpenSK, and all subprojects of THU-OpenSK are as follows.
+
+- [OpenNE](https://www.github.com/thunlp/OpenNE)
+- [OpenKE](https://www.github.com/thunlp/OpenKE)
+  - [KB2E](https://www.github.com/thunlp/KB2E)
+  - [TensorFlow-Transx](https://www.github.com/thunlp/TensorFlow-Transx)
+  - [Fast-TransX](https://www.github.com/thunlp/Fast-TransX)
+- [OpenNRE](https://www.github.com/thunlp/OpenNRE)
+  - [JointNRE](https://www.github.com/thunlp/JointNRE)
+
 An Open-source Framework for Knowledge Embedding implemented with PyTorch.
 
 More information is available on our website 
@@ -104,7 +114,7 @@ cd openke
 3. Compile C++ files
 ```bash
 bash make.sh
-```	
+```
 4. Quick Start
 ```bash
 cd ../
