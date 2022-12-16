@@ -1,0 +1,22 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Current File",
+            "type": "python",
+            "module": "torch.distributed.launch",
+            "request": "launch",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "env": {"CUDA_VISIBLE_DEVICES":"0,1",
+        },
+            "args": [
+                "--nproc_per_node", "2", 
+                "./train_transe_FB15K237.py"
+            ]   
+        }
+    ]
+}
