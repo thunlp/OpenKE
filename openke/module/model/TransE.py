@@ -5,39 +5,6 @@ from .Model import Model
 import torch.distributed as dist
 
 
-class parallel_normalize(torch.autograd.Function):
-	def __init__(self):
-		super(parallel_normalize, self).__init__()
-
-	@staticmethod
-	def forward(ctx, input):
-		sum_of_square = (input * input).sum(-1) 
-		dist.all_reduce(sum_of_square, dist.ReduceOp.SUM,)
-		input_norm = sum_of_square ** 0.5
-		inverse_l2_norm = 1 / input_norm
-		input_norm_mask = input_norm < 1
-		ctx.save_for_backward(inverse_l2_norm, input, input_norm_mask)
-		return input * (inverse_l2_norm).unsqueeze(1) 
-
-
-	@staticmethod
-	def backward(ctx, grad_output):
-		inverse_l2_norm, input, input_norm_mask = ctx.saved_tensors
-		bs, dim = input.shape
-		tensor_list = [torch.zeros_like(input)]*2
-		dist.all_gather(tensor_list, input)		# communicate half a model is problematic
-		input = torch.cat(tensor_list, 1)
-		outer = torch.bmm(input.unsqueeze(2), input.unsqueeze(1))
-		jacobian = -1 * outer * torch.pow(inverse_l2_norm, 3).unsqueeze(1).unsqueeze(1)
-		jacobian_diag = torch.zeros_like(jacobian)
-		for i in range(len(jacobian)):
-			jacobian_diag[i].fill_diagonal_(inverse_l2_norm[i].item())
-		jacobian += jacobian_diag
-		jacobian = jacobian[:dim]
-		output = torch.bmm(grad_output.unsqueeze(1), jacobian).squeeze()
-		return output
-
-
 class TransE(Model):
 
 	def __init__(self, ent_tot, rel_tot, dim = 100, p_norm = 1, norm_flag = True, margin = None, epsilon = None, world_size=2):
@@ -51,7 +18,7 @@ class TransE(Model):
 
 		self.ent_embeddings = nn.Embedding(self.ent_tot, self.dim // world_size)
 		self.rel_embeddings = nn.Embedding(self.rel_tot, self.dim // world_size)
-		self.parallel_normalize = parallel_normalize().apply
+		# self.parallel_normalize = parallel_normalize().apply
 		if margin == None or epsilon == None:
 			nn.init.xavier_uniform_(self.ent_embeddings.weight.data)
 			nn.init.xavier_uniform_(self.rel_embeddings.weight.data)
@@ -80,9 +47,9 @@ class TransE(Model):
 
 	def _calc(self, h, t, r, mode):
 		if self.norm_flag:
-			h = self.parallel_normalize(h)
-			r = self.parallel_normalize(r)
-			t = self.parallel_normalize(t)
+			h = F.normalize(h)
+			r = F.normalize(r)
+			t = F.normalize(t)
 		if mode != 'normal':
 			h = h.view(-1, r.shape[0], h.shape[-1])
 			t = t.view(-1, r.shape[0], t.shape[-1])
