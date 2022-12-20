@@ -48,10 +48,16 @@ class TransE(Model):
 
 	def _calc(self, h, t, r, mode):
 		if self.norm_flag:
+<<<<<<< HEAD
 			h = F.normalize(h, 2, -1)
 			r = F.normalize(r, 2, -1)
 			t = F.normalize(t, 2, -1)
 
+=======
+			h = F.normalize(h)
+			r = F.normalize(r)
+			t = F.normalize(t)
+>>>>>>> 642bba4563d441d11cefbbfb2dd94ef4deac2206
 		if mode != 'normal':
 			h = h.view(-1, r.shape[0], h.shape[-1])
 			t = t.view(-1, r.shape[0], t.shape[-1])
