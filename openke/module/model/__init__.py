@@ -14,6 +14,7 @@ from .Analogy import Analogy
 from .SimplE import SimplE
 from .RotatE import RotatE
 from .RotatE_dist import DistributedRotatE
+
 __all__ = [
     'Model',
     'TransE',

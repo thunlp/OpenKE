@@ -4,27 +4,11 @@ from openke.module.model import TransE
 from openke.module.loss import MarginLoss
 from openke.module.strategy import NegativeSampling
 from openke.data import TrainDataLoader, TestDataLoader
-import torch
-import torch.distributed as dist
-import argparse
-import time
-import numpy as np
 
-torch.manual_seed(1234)
-np.random.seed(1234)
-parser = argparse.ArgumentParser()
-parser.add_argument("--local_rank", default=-1, type=int)
-args = parser.parse_args()
-local_rank = args.local_rank
-
-total_start_time = time.time()
-torch.cuda.set_device(local_rank)
-dist.init_process_group(backend='nccl', )
-world_size = dist.get_world_size()
 # dataloader for training
 train_dataloader = TrainDataLoader(
 	in_path = "./benchmarks/FB15K237/", 
-	nbatches = 400,
+	nbatches = 100,
 	threads = 8, 
 	sampling_mode = "normal", 
 	bern_flag = 1, 
@@ -41,8 +25,7 @@ transe = TransE(
 	rel_tot = train_dataloader.get_rel_tot(),
 	dim = 200, 
 	p_norm = 1, 
-	norm_flag = True,
-	world_size = world_size)
+	norm_flag = True)
 
 
 # define the loss function
@@ -53,11 +36,8 @@ model = NegativeSampling(
 )
 
 # train the model
-trainer = Trainer(model = model, data_loader = train_dataloader, train_times = 1000, alpha = 1.0, use_gpu = True,)
+trainer = Trainer(model = model, data_loader = train_dataloader, train_times = 1000, alpha = 1.0, use_gpu = True)
 trainer.run()
-total_end_time = time.time()
-with open("./total_cost_time.txt", "a+") as f:
-	f.writelines(["total elapsed time {}".format(total_end_time - total_start_time)])
 transe.save_checkpoint('./checkpoint/transe.ckpt')
 
 # test the model

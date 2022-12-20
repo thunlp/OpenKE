@@ -90,22 +90,17 @@ class Trainer(object):
 		print("Finish initializing...")
 		
 		training_range = tqdm(range(self.train_times))
-		cost_time = 0
 		for epoch in training_range:
 			res = 0.0
 			for data in self.data_loader:
-				start_time = time.time()
 				loss = self.train_one_step(data)
-				end_time = time.time()
-				cost_time += (end_time - start_time)
 				res += loss
 			training_range.set_description("Epoch %d | loss: %f" % (epoch, res))
 			
 			if self.save_steps and self.checkpoint_dir and (epoch + 1) % self.save_steps == 0:
-				print("Epoch {} has finished after {}, saving...".format(epoch, cost_time))
+				print("Epoch %d has finished, saving..." % (epoch))
 				self.model.save_checkpoint(os.path.join(self.checkpoint_dir + "-" + str(epoch) + ".ckpt"))
-			with open("./{}_running_cost_time.txt".format(self.mode), "a+") as f:
-				f.writelines(["epoch:{} running time: {}".format(epoch, cost_time)])
+
 	def set_model(self, model):
 		self.model = model
 
