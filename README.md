@@ -1,6 +1,6 @@
 # OpenKE-PyTorch
 
-This repository is a subproject of THU-OpenSK, and all subprojects of THU-OpenSK are as follows.
+This repository is a subproject of THU-OpenSKL, and all subprojects of THU-OpenSKL are as follows.
 
 - [OpenNE](https://www.github.com/thunlp/OpenNE)
 - [OpenKE](https://www.github.com/thunlp/OpenKE)
@@ -9,6 +9,13 @@ This repository is a subproject of THU-OpenSK, and all subprojects of THU-OpenSK
   - [Fast-TransX](https://www.github.com/thunlp/Fast-TransX)
 - [OpenNRE](https://www.github.com/thunlp/OpenNRE)
   - [JointNRE](https://www.github.com/thunlp/JointNRE)
+  - [NRE](https://github.com/thunlp/NRE)
+- [ERNIE](https://github.com/thunlp/ERNIE)
+- [Knowledge-Plugin](https://github.com/THUNLP/Knowledge-Plugin)
+- Embedding Base
+  - [OpenKE-Wikidata](http://139.129.163.161/download/wikidata)
+  - [OpenKE-Freebase](http://139.129.163.161/download/wikidata)
+  - [OpenKE-XLORE](http://139.129.163.161/download/wikidata)
 
 An Open-source Framework for Knowledge Embedding implemented with PyTorch.
 
