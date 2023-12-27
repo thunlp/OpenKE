@@ -1,11 +1,11 @@
 # OpenKE, THU-OpenSKL
 
-This repository is a project of THU-OpenSKL, and all projects of THU-OpenSKL are as follows.
+This repository is a project of THU-OpenSKL that aims to harness the power of both structured knowledge and unstructured language via representation learning. All projects of THU-OpenSKL are as follows.
 
 - [OpenNE](https://www.github.com/thunlp/OpenNE)
-  - An effective and efficient toolkit for representing nodes and edges in graphs as embeddings.
+  - An effective and efficient toolkit for representing nodes and edges in large-scale graphs as embeddings.
 - [OpenKE](https://www.github.com/thunlp/OpenKE)
-  - An effective and efficient toolkit for representing structured knowledge in knowledge graphs as embeddings
+  - An effective and efficient toolkit for representing structured knowledge in large-scale knowledge graphs as embeddings
   - This toolkit also includes three sub-projects:
      - [KB2E](https://www.github.com/thunlp/KB2E)
      - [TensorFlow-Transx](https://www.github.com/thunlp/TensorFlow-Transx)
@@ -15,7 +15,7 @@ This repository is a project of THU-OpenSKL, and all projects of THU-OpenSKL are
   - This toolkit also includes two sub-projects:
      - [JointNRE](https://www.github.com/thunlp/JointNRE)
      - [NRE](https://github.com/thunlp/NRE)
-- OpenKPTM
+- OpenKPM
   - An effective and efficient framework for injecting knowledge graph representations into pre-trained language models.
   - This toolkit also includes two sub-projects:
   - [ERNIE](https://github.com/thunlp/ERNIE)
@@ -23,7 +23,7 @@ This repository is a project of THU-OpenSKL, and all projects of THU-OpenSKL are
   - [Knowledge-Plugin](https://github.com/THUNLP/Knowledge-Plugin)
     - A framework that can enhance pre-trained language models by plugging knowledge graph representations without tuning the parameters of pre-trained language models.
 - Knowledge Embedding Bases
-  - The knowledge graph embeddings pre-trained by OpenKE. These representations cover Wikidata, Freebase, and XLORE.
+  - The embeddings of large-scale knowledge graphs pre-trained by OpenKE. These representations cover Wikidata, Freebase, and XLORE.
   - [OpenKE-Wikidata](http://139.129.163.161/download/wikidata)
     - Knowledge graph embeddings of Wikidata pre-trained by OpenKE. Wikidata is a free and collaborative database, collecting structured data to provide support for Wikipedia.
   - [OpenKE-TransR-Knowledge-Plugin]()
