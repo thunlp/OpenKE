@@ -15,18 +15,23 @@ This repository is a project of THU-OpenSKL, and all projects of THU-OpenSKL are
   - This toolkit also includes two sub-projects:
      - [JointNRE](https://www.github.com/thunlp/JointNRE)
      - [NRE](https://github.com/thunlp/NRE)
-- [ERNIE](https://github.com/thunlp/ERNIE)
-  - An effective and efficient framework for augmenting pre-trained language models with knowledge graph representations.
-- [Knowledge-Plugin](https://github.com/THUNLP/Knowledge-Plugin)
-  - A framework that can enhance pre-trained language models by plugging knowledge graph representations without tuning the parameters of pre-trained language models.
-- Embedding Base
+- OpenKPTM
+  - An effective and efficient framework for injecting knowledge graph representations into pre-trained language models.
+  - This toolkit also includes two sub-projects:
+  - [ERNIE](https://github.com/thunlp/ERNIE)
+    - An effective and efficient framework for augmenting pre-trained language models with knowledge graph representations.
+  - [Knowledge-Plugin](https://github.com/THUNLP/Knowledge-Plugin)
+    - A framework that can enhance pre-trained language models by plugging knowledge graph representations without tuning the parameters of pre-trained language models.
+- Knowledge Embedding Bases
   - The knowledge graph embeddings pre-trained by OpenKE. These representations cover Wikidata, Freebase, and XLORE.
-  - Wikidata is a free and collaborative database, collecting structured data to provide support for Wikipedia.
-      - [OpenKE-Wikidata](http://139.129.163.161/download/wikidata)
-  -  Freebase was a large collaborative knowledge base consisting of data composed mainly by its community members. It was an online collection of structured data harvested from many sources. 
-      - [OpenKE-Freebase](http://139.129.163.161/download/wikidata)
-  - XLORE is one of the most popular Chinese knowledge graphs developed by THUKEG.
-      - [OpenKE-XLORE](http://139.129.163.161/download/wikidata)
+  - [OpenKE-Wikidata](http://139.129.163.161/download/wikidata)
+    - Knowledge graph embeddings of Wikidata pre-trained by OpenKE. Wikidata is a free and collaborative database, collecting structured data to provide support for Wikipedia.
+  - [OpenKE-TransR-Knowledge-Plugin]()
+    - Knowledge graph embeddings of Wikidata pre-trained by OpenKE for the project [Knowledge-Plugin](https://github.com/THUNLP/Knowledge-Plugin).
+  - [OpenKE-Freebase](http://139.129.163.161/download/wikidata)
+    - Knowledge graph embeddings of Freebase pre-trained by OpenKE. Freebase was a large collaborative knowledge base consisting of data composed mainly by its community members. It was an online collection of structured data harvested from many sources. 
+  - [OpenKE-XLORE](http://139.129.163.161/download/wikidata)
+    - Knowledge graph embeddings of XLORE pre-trained by OpenKE. XLORE is one of the most popular Chinese knowledge graphs developed by THUKEG.
 
 ## OpenKE-PyTorch
 
