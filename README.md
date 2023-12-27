@@ -1,21 +1,34 @@
-# OpenKE-PyTorch
+# OpenKE, THU-OpenSKL
 
-This repository is a subproject of THU-OpenSKL, and all subprojects of THU-OpenSKL are as follows.
+This repository is a project of THU-OpenSKL, and all projects of THU-OpenSKL are as follows.
 
 - [OpenNE](https://www.github.com/thunlp/OpenNE)
+  - An effective and efficient toolkit for representing nodes and edges in graphs as embeddings.
 - [OpenKE](https://www.github.com/thunlp/OpenKE)
-  - [KB2E](https://www.github.com/thunlp/KB2E)
-  - [TensorFlow-Transx](https://www.github.com/thunlp/TensorFlow-Transx)
-  - [Fast-TransX](https://www.github.com/thunlp/Fast-TransX)
+  - An effective and efficient toolkit for representing structured knowledge in knowledge graphs as embeddings
+  - This toolkit also includes three sub-projects:
+     - [KB2E](https://www.github.com/thunlp/KB2E)
+     - [TensorFlow-Transx](https://www.github.com/thunlp/TensorFlow-Transx)
+     - [Fast-TransX](https://www.github.com/thunlp/Fast-TransX)
 - [OpenNRE](https://www.github.com/thunlp/OpenNRE)
-  - [JointNRE](https://www.github.com/thunlp/JointNRE)
-  - [NRE](https://github.com/thunlp/NRE)
+  - An effective and efficient toolkit for implementing neural networks for extracting structured knowledge from text.
+  - This toolkit also includes two sub-projects:
+     - [JointNRE](https://www.github.com/thunlp/JointNRE)
+     - [NRE](https://github.com/thunlp/NRE)
 - [ERNIE](https://github.com/thunlp/ERNIE)
+  - An effective and efficient framework for augmenting pre-trained language models with knowledge graph representations.
 - [Knowledge-Plugin](https://github.com/THUNLP/Knowledge-Plugin)
+  - A framework that can enhance pre-trained language models by plugging knowledge graph representations without tuning the parameters of pre-trained language models.
 - Embedding Base
-  - [OpenKE-Wikidata](http://139.129.163.161/download/wikidata)
-  - [OpenKE-Freebase](http://139.129.163.161/download/wikidata)
-  - [OpenKE-XLORE](http://139.129.163.161/download/wikidata)
+  - The knowledge graph embeddings pre-trained by OpenKE. These representations cover Wikidata, Freebase, and XLORE.
+  - Wikidata is a free and collaborative database, collecting structured data to provide support for Wikipedia.
+      - [OpenKE-Wikidata](http://139.129.163.161/download/wikidata)
+  -  Freebase was a large collaborative knowledge base consisting of data composed mainly by its community members. It was an online collection of structured data harvested from many sources. 
+      - [OpenKE-Freebase](http://139.129.163.161/download/wikidata)
+  - XLORE is one of the most popular Chinese knowledge graphs developed by THUKEG.
+      - [OpenKE-XLORE](http://139.129.163.161/download/wikidata)
+
+## OpenKE-PyTorch
 
 An Open-source Framework for Knowledge Embedding implemented with PyTorch.
 
