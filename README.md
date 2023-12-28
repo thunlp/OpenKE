@@ -44,7 +44,7 @@ More information is available on our website
 
 If you use the code, please cite the following [paper](http://aclweb.org/anthology/D18-2024):
 
-```
+```bibtex
  @inproceedings{han2018openke,
    title={OpenKE: An Open Toolkit for Knowledge Embedding},
    author={Han, Xu and Cao, Shulin and Lv Xin and Lin, Yankai and Liu, Zhiyuan and Sun, Maosong and Li, Juanzi},
