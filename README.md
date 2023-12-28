@@ -1,6 +1,6 @@
 # OpenKE, THU-OpenSKL
 
-This repository is a project of THU-OpenSKL which aims to harness the power of both structured knowledge and unstructured language via representation learning. All projects of THU-OpenSKL are as follows.
+This repository is a project of THU-OpenSKL which aims to harness the power of both structured knowledge and unstructured languages via representation learning. All projects of THU-OpenSKL are as follows.
 
 - [OpenNE](https://www.github.com/thunlp/OpenNE)
   - An effective and efficient toolkit for representing nodes and edges in large-scale graphs as embeddings.
@@ -23,11 +23,11 @@ This repository is a project of THU-OpenSKL which aims to harness the power of b
   - [Knowledge-Plugin](https://github.com/THUNLP/Knowledge-Plugin)
     - A framework that can enhance pre-trained language models by plugging knowledge graph representations without tuning the parameters of pre-trained language models.
 - **Resource**: Knowledge Embedding Bases
-  - The embeddings of large-scale knowledge graphs pre-trained by OpenKE, cover three typical large-scale knowledge graphs: Wikidata, Freebase, and XLORE.
+  - The embeddings of large-scale knowledge graphs pre-trained by OpenKE, covering three typical large-scale knowledge graphs: Wikidata, Freebase, and XLORE.
   - [OpenKE-Wikidata](http://139.129.163.161/download/wikidata)
     - Wikidata is a free and collaborative database, collecting structured data to provide support for Wikipedia. 
     - TransE version: Knowledge graph embeddings of Wikidata pre-trained by OpenKE. 
-    - [Plugin version](): Knowledge graph embeddings of Wikidata pre-trained by OpenKE for the project [Knowledge-Plugin](https://github.com/THUNLP/Knowledge-Plugin).
+    - [Plugin TransR version](): Knowledge graph embeddings of Wikidata pre-trained by OpenKE for the project [Knowledge-Plugin](https://github.com/THUNLP/Knowledge-Plugin).
   - [OpenKE-Freebase](http://139.129.163.161/download/wikidata)
     - Freebase was a large collaborative knowledge base consisting of data composed mainly by its community members. It was an online collection of structured data harvested from many sources. 
     - TransE version: Knowledge graph embeddings of Freebase pre-trained by OpenKE. 
