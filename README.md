@@ -1,6 +1,6 @@
-# OpenKE (a sub-project of THU-OpenSKL)
+# OpenKE (sub-project of THU-OpenSKL)
 
-OpenKE is a sub-project of THU-OpenSKL, providing an Open-source toolkit for Knowledge Embedding implemented with PyTorch.
+OpenKE is a sub-project of THU-OpenSKL, providing an Open-source toolkit for Knowledge Embedding with <a href="https://ojs.aaai.org/index.php/AAAI/article/view/9491/9350"> TransR</a> and  <a href="https://aclanthology.org/D15-1082.pdf">PTransE</a> as key features to handle complex relations and relational paths.
 
 ## Overview
 
