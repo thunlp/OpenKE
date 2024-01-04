@@ -148,10 +148,10 @@ THU-OpenSKL project aims to harness the power of both structured knowledge and u
        - [TensorFlow-Transx](https://www.github.com/thunlp/TensorFlow-Transx)
        - [Fast-TransX](https://www.github.com/thunlp/Fast-TransX)
   - [OpenNRE](https://www.github.com/thunlp/OpenNRE)
-    - An effective and efficient toolkit for implementing neural networks for extracting structured knowledge from text, with [ATT](https://aclanthology.org/P16-1200.pdf) as key features to consider relation-aware text information.
+    - An effective and efficient toolkit for implementing neural networks for extracting structured knowledge from text, with [ATT](https://aclanthology.org/P16-1200.pdf) as key features to consider relation-associated text information.
     - This toolkit also includes two sub-toolkits:
-     - [JointNRE](https://www.github.com/thunlp/JointNRE)
-     - [NRE](https://github.com/thunlp/NRE)
+      - [JointNRE](https://www.github.com/thunlp/JointNRE)
+      - [NRE](https://github.com/thunlp/NRE)
   - [ERNIE](https://github.com/thunlp/ERNIE)
     - An effective and efficient toolkit for augmenting pre-trained language models with knowledge graph representations.
 - **Resource**:
