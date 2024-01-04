@@ -168,4 +168,4 @@ THU-OpenSKL project aims to harness the power of both structured knowledge and u
     - TransE version: Knowledge graph embeddings of XLORE pre-trained by OpenKE.
 - **Application**:   
     - [Knowledge-Plugin](https://github.com/THUNLP/Knowledge-Plugin)
-      - A framework that can enhance pre-trained language models by plugging knowledge graph representations without tuning the parameters of pre-trained language models. 
+      - An effective and efficient framework for plug-and-play knowledge injection for pre-trained language models. This framework is general for all kinds of knowledge base embeddings mentioned above. In the repository, we provide the example of plugging OpenKE-Wikidata embeddings into BERT.
