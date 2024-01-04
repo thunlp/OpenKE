@@ -153,19 +153,19 @@ THU-OpenSKL project aims to harness the power of both structured knowledge and u
      - [JointNRE](https://www.github.com/thunlp/JointNRE)
      - [NRE](https://github.com/thunlp/NRE)
   - [ERNIE](https://github.com/thunlp/ERNIE)
-    - An effective and efficient framework for augmenting pre-trained language models with knowledge graph representations.
+    - An effective and efficient toolkit for augmenting pre-trained language models with knowledge graph representations.
 - **Resource**:
-  - The embeddings of large-scale knowledge graphs pre-trained by OpenKE, covering three typical large-scale knowledge graphs: Wikidata, Freebase, and XLORE.
+  - The embeddings of large-scale knowledge graphs pre-trained by OpenKE, covering three typical large-scale knowledge graphs: Wikidata, Freebase, and XLORE. The embeddings are free to use under the [MIT license](https://opensource.org/license/mit/).
   - [OpenKE-Wikidata](http://139.129.163.161/download/wikidata)
-    - Wikidata is a free and collaborative database, collecting structured data to provide support for Wikipedia. 
+    - Wikidata is a free and collaborative database, collecting structured data to provide support for Wikipedia. Wikidata contains 20,982,733 entities, 594 relations and 68,904,773 triplets.
     - TransE version: Knowledge graph embeddings of Wikidata pre-trained by OpenKE. 
-    - [Plugin TransR version](https://thunlp.oss-cn-qingdao.aliyuncs.com/zzy/transr.npy): Knowledge graph embeddings of Wikidata pre-trained by OpenKE for the project [Knowledge-Plugin](https://github.com/THUNLP/Knowledge-Plugin).
+    - [Plugin version of TransR](https://thunlp.oss-cn-qingdao.aliyuncs.com/zzy/transr.npy): Knowledge graph embeddings of Wikidata pre-trained by OpenKE for the project [Knowledge-Plugin](https://github.com/THUNLP/Knowledge-Plugin).
   - [OpenKE-Freebase](http://139.129.163.161/download/wikidata)
-    - Freebase was a large collaborative knowledge base consisting of data composed mainly by its community members. It was an online collection of structured data harvested from many sources. 
+    - Freebase was a large collaborative knowledge base consisting of data composed mainly by its community members. It was an online collection of structured data harvested from many sources. Freebase contains 86,054,151 entities, 14,824 relations and 338,586,276 triplets.
     - TransE version: Knowledge graph embeddings of Freebase pre-trained by OpenKE. 
   - [OpenKE-XLORE](http://139.129.163.161/download/wikidata)
-    - XLORE is one of the most popular Chinese knowledge graphs developed by THUKEG.
+    - XLORE is one of the most popular Chinese knowledge graphs developed by THUKEG. XLORE contains 10,572,209 entities, 138,581 relations and 35,954,249 triplets.
     - TransE version: Knowledge graph embeddings of XLORE pre-trained by OpenKE.
 - **Application**:   
     - [Knowledge-Plugin](https://github.com/THUNLP/Knowledge-Plugin)
-      - An effective and efficient framework of plug-and-play knowledge injection for pre-trained language models. This framework is general for all kinds of knowledge graph embeddings mentioned above. In the framework repository, we provide the example of plugging OpenKE-Wikidata embeddings into BERT.
+      - An effective and efficient toolkit of plug-and-play knowledge injection for pre-trained language models. Knowledge-Plugin is general for all kinds of knowledge graph embeddings mentioned above. In the toolkit repository, we provide the example of plugging OpenKE-Wikidata embeddings into BERT.
