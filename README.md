@@ -159,7 +159,7 @@ THU-OpenSKL project aims to harness the power of both structured knowledge and u
   - [OpenKE-Wikidata](http://139.129.163.161/download/wikidata)
     - Wikidata is a free and collaborative database, collecting structured data to provide support for Wikipedia. 
     - TransE version: Knowledge graph embeddings of Wikidata pre-trained by OpenKE. 
-    - [Plugin TransR version](): Knowledge graph embeddings of Wikidata pre-trained by OpenKE for the project [Knowledge-Plugin](https://github.com/THUNLP/Knowledge-Plugin).
+    - [Plugin TransR version](https://thunlp.oss-cn-qingdao.aliyuncs.com/zzy/transr.npy): Knowledge graph embeddings of Wikidata pre-trained by OpenKE for the project [Knowledge-Plugin](https://github.com/THUNLP/Knowledge-Plugin).
   - [OpenKE-Freebase](http://139.129.163.161/download/wikidata)
     - Freebase was a large collaborative knowledge base consisting of data composed mainly by its community members. It was an online collection of structured data harvested from many sources. 
     - TransE version: Knowledge graph embeddings of Freebase pre-trained by OpenKE. 
