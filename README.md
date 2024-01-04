@@ -1,30 +1,10 @@
-# OpenKE, a subproject of THU-OpenSKL
+# OpenKE (a sub-project of THU-OpenSKL)
 
-This toolkit is a subproject of 
-
-
-
-An Open-source Framework for Knowledge Embedding implemented with PyTorch.
-
-More information is available on our website 
-[http://openke.thunlp.org/](http://openke.thunlp.org/)
-
-If you use the code, please cite the following [paper](http://aclweb.org/anthology/D18-2024):
-
-```
- @inproceedings{han2018openke,
-   title={OpenKE: An Open Toolkit for Knowledge Embedding},
-   author={Han, Xu and Cao, Shulin and Lv Xin and Lin, Yankai and Liu, Zhiyuan and Sun, Maosong and Li, Juanzi},
-   booktitle={Proceedings of EMNLP},
-   year={2018}
- }
-```
-
-This package is mainly contributed (in chronological order) by [Xu Han](https://github.com/THUCSTHanxu13), [Yankai Lin](https://github.com/Mrlyk423), [Ruobing Xie](http://nlp.csai.tsinghua.edu.cn/~xrb/), [Zhiyuan Liu](http://nlp.csai.tsinghua.edu.cn/~lzy/), [Xin Lv](https://github.com/davidlvxin), [Shulin Cao](https://github.com/ShulinCao), [Weize Chen](https://github.com/chenweize1998), [Jingqin Yang](https://github.com/yjqqqaq).
+OpenKE is a sub-project of THU-OpenSKL, providing an Open-source toolkit for Knowledge Embedding implemented with PyTorch.
 
 ## Overview
 
-This is an Efficient implementation based on PyTorch for knowledge representation learning (KRL). We use C++ to implement some underlying operations such as data preprocessing and negative sampling. For each specific model, it is implemented by PyTorch with Python interfaces so that there is a convenient platform to run models on GPUs. OpenKE composes 4 repositories:
+OpenKE is an efficient implementation based on PyTorch for knowledge representation learning (KRL). We use C++ to implement some underlying operations such as data preprocessing and negative sampling. For each specific model, it is implemented by PyTorch with Python interfaces so that there is a convenient platform to run models on GPUs. OpenKE composes 4 repositories:
 
 OpenKE-PyTorch: the project based on PyTorch, which provides the optimized and stable framework for knowledge graph embedding models.
 
@@ -34,6 +14,8 @@ OpenKE-PyTorch: the project based on PyTorch, which provides the optimized and s
 
 <a href="https://github.com/thunlp/Fast-TransX"> Fast-TransX</a>: efficient lightweight C++ inferences for TransE and its extended models utilizing the framework of OpenKE, including TransH, TransR, TransD, TranSparse and PTransE. 
 
+More information is available on our website 
+[http://openke.thunlp.org/](http://openke.thunlp.org/)
 
 *** **UPDATE** ***
 
@@ -138,27 +120,41 @@ python train_transe_FB15K237.py
 
 The document of the new version of OpenKE-PyTorch will come soon.
 
+
+If you use the code, please cite the following [paper](http://aclweb.org/anthology/D18-2024):
+
+```
+ @inproceedings{han2018openke,
+   title={OpenKE: An Open Toolkit for Knowledge Embedding},
+   author={Han, Xu and Cao, Shulin and Lv Xin and Lin, Yankai and Liu, Zhiyuan and Sun, Maosong and Li, Juanzi},
+   booktitle={Proceedings of EMNLP},
+   year={2018}
+ }
+```
+
+This package is mainly contributed (in chronological order) by [Xu Han](https://github.com/THUCSTHanxu13), [Yankai Lin](https://github.com/Mrlyk423), [Ruobing Xie](http://nlp.csai.tsinghua.edu.cn/~xrb/), [Zhiyuan Liu](http://nlp.csai.tsinghua.edu.cn/~lzy/), [Xin Lv](https://github.com/davidlvxin), [Shulin Cao](https://github.com/ShulinCao), [Weize Chen](https://github.com/chenweize1998), [Jingqin Yang](https://github.com/yjqqqaq).
+
 ******************
 ## THU_OpenSKL
-THU-OpenSKL, which aims to harness the power of both structured knowledge and unstructured languages via representation learning. All projects of THU-OpenSKL are as follows.
+THU-OpenSKL project aims to harness the power of both structured knowledge and unstructured languages via representation learning. All sub-projects of THU-OpenSKL are as follows.
 
 - **Algorithm**: 
   - [OpenNE](https://www.github.com/thunlp/OpenNE)
     - An effective and efficient toolkit for representing nodes and edges in large-scale graphs as embeddings.
   - [OpenKE](https://www.github.com/thunlp/OpenKE)
     - An effective and efficient toolkit for representing structured knowledge in large-scale knowledge graphs as embeddings.
-    - This toolkit also includes three sub-projects:
+    - This toolkit also includes three sub-toolkits:
        - [KB2E](https://www.github.com/thunlp/KB2E)
        - [TensorFlow-Transx](https://www.github.com/thunlp/TensorFlow-Transx)
        - [Fast-TransX](https://www.github.com/thunlp/Fast-TransX)
   - [OpenNRE](https://www.github.com/thunlp/OpenNRE)
     - An effective and efficient toolkit for implementing neural networks for extracting structured knowledge from text.
-    - This toolkit also includes two sub-projects:
+    - This toolkit also includes two sub-toolkits:
      - [JointNRE](https://www.github.com/thunlp/JointNRE)
      - [NRE](https://github.com/thunlp/NRE)
   - [ERNIE](https://github.com/thunlp/ERNIE)
     - An effective and efficient framework for augmenting pre-trained language models with knowledge graph representations.
-- **Resource**: Knowledge Embedding Bases
+- **Resource**:
   - The embeddings of large-scale knowledge graphs pre-trained by OpenKE, covering three typical large-scale knowledge graphs: Wikidata, Freebase, and XLORE.
   - [OpenKE-Wikidata](http://139.129.163.161/download/wikidata)
     - Wikidata is a free and collaborative database, collecting structured data to provide support for Wikipedia. 
@@ -170,6 +166,6 @@ THU-OpenSKL, which aims to harness the power of both structured knowledge and un
   - [OpenKE-XLORE](http://139.129.163.161/download/wikidata)
     - XLORE is one of the most popular Chinese knowledge graphs developed by THUKEG.
     - TransE version: Knowledge graph embeddings of XLORE pre-trained by OpenKE.
-- **Applications**:   
+- **Application**:   
     - [Knowledge-Plugin](https://github.com/THUNLP/Knowledge-Plugin)
       - A framework that can enhance pre-trained language models by plugging knowledge graph representations without tuning the parameters of pre-trained language models. 
