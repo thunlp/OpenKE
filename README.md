@@ -1,12 +1,12 @@
-# OpenKE (sub-project of THU-OpenSKL)
+# OpenKE (sub-project of OpenSKL)
 
-OpenKE is a sub-project of THU-OpenSKL, providing an Open-source toolkit for Knowledge Embedding with <a href="https://ojs.aaai.org/index.php/AAAI/article/view/9491/9350"> TransR</a> and  <a href="https://aclanthology.org/D15-1082.pdf">PTransE</a> as key features to handle complex relations and relational paths.
+OpenKE is a sub-project of OpenSKL, providing an **Open**-source **K**nowledge **E**mbedding toolkit for knowledge representation learning (KRL), with <a href="https://ojs.aaai.org/index.php/AAAI/article/view/9491/9350"> TransR</a> and  <a href="https://aclanthology.org/D15-1082.pdf">PTransE</a> as key features to handle complex relations and relational paths in large-scale knowledge graphs.
 
 ## Overview
 
-OpenKE is an efficient implementation based on PyTorch for knowledge representation learning (KRL). We use C++ to implement some underlying operations such as data preprocessing and negative sampling. For each specific model, it is implemented by PyTorch with Python interfaces so that there is a convenient platform to run models on GPUs. OpenKE composes 4 sub-toolkits:
+OpenKE is an efficient implementation based on PyTorch for knowledge embedding. We use C++ to implement some underlying operations such as data preprocessing and negative sampling. For each specific model, it is implemented by PyTorch with Python interfaces so that there is a convenient platform to run models on GPUs. OpenKE contains 4 repositories:
 
-OpenKE-PyTorch: the project based on PyTorch, which provides the optimized and stable framework for knowledge graph embedding models.
+[OpenKE-PyTorch](https://github.com/thunlp/OpenKE/tree/OpenKE-PyTorch): the repository based on PyTorch, which provides the optimized and stable framework for knowledge graph embedding models.
 
 <a href="https://github.com/thunlp/OpenKE/tree/OpenKE-Tensorflow1.0"> OpenKE-Tensorflow1.0</a>: OpenKE implemented with TensorFlow, also providing the optimized and stable framework for knowledge graph embedding models.
 
