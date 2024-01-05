@@ -156,7 +156,7 @@ OpenSKL project aims to harness the power of both structured knowledge and natur
   - OpenKE-Wikidata
     - Wikidata is a free and collaborative database, collecting structured data to provide support for Wikipedia. Wikidata contains 20,982,733 entities, 594 relations and 68,904,773 triplets.
     - TransE version: Knowledge graph embeddings of Wikidata pre-trained by OpenKE. 
-    - [Plugin version of TransR](https://thunlp.oss-cn-qingdao.aliyuncs.com/zzy/transr.npy): Knowledge graph embeddings of Wikidata pre-trained by OpenKE for the project [Knowledge-Plugin](https://github.com/THUNLP/Knowledge-Plugin).
+    - [TransR version](https://thunlp.oss-cn-qingdao.aliyuncs.com/zzy/transr.npy) of core Wikidata: Knowledge embeddings of a Wikidata subgraph pre-trained by OpenKE for the project [Knowledge-Plugin](https://github.com/THUNLP/Knowledge-Plugin). The subgraph contains 5,040,986 high-frequency entities from Wikidata with their corresponding 927 relations and 24,267,796 triples.
   - OpenKE-Freebase
     - Freebase was a large collaborative knowledge base consisting of data composed mainly by its community members. It was an online collection of structured data harvested from many sources. Freebase contains 86,054,151 entities, 14,824 relations and 338,586,276 triplets.
     - TransE version: Knowledge graph embeddings of Freebase pre-trained by OpenKE. 
