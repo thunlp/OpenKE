@@ -18,36 +18,48 @@ More information (especially the embedding databases of popular knowledge graphs
 [http://openke.thunlp.org/](http://openke.thunlp.org/)
 
 ## Models
-
-OpenKE (Tensorflow): 
-
-*	RESCAL, HolE
-*  DistMult, ComplEx, Analogy
-*  TransE, TransH, TransR, TransD
+Besides our proposed TransR, we also support the following typical knowledge embedding models.
 
 OpenKE (PyTorch): 
 
-*	RESCAL
+*	 RESCAL
 *  DistMult, ComplEx, Analogy
 *  TransE, TransH, TransR, TransD
 *  SimplE
-*	RotatE
+*	 RotatE
+
+OpenKE (Tensorflow): 
+
+*	 RESCAL, HolE
+*  DistMult, ComplEx, Analogy
+*  TransE, TransH, TransR, TransD
+
+TensorFlow-TransX (TensorFlow):
+
+*  TransE, TransH, TransR, TransD
+
+Fast-TransX (C++):
+
+*  TransH, TransR, TransD, TranSparse, PTransE
 
 We welcome any issues and requests for model implementation and bug fix.
 
-## Experimental Settings
+## Evaluation
 
+To validate the effectiveness of this toolkit, we employ the link prediction task on large-scale knowledge graphs for evaluation.
+
+### Settings
 For each test triplet, the head is removed and replaced by each of the entities from the entity set in turn. The scores of those corrupted triplets are first computed by the models and then sorted by the order. Then, we get the rank of the correct entity. This whole procedure is also repeated by removing those tail entities. We report the proportion of those correct entities ranked in the top 10/3/1 (Hits@10, Hits@3, Hits@1). The mean rank (MR) and mean reciprocal rank (MRR) of the test triplets under this setting are also reported.
 
-Because some corrupted triplets may be in the training set and validation set. In this case, those corrupted triplets may be ranked above the test triplet, but this should not be counted as an error because both triplets are true. Hence, we remove those corrupted triplets appearing in the training, validation or test set, which ensures the corrupted triplets are not in the dataset. We report the proportion of those correct entities ranked in the top 10/3/1 (Hits@10 (filter), Hits@3(filter), Hits@1(filter)) under this setting. The mean rank (MRR (filter)) and mean reciprocal rank (MRR (filter)) of the test triplets under this setting are also reported.
+Because some corrupted triplets may be in the training set and validation set. In this case, those corrupted triplets may be ranked above the test triplet, but this should not be counted as an error because both triplets are true. Hence, we remove those corrupted triplets appearing in the training, validation or test set, which ensures the corrupted triplets are not in the dataset. We report the proportion of those correct entities ranked in the top 10/3/1 (Hits@10 (filter), Hits@3(filter), Hits@1(filter)) under this setting. The mean rank (MR (filter)) and mean reciprocal rank (MRR (filter)) of the test triplets under this setting are also reported.
 
 More details of the above-mentioned settings can be found from the papers [TransE](http://papers.nips.cc/paper/5071-translating-embeddings-for-modeling-multi-relational-data.pdf), [ComplEx](http://proceedings.mlr.press/v48/trouillon16.pdf).
 
 For those large-scale entity sets, to corrupt all entities with the whole entity set is time-costing. Hence, we also provide the experimental setting named "[type constraint](https://www.dbs.ifi.lmu.de/~krompass/papers/TypeConstrainedRepresentationLearningInKnowledgeGraphs.pdf)" to corrupt entities with some limited entity sets determining by their relations.
 
-## Experiments
+### Results
 
-We have provided the hyper-parameters of some models to achieve the state-of-the-art performace (Hits@10 (filter)) on FB15K237 and WN18RR. These scripts can be founded in the folder "./examples/". Up to now, these models include TransE, TransH, TransR, TransD, DistMult, ComplEx. The results of these models are as follows,
+We have provided the hyper-parameters of some models to achieve the state-of-the-art performace (Hits@10 (filter)) on FB15K237 and WN18RR. These scripts can be founded in the folder "./examples/". The results of these models are as follows: the left two columns are the performance implemented by OpenKE, and the right two columns are the performance reported in the original papers.
 
 |Model			|	WN18RR	|	FB15K237	| WN18RR (Paper\*)| FB15K237  (Paper\*)|
 |:-:		|:-:	|:-:  |:-:  |:-:  |
@@ -153,4 +165,4 @@ OpenSKL project aims to harness the power of both structured knowledge and natur
     - TransE version: Knowledge graph embeddings of XLORE pre-trained by OpenKE.
 - **Application**:   
     - [Knowledge-Plugin](https://github.com/THUNLP/Knowledge-Plugin)
-      - An effective and efficient toolkit of plug-and-play knowledge injection for pre-trained language models. Knowledge-Plugin is general for all kinds of knowledge graph embeddings mentioned above. In the toolkit repository, we provide the example of plugging OpenKE-Wikidata embeddings into BERT.
+      - An effective and efficient toolkit of plug-and-play knowledge injection for pre-trained language models. Knowledge-Plugin is general for all kinds of knowledge graph embeddings mentioned above. In the toolkit, we provide the example of plugging OpenKE-Wikidata embeddings into BERT.
