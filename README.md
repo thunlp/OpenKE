@@ -14,20 +14,8 @@ OpenKE is an efficient implementation based on PyTorch for knowledge embedding. 
 
 <a href="https://github.com/thunlp/Fast-TransX"> Fast-TransX</a>: efficient lightweight C++ inferences for TransE and its extended models utilizing the framework of OpenKE, including TransH, TransR, TransD, TranSparse and PTransE. 
 
-More information is available on our website 
+More information (especially the embedding databases of popular knowledge graphs obtained by OpenKE and related documents) is available on our website 
 [http://openke.thunlp.org/](http://openke.thunlp.org/)
-
-*** **UPDATE** ***
-
-We are now developing a new version of OpenKE-PyTorch. The project has been completely reconstructed and is faster, more extendable and the codes are easier to read and use now. If you need get to the old version, please refer to branch [OpenKE-PyTorch(old)](https://github.com/thunlp/OpenKE/tree/OpenKE-PyTorch(old)).
-
-*** **New Features** ***
-
-- RotatE
-- More enhancing strategies (e.g., adversarial training)
-- More scripts of the typical models for the benchmark datasets.
-- More extendable interfaces
-
 
 ## Models
 
@@ -49,7 +37,7 @@ We welcome any issues and requests for model implementation and bug fix.
 
 ## Experimental Settings
 
-For each test triplet, the head is removed and replaced by each of the entities from the entity set in turn. The scores of those corrupted triplets are first computed by the models and then sorted by the order. Then, we get the rank of the correct entity. This whole procedure is also repeated by removing those tail entities. We report the proportion of those correct entities ranked in the top 10/3/1 (Hits@10, Hits@3, Hits@1). The mean rank (MRR) and mean reciprocal rank (MRR) of the test triplets under this setting are also reported.
+For each test triplet, the head is removed and replaced by each of the entities from the entity set in turn. The scores of those corrupted triplets are first computed by the models and then sorted by the order. Then, we get the rank of the correct entity. This whole procedure is also repeated by removing those tail entities. We report the proportion of those correct entities ranked in the top 10/3/1 (Hits@10, Hits@3, Hits@1). The mean rank (MR) and mean reciprocal rank (MRR) of the test triplets under this setting are also reported.
 
 Because some corrupted triplets may be in the training set and validation set. In this case, those corrupted triplets may be ranked above the test triplet, but this should not be counted as an error because both triplets are true. Hence, we remove those corrupted triplets appearing in the training, validation or test set, which ensures the corrupted triplets are not in the dataset. We report the proportion of those correct entities ranked in the top 10/3/1 (Hits@10 (filter), Hits@3(filter), Hits@1(filter)) under this setting. The mean rank (MRR (filter)) and mean reciprocal rank (MRR (filter)) of the test triplets under this setting are also reported.
 
@@ -116,10 +104,7 @@ python train_transe_FB15K237.py
 
   type_constrain.txt: type constraining file, the first line is the number of relations. Then the following lines are type constraints for each relation. For example, the relation with id 1200 has 4 types of head entities, which are 3123, 1034, 58 and 5733. The relation with id 1200 has 4 types of tail entities, which are 12123, 4388, 11087 and 11088. You can get this file through **n-n.py** in folder benchmarks/FB15K
   
-## To do
-
-The document of the new version of OpenKE-PyTorch will come soon.
-
+## Citation
 
 If you use the code, please cite the following [paper](http://aclweb.org/anthology/D18-2024):
 
@@ -135,25 +120,25 @@ If you use the code, please cite the following [paper](http://aclweb.org/antholo
 This package is mainly contributed (in chronological order) by [Xu Han](https://github.com/THUCSTHanxu13), [Yankai Lin](https://github.com/Mrlyk423), [Ruobing Xie](http://nlp.csai.tsinghua.edu.cn/~xrb/), [Zhiyuan Liu](http://nlp.csai.tsinghua.edu.cn/~lzy/), [Xin Lv](https://github.com/davidlvxin), [Shulin Cao](https://github.com/ShulinCao), [Weize Chen](https://github.com/chenweize1998), [Jingqin Yang](https://github.com/yjqqqaq).
 
 ******************
-## About THU_OpenSKL
-THU-OpenSKL project aims to harness the power of both structured knowledge and unstructured languages via representation learning. All sub-projects of THU-OpenSKL are as follows.
+## About OpenSKL
+OpenSKL project aims to harness the power of both structured knowledge and natural languages via representation learning. All sub-projects of OpenSKL, under the categories of **Algorithm**, **Resource** and **Application**, are as follows.
 
 - **Algorithm**: 
-  - [OpenNE](https://www.github.com/thunlp/OpenNE)
-    - An effective and efficient toolkit for representing nodes in large-scale graphs as embeddings, with [TADW](https://www.ijcai.org/Proceedings/15/Papers/299.pdf) as key features to incorporate text attributes of nodes.
   - [OpenKE](https://www.github.com/thunlp/OpenKE)
     - An effective and efficient toolkit for representing structured knowledge in large-scale knowledge graphs as embeddings, with <a href="https://ojs.aaai.org/index.php/AAAI/article/view/9491/9350"> TransR</a> and  <a href="https://aclanthology.org/D15-1082.pdf">PTransE</a> as key features to handle complex relations and relational paths.
-    - This toolkit also includes three sub-toolkits:
+    - This toolkit also includes three repositories:
        - [KB2E](https://www.github.com/thunlp/KB2E)
        - [TensorFlow-Transx](https://www.github.com/thunlp/TensorFlow-Transx)
        - [Fast-TransX](https://www.github.com/thunlp/Fast-TransX)
-  - [OpenNRE](https://www.github.com/thunlp/OpenNRE)
-    - An effective and efficient toolkit for implementing neural networks for extracting structured knowledge from text, with [ATT](https://aclanthology.org/P16-1200.pdf) as key features to consider relation-associated text information.
-    - This toolkit also includes two sub-toolkits:
-      - [JointNRE](https://www.github.com/thunlp/JointNRE)
-      - [NRE](https://github.com/thunlp/NRE)
   - [ERNIE](https://github.com/thunlp/ERNIE)
     - An effective and efficient toolkit for augmenting pre-trained language models with knowledge graph representations.
+  - [OpenNE](https://www.github.com/thunlp/OpenNE)
+    - An effective and efficient toolkit for representing nodes in large-scale graphs as embeddings, with [TADW](https://www.ijcai.org/Proceedings/15/Papers/299.pdf) as key features to incorporate text attributes of nodes.
+  - [OpenNRE](https://www.github.com/thunlp/OpenNRE)
+    - An effective and efficient toolkit for implementing neural networks for extracting structured knowledge from text, with [ATT](https://aclanthology.org/P16-1200.pdf) as key features to consider relation-associated text information.
+    - This toolkit also includes two repositories:
+      - [JointNRE](https://www.github.com/thunlp/JointNRE)
+      - [NRE](https://github.com/thunlp/NRE)
 - **Resource**:
   - The embeddings of large-scale knowledge graphs pre-trained by OpenKE, covering three typical large-scale knowledge graphs: Wikidata, Freebase, and XLORE. The embeddings are free to use under the [MIT license](https://opensource.org/license/mit/), and please click the following link to submit [download requests](http://139.129.163.161/download/wikidata).
   - OpenKE-Wikidata
