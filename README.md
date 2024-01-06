@@ -18,7 +18,7 @@ More information (especially the embedding databases of popular knowledge graphs
 [http://openke.thunlp.org/](http://openke.thunlp.org/)
 
 ## Models
-Besides our proposed TransR, we also support the following typical knowledge embedding models.
+Besides our proposed TransR and PTransE, we also support the following typical knowledge embedding models:
 
 OpenKE (PyTorch): 
 
@@ -40,7 +40,7 @@ TensorFlow-TransX (TensorFlow):
 
 Fast-TransX (C++):
 
-*  TransH, TransR, TransD, TranSparse, PTransE
+*  TransE, TransH, TransR, TransD, TranSparse, PTransE
 
 We welcome any issues and requests for model implementation and bug fix.
 
@@ -59,7 +59,7 @@ For those large-scale entity sets, to corrupt all entities with the whole entity
 
 ### Results
 
-We have provided the hyper-parameters of some models to achieve the state-of-the-art performace (Hits@10 (filter)) on FB15K237 and WN18RR. These scripts can be founded in the folder "./examples/". The results of these models are as follows: the left two columns are the performance implemented by OpenKE, and the right two columns are the performance reported in the original papers.
+We have provided the hyper-parameters of some models to achieve the state-of-the-art performace (Hits@10 (filter)) on FB15K237 and WN18RR. These scripts can be founded in the folder "./examples/". The results of these models are as follows: the left two columns are the performance implemented by OpenKE, and the right two columns are the performance reported in the original papers. Overall, OpenKE can achieve comparable performance with the results from the original papers.
 
 |Model			|	WN18RR	|	FB15K237	| WN18RR (Paper\*)| FB15K237  (Paper\*)|
 |:-:		|:-:	|:-:  |:-:  |:-:  |
@@ -72,10 +72,6 @@ We have provided the hyper-parameters of some models to achieve the state-of-the
 |ConvE		|0.506	|0.485|0.52|0.501|
 |RotatE	|0.549	|0.479|-|0.480|
 |RotatE (+adv)	|0.565	|0.522|0.571|0.533|
-
-
-<strong> We are still trying more hyper-parameters and more training strategies (e.g., adversarial training and label smoothing regularization) for these models. </strong> Hence, this table is still in change. We welcome everyone to help us update this table and hyper-parameters.
-
 
 ## Installation
 
@@ -114,7 +110,7 @@ python train_transe_FB15K237.py
 
   valid2id.txt: validating file, the first line is the number of triples for validating. Then the following lines are all in the format ***(e1, e2, rel)*** .
 
-  type_constrain.txt: type constraining file, the first line is the number of relations. Then the following lines are type constraints for each relation. For example, the relation with id 1200 has 4 types of head entities, which are 3123, 1034, 58 and 5733. The relation with id 1200 has 4 types of tail entities, which are 12123, 4388, 11087 and 11088. You can get this file through **n-n.py** in folder benchmarks/FB15K
+  type_constrain.txt: type constraining file, the first line is the number of relations. Then the following lines are type constraints for each relation. For example, the relation with id 1200 has 4 types of head entities, which are 3123, 1034, 58 and 5733. The relation with id 1200 has 4 types of tail entities, which are 12123, 4388, 11087 and 11088. You can get this file through **n-n.py** in folder benchmarks/FB15K .
   
 ## Citation
 
@@ -154,15 +150,15 @@ OpenSKL project aims to harness the power of both structured knowledge and natur
 - **Resource**:
   - The embeddings of large-scale knowledge graphs pre-trained by OpenKE, covering three typical large-scale knowledge graphs: Wikidata, Freebase, and XLORE. The embeddings are free to use under the [MIT license](https://opensource.org/license/mit/), and please click the following link to submit [download requests](http://139.129.163.161/download/wikidata).
   - OpenKE-Wikidata
-    - Wikidata is a free and collaborative database, collecting structured data to provide support for Wikipedia. Wikidata contains 20,982,733 entities, 594 relations and 68,904,773 triplets.
-    - TransE version: Knowledge graph embeddings of Wikidata pre-trained by OpenKE. 
-    - [TransR version](https://thunlp.oss-cn-qingdao.aliyuncs.com/zzy/transr.npy) of core Wikidata: Knowledge embeddings of a Wikidata subgraph pre-trained by OpenKE for the project [Knowledge-Plugin](https://github.com/THUNLP/Knowledge-Plugin). The subgraph contains 5,040,986 high-frequency entities from Wikidata with their corresponding 927 relations and 24,267,796 triples.
+    - Wikidata is a free and collaborative database, collecting structured data to provide support for Wikipedia. The original Wikidata contains 20,982,733 entities, 594 relations and 68,904,773 triplets. In particular, Wikidata-5M is the core subgraph of Wikidata, containing  5,040,986 high-frequency entities from Wikidata with their corresponding 927 relations and 24,267,796 triplets.
+    - TransE version: Knowledge embeddings of Wikidata pre-trained by OpenKE. 
+    - [TransR version](https://thunlp.oss-cn-qingdao.aliyuncs.com/zzy/transr.npy) of Wikidata-5M: Knowledge embeddings of Wikidata-5M pre-trained by OpenKE for the project [Knowledge-Plugin](https://github.com/THUNLP/Knowledge-Plugin).
   - OpenKE-Freebase
     - Freebase was a large collaborative knowledge base consisting of data composed mainly by its community members. It was an online collection of structured data harvested from many sources. Freebase contains 86,054,151 entities, 14,824 relations and 338,586,276 triplets.
-    - TransE version: Knowledge graph embeddings of Freebase pre-trained by OpenKE. 
+    - TransE version: Knowledge embeddings of Freebase pre-trained by OpenKE. 
   - OpenKE-XLORE
     - XLORE is one of the most popular Chinese knowledge graphs developed by THUKEG. XLORE contains 10,572,209 entities, 138,581 relations and 35,954,249 triplets.
-    - TransE version: Knowledge graph embeddings of XLORE pre-trained by OpenKE.
+    - TransE version: Knowledge embeddings of XLORE pre-trained by OpenKE.
 - **Application**:   
     - [Knowledge-Plugin](https://github.com/THUNLP/Knowledge-Plugin)
       - An effective and efficient toolkit of plug-and-play knowledge injection for pre-trained language models. Knowledge-Plugin is general for all kinds of knowledge graph embeddings mentioned above. In the toolkit, we provide the example of plugging OpenKE-Wikidata embeddings into BERT.
