@@ -73,26 +73,6 @@ We have provided the hyper-parameters of some models to achieve the state-of-the
 |RotatE	|0.549	|0.479|-|0.480|
 |RotatE (+adv)	|0.565	|0.522|0.571|0.533|
 
-## Installation
-
-1. Install [PyTorch](https://pytorch.org/get-started/locally/)
-
-2. Clone the OpenKE-PyTorch branch:
-```bash
-git clone -b OpenKE-PyTorch https://github.com/thunlp/OpenKE --depth 1
-cd OpenKE
-cd openke
-```
-3. Compile C++ files
-```bash
-bash make.sh
-```
-4. Quick Start
-```bash
-cd ../
-cp examples/train_transe_FB15K237.py ./
-python train_transe_FB15K237.py
-```
 ## Data
 
 * For training, datasets contain three files:
@@ -112,9 +92,30 @@ python train_transe_FB15K237.py
 
   type_constrain.txt: type constraining file, the first line is the number of relations. Then the following lines are type constraints for each relation. For example, the relation with id 1200 has 4 types of head entities, which are 3123, 1034, 58 and 5733. The relation with id 1200 has 4 types of tail entities, which are 12123, 4388, 11087 and 11088. You can get this file through **n-n.py** in folder benchmarks/FB15K .
   
+## Usage
+
+1. Install [PyTorch](https://pytorch.org/get-started/locally/)
+
+2. Clone the OpenKE-PyTorch branch:
+```bash
+git clone -b OpenKE-PyTorch https://github.com/thunlp/OpenKE --depth 1
+cd OpenKE
+cd openke
+```
+3. Compile C++ files
+```bash
+bash make.sh
+```
+4. Quick Start
+```bash
+cd ../
+cp examples/train_transe_FB15K237.py ./
+python train_transe_FB15K237.py
+```
+
 ## Citation
 
-If you use the code, please cite the following [paper](http://aclweb.org/anthology/D18-2024):
+If you find OpenKE is useful for your research, please consider citing the following papers:
 
 ```
  @inproceedings{han2018openke,
