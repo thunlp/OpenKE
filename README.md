@@ -59,7 +59,7 @@ For those large-scale entity sets, to corrupt all entities with the whole entity
 
 ### Results
 
-We have provided the hyper-parameters of some models to achieve the state-of-the-art performace (Hits@10 (filter)) on FB15K237 and WN18RR. These scripts can be founded in the folder "./examples/". The results of these models are as follows: the left two columns are the performance implemented by OpenKE, and the right two columns are the performance reported in the original papers. Overall, OpenKE can achieve comparable performance with the results from the original papers.
+We have provided the hyper-parameters of some models to achieve the state-of-the-art performace (Hits@10 (filter)) on FB15K237 and WN18RR. These scripts can be founded in the folder "./examples/". The results of these models are as follows: the left two columns are the performance implemented by OpenKE, and the right two columns are the performance reported in the original papers. Overall, OpenKE can reproduce the results in the original papers. RotatE has the best performance by representing knowledge in complex space. Our proposed TransR has the second best performance, and the real-valued representations learned by TransR can be more easily integrated with other neural network models.
 
 |Model			|	WN18RR	|	FB15K237	| WN18RR (Paper\*)| FB15K237  (Paper\*)|
 |:-:		|:-:	|:-:  |:-:  |:-:  |
@@ -152,7 +152,7 @@ OpenSKL project aims to harness the power of both structured knowledge and natur
   - OpenKE-Wikidata
     - Wikidata is a free and collaborative database, collecting structured data to provide support for Wikipedia. The original Wikidata contains 20,982,733 entities, 594 relations and 68,904,773 triplets. In particular, Wikidata-5M is the core subgraph of Wikidata, containing  5,040,986 high-frequency entities from Wikidata with their corresponding 927 relations and 24,267,796 triplets.
     - TransE version: Knowledge embeddings of Wikidata pre-trained by OpenKE. 
-    - [TransR version](https://thunlp.oss-cn-qingdao.aliyuncs.com/zzy/transr.npy) of Wikidata-5M: Knowledge embeddings of Wikidata-5M pre-trained by OpenKE for the project [Knowledge-Plugin](https://github.com/THUNLP/Knowledge-Plugin).
+    - [TransR version](https://thunlp.oss-cn-qingdao.aliyuncs.com/zzy/transr.npy) of Wikidata-5M: Knowledge embeddings of Wikidata-5M pre-trained by OpenKE.
   - OpenKE-Freebase
     - Freebase was a large collaborative knowledge base consisting of data composed mainly by its community members. It was an online collection of structured data harvested from many sources. Freebase contains 86,054,151 entities, 14,824 relations and 338,586,276 triplets.
     - TransE version: Knowledge embeddings of Freebase pre-trained by OpenKE. 
@@ -161,4 +161,4 @@ OpenSKL project aims to harness the power of both structured knowledge and natur
     - TransE version: Knowledge embeddings of XLORE pre-trained by OpenKE.
 - **Application**:   
     - [Knowledge-Plugin](https://github.com/THUNLP/Knowledge-Plugin)
-      - An effective and efficient toolkit of plug-and-play knowledge injection for pre-trained language models. Knowledge-Plugin is general for all kinds of knowledge graph embeddings mentioned above. In the toolkit, we provide the example of plugging OpenKE-Wikidata embeddings into BERT.
+      - An effective and efficient toolkit of plug-and-play knowledge injection for pre-trained language models. Knowledge-Plugin is general for all kinds of knowledge graph embeddings mentioned above. In the toolkit, we plug OpenKE-Wikidata embeddings into BERT as an example of applications.
