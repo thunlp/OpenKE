@@ -73,7 +73,7 @@ We have provided the hyper-parameters of some models to achieve the state-of-the
 |RotatE (2019)	|0.549	|0.479|-|0.480|
 |RotatE+adv (2019)	|0.565	|0.522|0.571|0.533|
 
-RotatE has the best performance by representing knowledge in complex space. Our proposed TransR has the second best performance, and the real-valued representations learned by TransR can be more easily integrated with other neural network models.
+RotatE has the best performance by representing knowledge in complex space. Our proposed TransR has the second best performance, and the real-valued representations learned by TransR can be more easily integrated with other neural network models, e.g. pre-trained language models. Please refer to our another toolkit [Knowledge-Plugin](https://github.com/THUNLP/Knowledge-Plugin) for such integration.
 
 ## Usage
 
@@ -165,4 +165,4 @@ OpenSKL project aims to harness the power of both structured knowledge and natur
     - TransE version: Knowledge embeddings of XLORE pre-trained by OpenKE.
 - **Application**:   
     - [Knowledge-Plugin](https://github.com/THUNLP/Knowledge-Plugin)
-      - An effective and efficient toolkit of plug-and-play knowledge injection for pre-trained language models. Knowledge-Plugin is general for all kinds of knowledge graph embeddings mentioned above. In the toolkit, we plug the TransR version of OpenKE-Wikidata into BERT as an example of applications. With the TransR embedding, we enhance the knowledge ability of BERT without fine-tuning the original model, e.g., up to 8% improvement on question answering.
+      - An effective and efficient toolkit of plug-and-play knowledge injection for pre-trained language models. Knowledge-Plugin is general for all kinds of knowledge graph embeddings mentioned above. In the toolkit, we plug the TransR version of Wikidata-5M into BERT as an example of applications. With the TransR embedding, we enhance the knowledge ability of BERT without fine-tuning the original model, e.g., up to 8% improvement on question answering.
