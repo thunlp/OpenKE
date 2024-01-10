@@ -52,6 +52,7 @@ class TrainDataLoader(object):
 			ctypes.c_int64,
 			ctypes.c_int64,
 			ctypes.c_int64,
+			ctypes.c_int64,
 			ctypes.c_int64
 		]
 		self.in_path = in_path
@@ -71,6 +72,7 @@ class TrainDataLoader(object):
 		self.negative_ent = neg_ent
 		self.negative_rel = neg_rel
 		self.sampling_mode = sampling_mode
+		self.domain_idx = domain_idx
 		self.cross_sampling_flag = 0
 		self.read()
 
@@ -115,6 +117,7 @@ class TrainDataLoader(object):
 			self.negative_ent,
 			self.negative_rel,
 			0,
+			self.domain_idx,
 			self.filter,
 			0,
 			0
@@ -137,6 +140,7 @@ class TrainDataLoader(object):
 			self.negative_ent,
 			self.negative_rel,
 			-1,
+			self.domain_idx,
 			self.filter,
 			0,
 			0
@@ -159,6 +163,7 @@ class TrainDataLoader(object):
 			self.negative_ent,
 			self.negative_rel,
 			1,
+			self.domain_idx,
 			self.filter,
 			0,
 			0
