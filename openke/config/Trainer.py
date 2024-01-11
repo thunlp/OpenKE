@@ -23,7 +23,9 @@ class Trainer(object):
 				 use_gpu = True,
 				 opt_method = "sgd",
 				 save_steps = None,
-				 checkpoint_dir = None):
+				 checkpoint_dir = None,
+				 mode="single"
+				 ):
 
 		self.work_threads = 8
 		self.train_times = train_times
@@ -39,6 +41,7 @@ class Trainer(object):
 		self.use_gpu = use_gpu
 		self.save_steps = save_steps
 		self.checkpoint_dir = checkpoint_dir
+		self.mode = mode
 
 	def train_one_step(self, data):
 		self.optimizer.zero_grad()

@@ -2,11 +2,12 @@ import torch
 import torch.autograd as autograd
 import torch.nn as nn
 from .Model import Model
+import torch.distributed as dist
 
-class RotatE(Model):
+class DistributedRotatE(Model):
 
-	def __init__(self, ent_tot, rel_tot, dim = 100, margin = 6.0, epsilon = 2.0):
-		super(RotatE, self).__init__(ent_tot, rel_tot)
+	def __init__(self, ent_tot, rel_tot, dim = 100, margin = 6.0, epsilon = 2.0, world_size=2):
+		super(DistributedRotatE, self).__init__(ent_tot, rel_tot)
 
 		self.margin = margin
 		self.epsilon = epsilon
@@ -14,11 +15,11 @@ class RotatE(Model):
 		self.dim_e = dim * 2
 		self.dim_r = dim
 
-		self.ent_embeddings = nn.Embedding(self.ent_tot, self.dim_e)
-		self.rel_embeddings = nn.Embedding(self.rel_tot, self.dim_r)
+		self.ent_embeddings = nn.Embedding(self.ent_tot, self.dim_e // world_size)
+		self.rel_embeddings = nn.Embedding(self.rel_tot, self.dim_r // world_size)
 
 		self.ent_embedding_range = nn.Parameter(
-			torch.Tensor([(self.margin + self.epsilon) / self.dim_e]), 
+			torch.Tensor([(self.margin + self.epsilon) / (self.dim_e // world_size)]), 
 			requires_grad=False
 		)
 
@@ -29,7 +30,7 @@ class RotatE(Model):
 		)
 
 		self.rel_embedding_range = nn.Parameter(
-			torch.Tensor([(self.margin + self.epsilon) / self.dim_r]), 
+			torch.Tensor([(self.margin + self.epsilon) / (self.dim_r // world_size)]), 
 			requires_grad=False
 		)
 
@@ -48,7 +49,7 @@ class RotatE(Model):
 		re_head, im_head = torch.chunk(h, 2, dim=-1)
 		re_tail, im_tail = torch.chunk(t, 2, dim=-1)
 
-		phase_relation = r / (self.rel_embedding_range.item() / pi)
+		phase_relation = r / (self.rel_embedding_range / pi)
 
 		re_relation = torch.cos(phase_relation)
 		im_relation = torch.sin(phase_relation)
@@ -73,6 +74,7 @@ class RotatE(Model):
 
 		score = torch.stack([re_score, im_score], dim = 0)
 		score = score.norm(dim = 0).sum(dim = -1)
+		dist.all_reduce(score, dist.ReduceOp.SUM,)
 		return score.permute(1, 0).flatten()
 
 	def forward(self, data):

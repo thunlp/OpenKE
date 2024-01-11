@@ -2,10 +2,12 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from .Model import Model
+import torch.distributed as dist
+
 
 class TransE(Model):
 
-	def __init__(self, ent_tot, rel_tot, dim = 100, p_norm = 1, norm_flag = True, margin = None, epsilon = None):
+	def __init__(self, ent_tot, rel_tot, dim = 100, p_norm = 1, norm_flag = True, margin = None, epsilon = None, world_size=2):
 		super(TransE, self).__init__(ent_tot, rel_tot)
 		
 		self.dim = dim
@@ -14,15 +16,16 @@ class TransE(Model):
 		self.norm_flag = norm_flag
 		self.p_norm = p_norm
 
-		self.ent_embeddings = nn.Embedding(self.ent_tot, self.dim)
-		self.rel_embeddings = nn.Embedding(self.rel_tot, self.dim)
 
+		self.ent_embeddings = nn.Embedding(self.ent_tot, self.dim // world_size)
+		self.rel_embeddings = nn.Embedding(self.rel_tot, self.dim // world_size)
 		if margin == None or epsilon == None:
 			nn.init.xavier_uniform_(self.ent_embeddings.weight.data)
 			nn.init.xavier_uniform_(self.rel_embeddings.weight.data)
 		else:
 			self.embedding_range = nn.Parameter(
-				torch.Tensor([(self.margin + self.epsilon) / self.dim]), requires_grad=False
+
+				torch.Tensor([(self.margin + self.epsilon) / self.dim//world_size]), requires_grad=False
 			)
 			nn.init.uniform_(
 				tensor = self.ent_embeddings.weight.data, 
@@ -45,9 +48,16 @@ class TransE(Model):
 
 	def _calc(self, h, t, r, mode):
 		if self.norm_flag:
+<<<<<<< HEAD
 			h = F.normalize(h, 2, -1)
 			r = F.normalize(r, 2, -1)
 			t = F.normalize(t, 2, -1)
+
+=======
+			h = F.normalize(h)
+			r = F.normalize(r)
+			t = F.normalize(t)
+>>>>>>> 642bba4563d441d11cefbbfb2dd94ef4deac2206
 		if mode != 'normal':
 			h = h.view(-1, r.shape[0], h.shape[-1])
 			t = t.view(-1, r.shape[0], t.shape[-1])
@@ -57,6 +67,8 @@ class TransE(Model):
 		else:
 			score = (h + r) - t
 		score = torch.norm(score, self.p_norm, -1).flatten()
+
+		dist.all_reduce(score, dist.ReduceOp.SUM,)
 		return score
 
 	def forward(self, data):
